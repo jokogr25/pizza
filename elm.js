@@ -5288,6 +5288,10 @@ var $author$project$Main$carouselItem = F2(
 					_List_Nil)
 				]));
 	});
+var $author$project$Main$carouselItems = _List_fromArray(
+	[
+		A2($author$project$Main$carouselItem, true, 'src/img/IMG_4365.jpeg')
+	]);
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$viewCarousel1 = A2(
 	$elm$html$Html$div,
@@ -5306,12 +5310,9 @@ var $author$project$Main$viewCarousel1 = A2(
 					$elm$html$Html$Attributes$class('carousel-inner'),
 					A2($elm$html$Html$Attributes$style, 'height', '100%')
 				]),
-			_List_fromArray(
-				[
-					A2($author$project$Main$carouselItem, true, 'src/img/IMG_4365.jpeg')
-				])),
-			A4($author$project$Main$carouselButton, 'prev', 'Previous', 'carousel-control-prev', 'carousel-control-prev-icon'),
-			A4($author$project$Main$carouselButton, 'next', 'Next', 'carousel-control-next', 'carousel-control-next-icon')
+			$author$project$Main$carouselItems),
+			($elm$core$List$length($author$project$Main$carouselItems) > 1) ? A4($author$project$Main$carouselButton, 'prev', 'Previous', 'carousel-control-prev', 'carousel-control-prev-icon') : $elm$html$Html$text(''),
+			($elm$core$List$length($author$project$Main$carouselItems) > 1) ? A4($author$project$Main$carouselButton, 'next', 'Next', 'carousel-control-next', 'carousel-control-next-icon') : $elm$html$Html$text('')
 		]));
 var $author$project$Main$view = function (_v0) {
 	return $author$project$Main$viewCarousel1;
