@@ -1,40 +1,107 @@
 module Main exposing (Msg(..), main, update, view)
 
 import Browser
-import Html exposing (Html, button, div, img, span, text)
+import Html exposing (Html, button, div, h1, img, span, text)
 import Html.Attributes exposing (alt, attribute, class, id, src, style, type_)
+import Html.Events exposing (onClick)
+
+
+
+-- MAIN
 
 
 main : Program () Model Msg
 main =
     Browser.sandbox
-        { init = Nille
+        { init = Front
         , update = update
         , view = view
         }
 
 
+
+-- MODEL
+
+
 type Model
-    = Nille
+    = Front
+    | Carousel
+
+
+
+-- MSG
 
 
 type Msg
-    = NoOp
+    = GoToCarousel
+    | NoOp
+
+
+
+-- UPDATE
 
 
 update : Msg -> Model -> Model
-update _ model =
-    model
+update msg model =
+    case msg of
+        GoToCarousel ->
+            Carousel
+
+        NoOp ->
+            model
+
+
+
+-- VIEW
 
 
 view : Model -> Html Msg
-view _ =
-    viewCarousel1
+view model =
+    case model of
+        Front ->
+            frontView
+
+        Carousel ->
+            viewCarousel1
+
+
+
+-- FRONT PAGE
+
+
+frontView : Html Msg
+frontView =
+    div
+        [ style "height" "100vh"
+        , style "display" "flex"
+        , style "flex-direction" "column"
+        , style "justify-content" "center"
+        , style "align-items" "center"
+        , style "text-align" "center"
+        , style "padding" "2rem"
+        ]
+        [ h1 []
+            [ text "don’t we all need someone who looks at us the way joscha looks at pizza?" ]
+        , button
+            [ onClick GoToCarousel
+            , style "margin-top" "2rem"
+            , class "btn btn-primary"
+            ]
+            [ text "Show me 🍕" ]
+        ]
+
+
+
+-- CAROUSEL (your existing code, mostly unchanged)
 
 
 carouselItems : List (Html msg)
 carouselItems =
-    [ carouselItem True "src/img/IMG_4365.jpeg" ]
+    [ carouselItem True "src/img/IMG_4365.jpeg"
+
+    -- , carouselItem False "src/img/IMG_4366.jpeg"
+    -- , carouselItem False "src/img/IMG_4367.jpeg"
+    ]
 
 
 viewCarousel1 : Html msg

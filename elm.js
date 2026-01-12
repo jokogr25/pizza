@@ -4378,7 +4378,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $author$project$Main$Nille = {$: 'Nille'};
+var $author$project$Main$Front = {$: 'Front'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5189,18 +5189,16 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
-	function (_v0, model) {
-		return model;
+	function (msg, model) {
+		if (msg.$ === 'GoToCarousel') {
+			return $author$project$Main$Carousel;
+		} else {
+			return model;
+		}
 	});
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $author$project$Main$GoToCarousel = {$: 'GoToCarousel'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5211,9 +5209,72 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$frontView = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+			A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
+			A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+			A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+			A2($elm$html$Html$Attributes$style, 'padding', '2rem')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h1,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('don’t we all need someone who looks at us the way joscha looks at pizza?')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick($author$project$Main$GoToCarousel),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+					$elm$html$Html$Attributes$class('btn btn-primary')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Show me 🍕')
+				]))
+		]));
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
@@ -5249,7 +5310,6 @@ var $author$project$Main$carouselButton = F4(
 				]));
 	});
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -5257,8 +5317,6 @@ var $elm$html$Html$Attributes$src = function (url) {
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$carouselItem = F2(
 	function (isActive, imageSrc) {
 		return A2(
@@ -5313,10 +5371,14 @@ var $author$project$Main$viewCarousel1 = A2(
 			($elm$core$List$length($author$project$Main$carouselItems) > 1) ? A4($author$project$Main$carouselButton, 'prev', 'Previous', 'carousel-control-prev', 'carousel-control-prev-icon') : $elm$html$Html$text(''),
 			($elm$core$List$length($author$project$Main$carouselItems) > 1) ? A4($author$project$Main$carouselButton, 'next', 'Next', 'carousel-control-next', 'carousel-control-next-icon') : $elm$html$Html$text('')
 		]));
-var $author$project$Main$view = function (_v0) {
-	return $author$project$Main$viewCarousel1;
+var $author$project$Main$view = function (model) {
+	if (model.$ === 'Front') {
+		return $author$project$Main$frontView;
+	} else {
+		return $author$project$Main$viewCarousel1;
+	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{init: $author$project$Main$Nille, update: $author$project$Main$update, view: $author$project$Main$view});
+	{init: $author$project$Main$Front, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
