@@ -5242,24 +5242,30 @@ var $author$project$Main$frontView = A2(
 			A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
 			A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
 			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-			A2($elm$html$Html$Attributes$style, 'padding', '2rem')
+			A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
 		]),
 	_List_fromArray(
 		[
 			A2(
 			$elm$html$Html$h1,
-			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('don’t we all need someone who looks at us the way joscha looks at pizza?')
+					$elm$html$Html$Attributes$class('fw-bold'),
+					A2($elm$html$Html$Attributes$style, 'font-size', 'clamp(1.8rem, 5vw, 3rem)'),
+					A2($elm$html$Html$Attributes$style, 'line-height', '1.2')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza?')
 				])),
 			A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
 					$elm$html$Html$Events$onClick($author$project$Main$GoToCarousel),
+					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-					$elm$html$Html$Attributes$class('btn btn-primary')
+					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
 				]),
 			_List_fromArray(
 				[
