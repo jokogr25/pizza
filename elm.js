@@ -5256,7 +5256,7 @@ var $author$project$Main$frontView = A2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza?')
+					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza')
 				])),
 			A2(
 			$elm$html$Html$button,
@@ -5269,7 +5269,7 @@ var $author$project$Main$frontView = A2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Show me 🍕')
+					$elm$html$Html$text('take a look 🍕')
 				]))
 		]));
 var $elm$virtual_dom$VirtualDom$attribute = F2(

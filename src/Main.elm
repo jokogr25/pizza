@@ -85,27 +85,20 @@ frontView =
             , style "font-size" "clamp(1.8rem, 5vw, 3rem)"
             , style "line-height" "1.2"
             ]
-            [ text "dont we all need someone who looks at us the way joscha looks at pizza?" ]
+            [ text "dont we all need someone who looks at us the way joscha looks at pizza" ]
         , button
             [ onClick GoToCarousel
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
             ]
-            [ text "Show me 🍕" ]
+            [ text "take a look 🍕" ]
         ]
-
-
-
--- CAROUSEL (your existing code, mostly unchanged)
 
 
 carouselItems : List (Html msg)
 carouselItems =
     [ carouselItem True "src/img/IMG_4365.jpeg"
-
-    -- , carouselItem False "src/img/IMG_4366.jpeg"
-    -- , carouselItem False "src/img/IMG_4367.jpeg"
     ]
 
 
