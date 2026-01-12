@@ -73,7 +73,6 @@ carouselItem isActive imageSrc =
                 "carousel-item"
             )
         , style "height" "100%"
-        , style "background-color" "#111"
         , style "display" "flex"
         , style "align-items" "center"
         , style "justify-content" "center"

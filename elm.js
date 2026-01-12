@@ -5268,7 +5268,6 @@ var $author$project$Main$carouselItem = F2(
 					$elm$html$Html$Attributes$class(
 					isActive ? 'carousel-item active' : 'carousel-item'),
 					A2($elm$html$Html$Attributes$style, 'height', '100%'),
-					A2($elm$html$Html$Attributes$style, 'background-color', '#111'),
 					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
 					A2($elm$html$Html$Attributes$style, 'justify-content', 'center')
