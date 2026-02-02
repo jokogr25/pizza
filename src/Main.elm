@@ -1,8 +1,8 @@
 module Main exposing (Msg(..), main, update, view)
 
 import Browser
-import Html exposing (Html, button, div, img, input, label, span, text)
-import Html.Attributes exposing (alt, attribute, class, for, id, placeholder, src, style, type_)
+import Html exposing (Html, button, div, img, input, label, pre, span, text)
+import Html.Attributes exposing (alt, attribute, class, disabled, for, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
 
 
@@ -26,7 +26,7 @@ main =
 type Model
     = Front
     | Carousel
-    | Calculator
+    | Calculator Int Float
 
 
 
@@ -36,6 +36,8 @@ type Model
 type Msg
     = GoCarousel
     | GoCalculator
+    | Next
+    | Prev
     | NoOp
 
 
@@ -50,7 +52,27 @@ update msg model =
             Carousel
 
         GoCalculator ->
-            Calculator
+            Calculator 0 1
+
+        Next ->
+            case model of
+                Calculator index ratio ->
+                    Calculator
+                        (index + 1)
+                        ratio
+
+                _ ->
+                    model
+
+        Prev ->
+            case model of
+                Calculator index ratio ->
+                    Calculator
+                        (max 0 (index - 1))
+                        ratio
+
+                _ ->
+                    model
 
         NoOp ->
             model
@@ -69,8 +91,8 @@ view model =
         Carousel ->
             viewCarousel1
 
-        Calculator ->
-            pizzaCalculatorView 1 "none"
+        Calculator stepIndex ratio ->
+            pizzaCalculatorView stepIndex ratio "none"
 
 
 
@@ -179,8 +201,8 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
-pizzaCalculatorView : Float -> String -> Html Msg
-pizzaCalculatorView ratio idToEdit =
+pizzaCalculatorView : Int -> Float -> String -> Html Msg
+pizzaCalculatorView stepIndex ratio idToEdit =
     div
         [ class "card"
         , style "max-width" "700px"
@@ -227,7 +249,7 @@ pizzaCalculatorView ratio idToEdit =
                 Teaspoon
                 (toFloat pizza.honey * ratio)
                 idToEdit
-            , pizzaPrepStepsView pizza.steps
+            , pizzaPrepStepsView stepIndex pizza.steps
             ]
         ]
 
@@ -246,14 +268,21 @@ ingredientView label id unit value idToEdit =
             , class "form-label mb-0"
             ]
             [ text label ]
-        , input
-            [ Html.Attributes.id id
-            , type_ "number"
-            , class "form-control"
-            , Html.Attributes.disabled (id /= idToEdit)
-            , placeholder (String.fromFloat value)
-            ]
-            []
+        , if id /= idToEdit then
+            Html.span
+                []
+                [ text (String.fromFloat value)
+                ]
+
+          else
+            input
+                [ Html.Attributes.id id
+                , type_ "number"
+                , class "form-control"
+                , Html.Attributes.disabled (id /= idToEdit)
+                , placeholder (String.fromFloat value)
+                ]
+                []
         , span
             [ class "text-muted" ]
             [ text (unitToAbbr unit) ]
@@ -266,15 +295,21 @@ ingredientView label id unit value idToEdit =
         ]
 
 
-pizzaPrepStepsView : List PrepStep -> Html Msg
-pizzaPrepStepsView prepSteps =
+pizzaPrepStepsView : Int -> List PrepStep -> Html Msg
+pizzaPrepStepsView index prepSteps =
     if List.length prepSteps == 0 then
         text "no steps :("
 
     else
         div
             []
-            (List.indexedMap pizzaPrepStepView prepSteps)
+            [ case List.head (List.drop index prepSteps) of
+                Just prepStep ->
+                    pizzaPrepStepView index prepStep
+
+                Nothing ->
+                    text "ERROR"
+            ]
 
 
 pizzaPrepStepView : Int -> PrepStep -> Html Msg
@@ -298,6 +333,28 @@ pizzaPrepStepView i prepStep =
         , div
             []
             [ text prepStep.description ]
+        , div
+            [ class "mb-3"
+            , style "display" "grid"
+            , style "grid-template-columns" "1fr 1fr"
+            , style "gap" "0.75rem"
+            ]
+            [ button
+                [ onClick Prev
+                , class "btn btn-primary btn-lg"
+                , style "margin-top" "2rem"
+                , style "padding" "0.75rem 2rem"
+                ]
+                [ text "<--" ]
+            , button
+                [ onClick Next
+                , disabled (i >= List.length pizza.steps - 1)
+                , class "btn btn-primary btn-lg"
+                , style "margin-top" "2rem"
+                , style "padding" "0.75rem 2rem"
+                ]
+                [ text "-->" ]
+            ]
         ]
 
 
@@ -307,17 +364,20 @@ type Unit
     | Teaspoon
 
 
-unitToString : Unit -> String
-unitToString unit =
-    case unit of
-        Gram ->
-            "grams"
 
-        Mililiter ->
-            "mililiters"
+{-
+   unitToString : Unit -> String
+   unitToString unit =
+       case unit of
+           Gram ->
+               "grams"
 
-        Teaspoon ->
-            "teaspoon"
+           Mililiter ->
+               "mililiters"
+
+           Teaspoon ->
+               "teaspoon"
+-}
 
 
 unitToAbbr : Unit -> String
@@ -352,7 +412,7 @@ pizza =
           , description = "Mix flour and roughly π/4 of water in a bowl, leave it."
           }
         , { time = 15
-          , title = "ALIVEN THE YEAST"
+          , title = "BRING THE YEAST TO LIFE"
           , description = "Mix rest of the water with yeast and honey, leave it."
           }
         , { time = 10

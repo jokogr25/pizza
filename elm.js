@@ -5189,7 +5189,10 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$Calculator = {$: 'Calculator'};
+var $author$project$Main$Calculator = F2(
+	function (a, b) {
+		return {$: 'Calculator', a: a, b: b};
+	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5197,7 +5200,26 @@ var $author$project$Main$update = F2(
 			case 'GoCarousel':
 				return $author$project$Main$Carousel;
 			case 'GoCalculator':
-				return $author$project$Main$Calculator;
+				return A2($author$project$Main$Calculator, 0, 1);
+			case 'Next':
+				if (model.$ === 'Calculator') {
+					var index = model.a;
+					var ratio = model.b;
+					return A2($author$project$Main$Calculator, index + 1, ratio);
+				} else {
+					return model;
+				}
+			case 'Prev':
+				if (model.$ === 'Calculator') {
+					var index = model.a;
+					var ratio = model.b;
+					return A2(
+						$author$project$Main$Calculator,
+						A2($elm$core$Basics$max, 0, index - 1),
+						ratio);
+				} else {
+					return model;
+				}
 			default:
 				return model;
 		}
@@ -5334,7 +5356,14 @@ var $author$project$Main$ingredientView = F5(
 						[
 							$elm$html$Html$text(label)
 						])),
-					A2(
+					(!_Utils_eq(id, idToEdit)) ? A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromFloat(value))
+						])) : A2(
 					$elm$html$Html$input,
 					_List_fromArray(
 						[
@@ -5385,7 +5414,7 @@ var $author$project$Main$pizza = {
 	steps: _List_fromArray(
 		[
 			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
-			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'ALIVEN THE YEAST'},
+			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
 			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands', time: 10, title: 'imx'},
 			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
 			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
@@ -5399,6 +5428,39 @@ var $author$project$Main$pizza = {
 	water: 313,
 	yeast: 3.4
 };
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$Next = {$: 'Next'};
+var $author$project$Main$Prev = {$: 'Prev'};
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$pizzaPrepStepView = F2(
 	function (i, prepStep) {
@@ -5432,17 +5494,72 @@ var $author$project$Main$pizzaPrepStepView = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(prepStep.description)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mb-3'),
+							A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+							A2($elm$html$Html$Attributes$style, 'grid-template-columns', '1fr 1fr'),
+							A2($elm$html$Html$Attributes$style, 'gap', '0.75rem')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick($author$project$Main$Prev),
+									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('<--')
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick($author$project$Main$Next),
+									$elm$html$Html$Attributes$disabled(
+									_Utils_cmp(
+										i,
+										$elm$core$List$length($author$project$Main$pizza.steps) - 1) > -1),
+									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('-->')
+								]))
 						]))
 				]));
 	});
-var $author$project$Main$pizzaPrepStepsView = function (prepSteps) {
-	return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		A2($elm$core$List$indexedMap, $author$project$Main$pizzaPrepStepView, prepSteps));
-};
-var $author$project$Main$pizzaCalculatorView = F2(
-	function (ratio, idToEdit) {
+var $author$project$Main$pizzaPrepStepsView = F2(
+	function (index, prepSteps) {
+		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					function () {
+					var _v0 = $elm$core$List$head(
+						A2($elm$core$List$drop, index, prepSteps));
+					if (_v0.$ === 'Just') {
+						var prepStep = _v0.a;
+						return A2($author$project$Main$pizzaPrepStepView, index, prepStep);
+					} else {
+						return $elm$html$Html$text('ERROR');
+					}
+				}()
+				]));
+	});
+var $author$project$Main$pizzaCalculatorView = F3(
+	function (stepIndex, ratio, idToEdit) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5477,7 +5594,7 @@ var $author$project$Main$pizzaCalculatorView = F2(
 							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, $author$project$Main$pizza.salt * ratio, idToEdit),
 							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, $author$project$Main$pizza.oliveoil * ratio, idToEdit),
 							A5($author$project$Main$ingredientView, 'Honey', 'honeyInput', $author$project$Main$Teaspoon, $author$project$Main$pizza.honey * ratio, idToEdit),
-							$author$project$Main$pizzaPrepStepsView($author$project$Main$pizza.steps)
+							A2($author$project$Main$pizzaPrepStepsView, stepIndex, $author$project$Main$pizza.steps)
 						]))
 				]));
 	});
@@ -5590,7 +5707,9 @@ var $author$project$Main$view = function (model) {
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
 		default:
-			return A2($author$project$Main$pizzaCalculatorView, 1, 'none');
+			var stepIndex = model.a;
+			var ratio = model.b;
+			return A3($author$project$Main$pizzaCalculatorView, stepIndex, ratio, 'none');
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
