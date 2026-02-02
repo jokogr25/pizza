@@ -5423,7 +5423,7 @@ var $author$project$Main$pizza = {
 			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
 			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
 			{description: 'You need an instruction for that too?', time: 0, title: 'Enjoy'},
-			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play games, talk, laugh - live.', time: -1, title: 'I knew it'}
+			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved .', time: -1, title: 'I knew it'}
 		]),
 	water: 313,
 	yeast: 3.4

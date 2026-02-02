@@ -449,7 +449,7 @@ pizza =
           }
         , { time = -1
           , title = "I knew it"
-          , description = "Call some friends, your parents, grandma and get together at your table. Eat, play games, talk, laugh - live."
+          , description = "Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ."
           }
         ]
     }
