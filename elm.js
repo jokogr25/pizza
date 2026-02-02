@@ -5210,7 +5210,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5247,18 +5246,6 @@ var $author$project$Main$frontView = A2(
 	_List_fromArray(
 		[
 			A2(
-			$elm$html$Html$h1,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('fw-bold'),
-					A2($elm$html$Html$Attributes$style, 'font-size', 'clamp(1.8rem, 5vw, 3rem)'),
-					A2($elm$html$Html$Attributes$style, 'line-height', '1.2')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza')
-				])),
-			A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
@@ -5269,7 +5256,7 @@ var $author$project$Main$frontView = A2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('take a look 🍕')
+					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza 🍕')
 				]))
 		]));
 var $elm$virtual_dom$VirtualDom$attribute = F2(

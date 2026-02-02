@@ -80,19 +80,13 @@ frontView =
         , style "text-align" "center"
         , style "padding" "1.5rem"
         ]
-        [ h1
-            [ class "fw-bold"
-            , style "font-size" "clamp(1.8rem, 5vw, 3rem)"
-            , style "line-height" "1.2"
-            ]
-            [ text "dont we all need someone who looks at us the way joscha looks at pizza" ]
-        , button
+        [ button
             [ onClick GoToCarousel
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
             ]
-            [ text "take a look 🍕" ]
+            [ text "dont we all need someone who looks at us the way joscha looks at pizza 🍕" ]
         ]
 
 
