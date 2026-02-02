@@ -373,7 +373,7 @@ pizza =
           }
         , { time = 5
           , title = "Don't we all need a little stretch when we're older?"
-          , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inner circles and thick on the edge"
+          , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge"
           }
         , { time = 5
           , title = "What belongs together, will be together in the end"
