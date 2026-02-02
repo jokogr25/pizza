@@ -5423,8 +5423,8 @@ var $author$project$Main$pizzaPrepStepView = F2(
 					_List_Nil,
 					_List_fromArray(
 						[
-							_Utils_eq(prepStep.time, -1) ? $elm$html$Html$text('∞') : $elm$html$Html$text(
-							$elm$core$String$fromInt(prepStep.time) + ' mins')
+							_Utils_eq(prepStep.time, -1) ? $elm$html$Html$text('∞') : ((!prepStep.time) ? $elm$html$Html$text('') : $elm$html$Html$text(
+							$elm$core$String$fromInt(prepStep.time) + ' mins'))
 						])),
 					A2(
 					$elm$html$Html$div,

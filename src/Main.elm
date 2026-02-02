@@ -289,6 +289,9 @@ pizzaPrepStepView i prepStep =
             [ if prepStep.time == -1 then
                 text "∞"
 
+              else if prepStep.time == 0 then
+                text ""
+
               else
                 text (String.fromInt prepStep.time ++ " mins")
             ]
