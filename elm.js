@@ -5189,15 +5189,20 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $author$project$Main$Calculator = {$: 'Calculator'};
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'GoToCarousel') {
-			return $author$project$Main$Carousel;
-		} else {
-			return model;
+		switch (msg.$) {
+			case 'GoToCarousel':
+				return $author$project$Main$Carousel;
+			case 'GoCalculator':
+				return $author$project$Main$Calculator;
+			default:
+				return model;
 		}
 	});
+var $author$project$Main$GoCalculator = {$: 'GoCalculator'};
 var $author$project$Main$GoToCarousel = {$: 'GoToCarousel'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5257,8 +5262,148 @@ var $author$project$Main$frontView = A2(
 			_List_fromArray(
 				[
 					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza 🍕')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick($author$project$Main$GoCalculator),
+					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Pizza calculator')
 				]))
 		]));
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$unitToAbbr = function (unit) {
+	if (unit.$ === 'Gram') {
+		return 'g';
+	} else {
+		return 'ml';
+	}
+};
+var $author$project$Main$ingredientView = F5(
+	function (label, id, unit, value, idToEdit) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('mb-3'),
+					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr auto'),
+					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$label,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$for(id),
+							$elm$html$Html$Attributes$class('form-label mb-0')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(label)
+						])),
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$id(id),
+							$elm$html$Html$Attributes$type_('number'),
+							$elm$html$Html$Attributes$class('form-control'),
+							$elm$html$Html$Attributes$disabled(
+							!_Utils_eq(id, idToEdit)),
+							$elm$html$Html$Attributes$placeholder(
+							$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit)))
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('button'),
+							$elm$html$Html$Attributes$class('btn btn-outline-primary')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Edit')
+						]))
+				]));
+	});
+var $author$project$Main$pizza = {flour: 496, name: '7 hours pizza dough', oliveoil: 12, salt: 15, steps: _List_Nil, water: 313, yeast: 3.4};
+var $author$project$Main$pizzaPrepStepView = function (prepStep) {
+	return $elm$html$Html$text(prepStep.title);
+};
+var $author$project$Main$pizzaPrepStepsView = function (prepSteps) {
+	return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		A2($elm$core$List$map, $author$project$Main$pizzaPrepStepView, prepSteps));
+};
+var $author$project$Main$pizzaCalculatorView = F2(
+	function (ratio, idToEdit) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('card'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px'),
+					A2($elm$html$Html$Attributes$style, 'margin', '1em auto')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('card-body')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h5,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('card-title')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text($author$project$Main$pizza.name)
+								])),
+							A5($author$project$Main$ingredientView, 'Flour', 'flourInput', $author$project$Main$Gram, $author$project$Main$pizza.flour * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Water', 'waterInput', $author$project$Main$Gram, $author$project$Main$pizza.water * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Yeast', 'yeastInput', $author$project$Main$Gram, $author$project$Main$pizza.yeast * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, $author$project$Main$pizza.salt * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, $author$project$Main$pizza.oliveoil * ratio, idToEdit),
+							$author$project$Main$pizzaPrepStepsView($author$project$Main$pizza.steps)
+						]))
+				]));
+	});
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -5268,7 +5413,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(
@@ -5342,7 +5486,6 @@ var $author$project$Main$carouselItems = _List_fromArray(
 	[
 		A2($author$project$Main$carouselItem, true, 'src/img/IMG_4365.jpeg')
 	]);
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$viewCarousel1 = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -5365,10 +5508,13 @@ var $author$project$Main$viewCarousel1 = A2(
 			($elm$core$List$length($author$project$Main$carouselItems) > 1) ? A4($author$project$Main$carouselButton, 'next', 'Next', 'carousel-control-next', 'carousel-control-next-icon') : $elm$html$Html$text('')
 		]));
 var $author$project$Main$view = function (model) {
-	if (model.$ === 'Front') {
-		return $author$project$Main$frontView;
-	} else {
-		return $author$project$Main$viewCarousel1;
+	switch (model.$) {
+		case 'Front':
+			return $author$project$Main$frontView;
+		case 'Carousel':
+			return $author$project$Main$viewCarousel1;
+		default:
+			return A2($author$project$Main$pizzaCalculatorView, 1, 'none');
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
