@@ -5194,7 +5194,7 @@ var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'GoToCarousel':
+			case 'GoCarousel':
 				return $author$project$Main$Carousel;
 			case 'GoCalculator':
 				return $author$project$Main$Calculator;
@@ -5203,7 +5203,7 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Main$GoCalculator = {$: 'GoCalculator'};
-var $author$project$Main$GoToCarousel = {$: 'GoToCarousel'};
+var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5254,7 +5254,7 @@ var $author$project$Main$frontView = A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
-					$elm$html$Html$Events$onClick($author$project$Main$GoToCarousel),
+					$elm$html$Html$Events$onClick($author$project$Main$GoCarousel),
 					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5274,12 +5274,13 @@ var $author$project$Main$frontView = A2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Pizza calculator')
+					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
 var $author$project$Main$Gram = {$: 'Gram'};
 var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5299,10 +5300,13 @@ var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProp
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
-	if (unit.$ === 'Gram') {
-		return 'g';
-	} else {
-		return 'ml';
+	switch (unit.$) {
+		case 'Gram':
+			return 'g';
+		case 'Mililiter':
+			return 'ml';
+		default:
+			return 'tsp';
 	}
 };
 var $author$project$Main$ingredientView = F5(
@@ -5359,7 +5363,9 @@ var $author$project$Main$ingredientView = F5(
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$type_('button'),
-							$elm$html$Html$Attributes$class('btn btn-outline-primary')
+							$elm$html$Html$Attributes$class('btn btn-outline-primary'),
+							$elm$html$Html$Attributes$disabled(
+							!_Utils_eq(id, idToEdit))
 						]),
 					_List_fromArray(
 						[
@@ -5367,15 +5373,73 @@ var $author$project$Main$ingredientView = F5(
 						]))
 				]));
 	});
-var $author$project$Main$pizza = {flour: 496, name: '7 hours pizza dough', oliveoil: 12, salt: 15, steps: _List_Nil, water: 313, yeast: 3.4};
-var $author$project$Main$pizzaPrepStepView = function (prepStep) {
-	return $elm$html$Html$text(prepStep.title);
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
+var $author$project$Main$pizza = {
+	flour: 496,
+	honey: 1,
+	name: '7 hours pizza dough',
+	oliveoil: 12,
+	salt: 15,
+	steps: _List_fromArray(
+		[
+			{description: 'Mix flour and roughly 3.14/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
+			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'ALIVEN THE YEAST'},
+			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands', time: 10, title: 'imx'},
+			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
+			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
+			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
+			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inner circles and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
+			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
+			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
+			{description: 'You need an instruction for that too?', time: 0, title: 'Enjoy'},
+			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play games, talk, laugh - live.', time: -1, title: 'I knew it'}
+		]),
+	water: 313,
+	yeast: 3.4
+};
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $author$project$Main$pizzaPrepStepView = F2(
+	function (i, prepStep) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(i + 1) + ('. ' + prepStep.title))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							_Utils_eq(prepStep.time, -1) ? $elm$html$Html$text('∞') : $elm$html$Html$text(
+							$elm$core$String$fromInt(prepStep.time) + ' mins')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(prepStep.description)
+						]))
+				]));
+	});
 var $author$project$Main$pizzaPrepStepsView = function (prepSteps) {
 	return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
 		$elm$html$Html$div,
 		_List_Nil,
-		A2($elm$core$List$map, $author$project$Main$pizzaPrepStepView, prepSteps));
+		A2($elm$core$List$indexedMap, $author$project$Main$pizzaPrepStepView, prepSteps));
 };
 var $author$project$Main$pizzaCalculatorView = F2(
 	function (ratio, idToEdit) {
@@ -5398,7 +5462,7 @@ var $author$project$Main$pizzaCalculatorView = F2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$h5,
+							$elm$html$Html$h2,
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('card-title')
@@ -5412,6 +5476,7 @@ var $author$project$Main$pizzaCalculatorView = F2(
 							A5($author$project$Main$ingredientView, 'Yeast', 'yeastInput', $author$project$Main$Gram, $author$project$Main$pizza.yeast * ratio, idToEdit),
 							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, $author$project$Main$pizza.salt * ratio, idToEdit),
 							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, $author$project$Main$pizza.oliveoil * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Honey', 'honeyInput', $author$project$Main$Teaspoon, $author$project$Main$pizza.honey * ratio, idToEdit),
 							$author$project$Main$pizzaPrepStepsView($author$project$Main$pizza.steps)
 						]))
 				]));

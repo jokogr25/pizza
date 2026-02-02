@@ -1,8 +1,8 @@
 module Main exposing (Msg(..), main, update, view)
 
 import Browser
-import Html exposing (Html, button, div, form, img, input, label, span, text)
-import Html.Attributes exposing (alt, attribute, class, for, id, placeholder, src, step, style, type_)
+import Html exposing (Html, button, div, img, input, label, span, text)
+import Html.Attributes exposing (alt, attribute, class, for, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
 
 
@@ -34,7 +34,7 @@ type Model
 
 
 type Msg
-    = GoToCarousel
+    = GoCarousel
     | GoCalculator
     | NoOp
 
@@ -46,7 +46,7 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        GoToCarousel ->
+        GoCarousel ->
             Carousel
 
         GoCalculator ->
@@ -89,7 +89,7 @@ frontView =
         , style "padding" "1.5rem"
         ]
         [ button
-            [ onClick GoToCarousel
+            [ onClick GoCarousel
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
@@ -101,7 +101,7 @@ frontView =
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
             ]
-            [ text "Pizza calculator" ]
+            [ text "🍕 🧮" ]
         ]
 
 
@@ -189,7 +189,7 @@ pizzaCalculatorView ratio idToEdit =
         [ div
             [ class "card-body"
             ]
-            [ Html.h5
+            [ Html.h2
                 [ class "card-title" ]
                 [ text pizza.name ]
             , ingredientView
@@ -220,6 +220,12 @@ pizzaCalculatorView ratio idToEdit =
                 "oliveoilInput"
                 Mililiter
                 (pizza.oliveoil * ratio)
+                idToEdit
+            , ingredientView
+                "Honey"
+                "honeyInput"
+                Teaspoon
+                (toFloat pizza.honey * ratio)
                 idToEdit
             , pizzaPrepStepsView pizza.steps
             ]
@@ -254,6 +260,7 @@ ingredientView label id unit value idToEdit =
         , button
             [ type_ "button"
             , class "btn btn-outline-primary"
+            , Html.Attributes.disabled (id /= idToEdit)
             ]
             [ text "✎" ]
         ]
@@ -267,17 +274,34 @@ pizzaPrepStepsView prepSteps =
     else
         div
             []
-            (List.map pizzaPrepStepView prepSteps)
+            (List.indexedMap pizzaPrepStepView prepSteps)
 
 
-pizzaPrepStepView : PrepStep -> Html Msg
-pizzaPrepStepView prepStep =
-    text prepStep.title
+pizzaPrepStepView : Int -> PrepStep -> Html Msg
+pizzaPrepStepView i prepStep =
+    div
+        [ Html.Attributes.style "margin-top" "1rem" ]
+        [ Html.h3
+            []
+            [ text (String.fromInt (i + 1) ++ ". " ++ prepStep.title) ]
+        , div
+            []
+            [ if prepStep.time == -1 then
+                text "∞"
+
+              else
+                text (String.fromInt prepStep.time ++ " mins")
+            ]
+        , div
+            []
+            [ text prepStep.description ]
+        ]
 
 
 type Unit
     = Gram
     | Mililiter
+    | Teaspoon
 
 
 unitToString : Unit -> String
@@ -289,6 +313,9 @@ unitToString unit =
         Mililiter ->
             "mililiters"
 
+        Teaspoon ->
+            "teaspoon"
+
 
 unitToAbbr : Unit -> String
 unitToAbbr unit =
@@ -298,6 +325,9 @@ unitToAbbr unit =
 
         Mililiter ->
             "ml"
+
+        Teaspoon ->
+            "tsp"
 
 
 
@@ -311,8 +341,54 @@ pizza =
     , water = 313
     , yeast = 3.4
     , oliveoil = 12
+    , honey = 1
     , salt = 15
-    , steps = []
+    , steps =
+        [ { time = 15
+          , title = "Pre mix"
+          , description = "Mix flour and roughly 3.14/4 of water in a bowl, leave it."
+          }
+        , { time = 15
+          , title = "ALIVEN THE YEAST"
+          , description = "Mix rest of the water with yeast and honey, leave it."
+          }
+        , { time = 10
+          , title = "imx"
+          , description = "Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands"
+          }
+        , { time = 7 * 60
+          , title = "slumber time"
+          , description = "Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo"
+          }
+        , { time = 5
+          , title = "Roll it, baby"
+          , description = "Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball."
+          }
+        , { time = 60
+          , title = "stueckgare"
+          , description = "After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box."
+          }
+        , { time = 5
+          , title = "Don't we all need a little stretch when we're older?"
+          , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inner circles and thick on the edge"
+          }
+        , { time = 5
+          , title = "What belongs together, will be together in the end"
+          , description = "Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It's BLASFEMIA. Do it and I'll call the cops"
+          }
+        , { time = 0
+          , title = "Ich bin nicht sauer, ich bin enttäuscht"
+          , description = "You did it, right? That's okay. Pizza is for everyone, even taste-impaired germans."
+          }
+        , { time = 0
+          , title = "Enjoy"
+          , description = "You need an instruction for that too?"
+          }
+        , { time = -1
+          , title = "I knew it"
+          , description = "Call some friends, your parents, grandma and get together at your table. Eat, play games, talk, laugh - live."
+          }
+        ]
     }
 
 
@@ -325,6 +401,7 @@ type alias Pizza =
     , flour : Float
     , water : Float
     , yeast : Float
+    , honey : Int
     , oliveoil : Float
     , salt : Float
     , steps : List PrepStep
