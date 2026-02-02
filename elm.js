@@ -5296,6 +5296,7 @@ var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
 	if (unit.$ === 'Gram') {
@@ -5312,7 +5313,7 @@ var $author$project$Main$ingredientView = F5(
 				[
 					$elm$html$Html$Attributes$class('mb-3'),
 					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr auto'),
+					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 0.4fr minmax(50px, 120px) auto'),
 					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
 				]),
@@ -5339,9 +5340,20 @@ var $author$project$Main$ingredientView = F5(
 							$elm$html$Html$Attributes$disabled(
 							!_Utils_eq(id, idToEdit)),
 							$elm$html$Html$Attributes$placeholder(
-							$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit)))
+							$elm$core$String$fromFloat(value))
 						]),
 					_List_Nil),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('text-muted')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$author$project$Main$unitToAbbr(unit))
+						])),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -5351,7 +5363,7 @@ var $author$project$Main$ingredientView = F5(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Edit')
+							$elm$html$Html$text('✎')
 						]))
 				]));
 	});
@@ -5412,7 +5424,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(

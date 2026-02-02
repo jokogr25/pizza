@@ -231,7 +231,7 @@ ingredientView label id unit value idToEdit =
     div
         [ class "mb-3"
         , style "display" "grid"
-        , style "grid-template-columns" "minmax(120px, 1fr) 1fr auto"
+        , style "grid-template-columns" "minmax(120px, 1fr) 0.4fr minmax(50px, 120px) auto"
         , style "gap" "0.75rem"
         , style "align-items" "center"
         ]
@@ -245,15 +245,17 @@ ingredientView label id unit value idToEdit =
             , type_ "number"
             , class "form-control"
             , Html.Attributes.disabled (id /= idToEdit)
-            , placeholder
-                (String.fromFloat value ++ " " ++ unitToAbbr unit)
+            , placeholder (String.fromFloat value)
             ]
             []
+        , span
+            [ class "text-muted" ]
+            [ text (unitToAbbr unit) ]
         , button
             [ type_ "button"
             , class "btn btn-outline-primary"
             ]
-            [ text "Edit" ]
+            [ text "✎" ]
         ]
 
 
