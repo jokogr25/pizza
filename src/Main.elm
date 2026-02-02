@@ -346,7 +346,7 @@ pizza =
     , steps =
         [ { time = 15
           , title = "Pre mix"
-          , description = "Mix flour and roughly 3.14/4 of water in a bowl, leave it."
+          , description = "Mix flour and roughly π/4 of water in a bowl, leave it."
           }
         , { time = 15
           , title = "ALIVEN THE YEAST"
