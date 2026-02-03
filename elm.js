@@ -5460,6 +5460,11 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
+var $author$project$ListHelper$get = F2(
+	function (index, list) {
+		return $elm$core$List$head(
+			A2($elm$core$List$drop, index, list));
+	});
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$core$Basics$ge = _Utils_ge;
@@ -5549,8 +5554,7 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 			_List_fromArray(
 				[
 					function () {
-					var _v0 = $elm$core$List$head(
-						A2($elm$core$List$drop, index, prepSteps));
+					var _v0 = A2($author$project$ListHelper$get, index, prepSteps);
 					if (_v0.$ === 'Just') {
 						var prepStep = _v0.a;
 						return A2($author$project$Main$pizzaPrepStepView, index, prepStep);
