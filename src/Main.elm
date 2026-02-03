@@ -432,6 +432,10 @@ pizza =
           , description = "After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box."
           }
         , { time = 5
+          , title = "MAX POWER"
+          , description = "Pre-heat oven to max"
+          }
+        , { time = 5
           , title = "Don't we all need a little stretch when we're older?"
           , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge"
           }
@@ -442,6 +446,10 @@ pizza =
         , { time = 0
           , title = "Ich bin nicht sauer, ich bin enttäuscht"
           , description = "You did it, right? That's okay. Pizza is for everyone, even taste-impaired germans."
+          }
+        , { time = 0
+          , title = "CIIIIIIRCLEE OF LIIIIFEE"
+          , description = "Put pizza in oven until cheese starts bubbling and the circle of life gets a little color"
           }
         , { time = 0
           , title = "Enjoy"

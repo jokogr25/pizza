@@ -5419,9 +5419,11 @@ var $author$project$Main$pizza = {
 			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
 			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
 			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
+			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
 			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
 			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
 			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
+			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
 			{description: 'You need an instruction for that too?', time: 0, title: 'Enjoy'},
 			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved .', time: -1, title: 'I knew it'}
 		]),
