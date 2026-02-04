@@ -484,7 +484,7 @@ pizza =
           }
         , { time = 0
           , title = "Enjoy"
-          , description = "You need an instruction for that too?"
+          , description = "You need instructions for that too?"
           }
         , { time = -1
           , title = "I knew it"
