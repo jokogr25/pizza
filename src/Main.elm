@@ -352,6 +352,10 @@ pizzaPrepStepsView indexToDisplay prepSteps =
             ]
 
 
+
+{- All elements are rendered but displayed conditionally by visibility. By this the layout is fixed on the start and does not crash -}
+
+
 pizzaPrepStepView : Int -> Int -> PrepStep -> Html Msg
 pizzaPrepStepView indexToDisplay index prepStep =
     div
