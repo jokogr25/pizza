@@ -5189,9 +5189,9 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$Calculator = F2(
-	function (a, b) {
-		return {$: 'Calculator', a: a, b: b};
+var $author$project$Main$Calculator = F3(
+	function (a, b, c) {
+		return {$: 'Calculator', a: a, b: b, c: c};
 	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
@@ -5200,12 +5200,22 @@ var $author$project$Main$update = F2(
 			case 'GoCarousel':
 				return $author$project$Main$Carousel;
 			case 'GoCalculator':
-				return A2($author$project$Main$Calculator, 0, 1);
+				return A3($author$project$Main$Calculator, 0, 1, 'none');
+			case 'Edit':
+				var idToEdit = msg.a;
+				if (model.$ === 'Calculator') {
+					var index = model.a;
+					var ratio = model.b;
+					return A3($author$project$Main$Calculator, index, ratio, idToEdit);
+				} else {
+					return model;
+				}
 			case 'Next':
 				if (model.$ === 'Calculator') {
 					var index = model.a;
 					var ratio = model.b;
-					return A2($author$project$Main$Calculator, index + 1, ratio);
+					var idToEdit = model.c;
+					return A3($author$project$Main$Calculator, index + 1, ratio, idToEdit);
 				} else {
 					return model;
 				}
@@ -5213,10 +5223,12 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'Calculator') {
 					var index = model.a;
 					var ratio = model.b;
-					return A2(
+					var idToEdit = model.c;
+					return A3(
 						$author$project$Main$Calculator,
 						A2($elm$core$Basics$max, 0, index - 1),
-						ratio);
+						ratio,
+						idToEdit);
 				} else {
 					return model;
 				}
@@ -5303,6 +5315,9 @@ var $author$project$Main$Gram = {$: 'Gram'};
 var $author$project$Main$Mililiter = {$: 'Mililiter'};
 var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $author$project$Main$Edit = function (a) {
+	return {$: 'Edit', a: a};
+};
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5312,14 +5327,18 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
-var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
 	switch (unit.$) {
@@ -5331,6 +5350,12 @@ var $author$project$Main$unitToAbbr = function (unit) {
 			return 'tsp';
 	}
 };
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
 var $author$project$Main$ingredientView = F5(
 	function (label, id, unit, value, idToEdit) {
 		return A2(
@@ -5339,66 +5364,64 @@ var $author$project$Main$ingredientView = F5(
 				[
 					$elm$html$Html$Attributes$class('mb-3'),
 					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 0.4fr minmax(50px, 120px) auto'),
+					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr auto'),
 					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
 				]),
 			_List_fromArray(
 				[
+					$elm$html$Html$text(label),
 					A2(
-					$elm$html$Html$label,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$for(id),
-							$elm$html$Html$Attributes$class('form-label mb-0')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(label)
-						])),
-					(!_Utils_eq(id, idToEdit)) ? A2(
-					$elm$html$Html$span,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$elm$core$String$fromFloat(value))
-						])) : A2(
 					$elm$html$Html$input,
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$id(id),
 							$elm$html$Html$Attributes$type_('number'),
 							$elm$html$Html$Attributes$class('form-control'),
-							$elm$html$Html$Attributes$disabled(
-							!_Utils_eq(id, idToEdit)),
 							$elm$html$Html$Attributes$placeholder(
-							$elm$core$String$fromFloat(value))
+							$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit))),
+							$elm$html$Html$Attributes$disabled(
+							!_Utils_eq(id, idToEdit))
 						]),
 					_List_Nil),
-					A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('text-muted')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$author$project$Main$unitToAbbr(unit))
-						])),
-					A2(
+					_Utils_eq(id, idToEdit) ? A2(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$type_('button'),
-							$elm$html$Html$Attributes$class('btn btn-outline-primary'),
-							$elm$html$Html$Attributes$disabled(
-							!_Utils_eq(id, idToEdit))
+							$elm$html$Html$Attributes$class('btn btn-primary'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$Edit('none'))
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('✎')
+							A2(
+							$elm$html$Html$img,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$width(16),
+									$elm$html$Html$Attributes$src('src/img/icon/check.svg')
+								]),
+							_List_Nil)
+						])) : A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('button'),
+							$elm$html$Html$Attributes$class('btn btn-primary'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$Edit(id))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$img,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$width(16),
+									$elm$html$Html$Attributes$src('src/img/icon/pencil.svg')
+								]),
+							_List_Nil)
 						]))
 				]));
 	});
@@ -5612,6 +5635,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(
@@ -5646,13 +5670,6 @@ var $author$project$Main$carouselButton = F4(
 				]));
 	});
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
 var $author$project$Main$carouselItem = F2(
 	function (isActive, imageSrc) {
 		return A2(
@@ -5715,7 +5732,8 @@ var $author$project$Main$view = function (model) {
 		default:
 			var stepIndex = model.a;
 			var ratio = model.b;
-			return A3($author$project$Main$pizzaCalculatorView, stepIndex, ratio, 'none');
+			var idToEdit = model.c;
+			return A3($author$project$Main$pizzaCalculatorView, stepIndex, ratio, idToEdit);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

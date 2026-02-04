@@ -2,9 +2,11 @@ module Main exposing (Msg(..), main, update, view)
 
 import Browser
 import Html exposing (Html, button, div, img, input, label, span, text)
-import Html.Attributes exposing (alt, attribute, class, disabled, for, id, placeholder, src, style, type_)
+import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
 import ListHelper
+import Svg
+import Svg.Attributes
 
 
 
@@ -27,7 +29,7 @@ main =
 type Model
     = Front
     | Carousel
-    | Calculator Int Float
+    | Calculator Int Float String
 
 
 
@@ -37,6 +39,7 @@ type Model
 type Msg
     = GoCarousel
     | GoCalculator
+    | Edit String
     | Next
     | Prev
     | NoOp
@@ -53,24 +56,34 @@ update msg model =
             Carousel
 
         GoCalculator ->
-            Calculator 0 1
+            Calculator 0 1 "none"
+
+        Edit idToEdit ->
+            case model of
+                Calculator index ratio _ ->
+                    Calculator index ratio idToEdit
+
+                _ ->
+                    model
 
         Next ->
             case model of
-                Calculator index ratio ->
+                Calculator index ratio idToEdit ->
                     Calculator
                         (index + 1)
                         ratio
+                        idToEdit
 
                 _ ->
                     model
 
         Prev ->
             case model of
-                Calculator index ratio ->
+                Calculator index ratio idToEdit ->
                     Calculator
                         (max 0 (index - 1))
                         ratio
+                        idToEdit
 
                 _ ->
                     model
@@ -92,8 +105,8 @@ view model =
         Carousel ->
             viewCarousel1
 
-        Calculator stepIndex ratio ->
-            pizzaCalculatorView stepIndex ratio "none"
+        Calculator stepIndex ratio idToEdit ->
+            pizzaCalculatorView stepIndex ratio idToEdit
 
 
 
@@ -260,39 +273,44 @@ ingredientView label id unit value idToEdit =
     div
         [ class "mb-3"
         , style "display" "grid"
-        , style "grid-template-columns" "minmax(120px, 1fr) 0.4fr minmax(50px, 120px) auto"
+        , style "grid-template-columns" "minmax(120px, 1fr) 1fr auto"
         , style "gap" "0.75rem"
         , style "align-items" "center"
         ]
-        [ Html.label
-            [ for id
-            , class "form-label mb-0"
+        [ text label
+        , input
+            [ Html.Attributes.id id
+            , type_ "number"
+            , class "form-control"
+            , placeholder (String.fromFloat value ++ " " ++ unitToAbbr unit)
+            , disabled (id /= idToEdit)
             ]
-            [ text label ]
-        , if id /= idToEdit then
-            Html.span
-                []
-                [ text (String.fromFloat value)
+            []
+        , if id == idToEdit then
+            button
+                [ type_ "button"
+                , class "btn btn-primary"
+                , onClick (Edit "none")
+                ]
+                [ img
+                    [ Html.Attributes.width 16
+                    , src "src/img/icon/check.svg"
+                    ]
+                    []
                 ]
 
           else
-            input
-                [ Html.Attributes.id id
-                , type_ "number"
-                , class "form-control"
-                , Html.Attributes.disabled (id /= idToEdit)
-                , placeholder (String.fromFloat value)
+            button
+                [ type_ "button"
+                , class "btn btn-primary"
+                , onClick (Edit id)
                 ]
-                []
-        , span
-            [ class "text-muted" ]
-            [ text (unitToAbbr unit) ]
-        , button
-            [ type_ "button"
-            , class "btn btn-outline-primary"
-            , Html.Attributes.disabled (id /= idToEdit)
-            ]
-            [ text "✎" ]
+                [ img
+                    [ Html.Attributes.width 16
+                    , src "src/img/icon/pencil.svg"
+                    ]
+                    []
+                ]
         ]
 
 
