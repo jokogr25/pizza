@@ -5204,29 +5204,29 @@ var $author$project$Main$update = F2(
 			case 'Edit':
 				var idToEdit = msg.a;
 				if (model.$ === 'Calculator') {
-					var index = model.a;
+					var indexToDisplay = model.a;
 					var ratio = model.b;
-					return A3($author$project$Main$Calculator, index, ratio, idToEdit);
+					return A3($author$project$Main$Calculator, indexToDisplay, ratio, idToEdit);
 				} else {
 					return model;
 				}
 			case 'Next':
 				if (model.$ === 'Calculator') {
-					var index = model.a;
+					var indexToDisplay = model.a;
 					var ratio = model.b;
 					var idToEdit = model.c;
-					return A3($author$project$Main$Calculator, index + 1, ratio, idToEdit);
+					return A3($author$project$Main$Calculator, indexToDisplay + 1, ratio, idToEdit);
 				} else {
 					return model;
 				}
 			case 'Prev':
 				if (model.$ === 'Calculator') {
-					var index = model.a;
+					var indexToDisplay = model.a;
 					var ratio = model.b;
 					var idToEdit = model.c;
 					return A3(
 						$author$project$Main$Calculator,
-						A2($elm$core$Basics$max, 0, index - 1),
+						A2($elm$core$Basics$max, 0, indexToDisplay - 1),
 						ratio,
 						idToEdit);
 				} else {
@@ -5453,52 +5453,22 @@ var $author$project$Main$pizza = {
 	water: 313,
 	yeast: 3.4
 };
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$ListHelper$get = F2(
-	function (index, list) {
-		return $elm$core$List$head(
-			A2($elm$core$List$drop, index, list));
-	});
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $author$project$Main$pizzaPrepStepView = F2(
-	function (i, prepStep) {
+var $author$project$Main$pizzaPrepStepView = F3(
+	function (indexToDisplay, index, prepStep) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem')
+					A2($elm$html$Html$Attributes$style, 'grid-row', '1'),
+					A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
+					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'visibility', 'visible') : A2($elm$html$Html$Attributes$style, 'visibility', 'hidden'),
+					A2($elm$html$Html$Attributes$style, 'transition', 'opacity 400ms ease'),
+					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'opacity', '1') : A2($elm$html$Html$Attributes$style, 'opacity', '0')
 				]),
 			_List_fromArray(
 				[
@@ -5508,7 +5478,7 @@ var $author$project$Main$pizzaPrepStepView = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$elm$core$String$fromInt(i + 1) + ('. ' + prepStep.title))
+							$elm$core$String$fromInt(index + 1) + ('. ' + prepStep.title))
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -5524,7 +5494,29 @@ var $author$project$Main$pizzaPrepStepView = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(prepStep.description)
-						])),
+						]))
+				]));
+	});
+var $author$project$Main$pizzaPrepStepsView = F2(
+	function (indexToDisplay, prepSteps) {
+		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'grid')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'display', 'grid')
+						]),
+					A2(
+						$elm$core$List$indexedMap,
+						$author$project$Main$pizzaPrepStepView(indexToDisplay),
+						prepSteps)),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -5556,8 +5548,8 @@ var $author$project$Main$pizzaPrepStepView = F2(
 									$elm$html$Html$Events$onClick($author$project$Main$Next),
 									$elm$html$Html$Attributes$disabled(
 									_Utils_cmp(
-										i,
-										$elm$core$List$length($author$project$Main$pizza.steps) - 1) > -1),
+										indexToDisplay,
+										$elm$core$List$length(prepSteps) - 1) > -1),
 									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5567,24 +5559,6 @@ var $author$project$Main$pizzaPrepStepView = F2(
 									$elm$html$Html$text('-->')
 								]))
 						]))
-				]));
-	});
-var $author$project$Main$pizzaPrepStepsView = F2(
-	function (index, prepSteps) {
-		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
-			$elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					function () {
-					var _v0 = A2($author$project$ListHelper$get, index, prepSteps);
-					if (_v0.$ === 'Just') {
-						var prepStep = _v0.a;
-						return A2($author$project$Main$pizzaPrepStepView, index, prepStep);
-					} else {
-						return $elm$html$Html$text('ERROR');
-					}
-				}()
 				]));
 	});
 var $author$project$Main$pizzaCalculatorView = F3(
@@ -5730,10 +5704,10 @@ var $author$project$Main$view = function (model) {
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
 		default:
-			var stepIndex = model.a;
+			var indexToDisplay = model.a;
 			var ratio = model.b;
 			var idToEdit = model.c;
-			return A3($author$project$Main$pizzaCalculatorView, stepIndex, ratio, idToEdit);
+			return A3($author$project$Main$pizzaCalculatorView, indexToDisplay, ratio, idToEdit);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

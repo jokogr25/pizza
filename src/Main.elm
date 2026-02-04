@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
+import List exposing (indexedMap)
 import ListHelper
 import Svg
 import Svg.Attributes
@@ -60,17 +61,17 @@ update msg model =
 
         Edit idToEdit ->
             case model of
-                Calculator index ratio _ ->
-                    Calculator index ratio idToEdit
+                Calculator indexToDisplay ratio _ ->
+                    Calculator indexToDisplay ratio idToEdit
 
                 _ ->
                     model
 
         Next ->
             case model of
-                Calculator index ratio idToEdit ->
+                Calculator indexToDisplay ratio idToEdit ->
                     Calculator
-                        (index + 1)
+                        (indexToDisplay + 1)
                         ratio
                         idToEdit
 
@@ -79,9 +80,9 @@ update msg model =
 
         Prev ->
             case model of
-                Calculator index ratio idToEdit ->
+                Calculator indexToDisplay ratio idToEdit ->
                     Calculator
-                        (max 0 (index - 1))
+                        (max 0 (indexToDisplay - 1))
                         ratio
                         idToEdit
 
@@ -105,8 +106,8 @@ view model =
         Carousel ->
             viewCarousel1
 
-        Calculator stepIndex ratio idToEdit ->
-            pizzaCalculatorView stepIndex ratio idToEdit
+        Calculator indexToDisplay ratio idToEdit ->
+            pizzaCalculatorView indexToDisplay ratio idToEdit
 
 
 
@@ -315,31 +316,62 @@ ingredientView label id unit value idToEdit =
 
 
 pizzaPrepStepsView : Int -> List PrepStep -> Html Msg
-pizzaPrepStepsView index prepSteps =
+pizzaPrepStepsView indexToDisplay prepSteps =
     if List.length prepSteps == 0 then
         text "no steps :("
 
     else
         div
-            []
-            [ case ListHelper.get index prepSteps of
-                Just prepStep ->
-                    pizzaPrepStepView index prepStep
-
-                Nothing ->
-                    text "ERROR"
+            [ style "display" "grid" ]
+            [ div
+                [ style "display" "grid"
+                ]
+                (List.indexedMap (pizzaPrepStepView indexToDisplay) prepSteps)
+            , div
+                [ class "mb-3"
+                , style "display" "grid"
+                , style "grid-template-columns" "1fr 1fr"
+                , style "gap" "0.75rem"
+                ]
+                [ button
+                    [ onClick Prev
+                    , class "btn btn-primary btn-lg"
+                    , style "margin-top" "2rem"
+                    , style "padding" "0.75rem 2rem"
+                    ]
+                    [ text "<--" ]
+                , button
+                    [ onClick Next
+                    , disabled (indexToDisplay >= List.length prepSteps - 1)
+                    , class "btn btn-primary btn-lg"
+                    , style "margin-top" "2rem"
+                    , style "padding" "0.75rem 2rem"
+                    ]
+                    [ text "-->" ]
+                ]
             ]
 
 
-pizzaPrepStepView : Int -> PrepStep -> Html Msg
-pizzaPrepStepView i prepStep =
+pizzaPrepStepView : Int -> Int -> PrepStep -> Html Msg
+pizzaPrepStepView indexToDisplay index prepStep =
     div
-        [ Html.Attributes.style "margin-top" "1rem" ]
-        [ Html.h3
-            []
-            [ text (String.fromInt (i + 1) ++ ". " ++ prepStep.title) ]
-        , div
-            []
+        [ style "grid-row" "1"
+        , style "grid-column" "1"
+        , style "margin-top" "1rem"
+        , if indexToDisplay == index then
+            style "visibility" "visible"
+
+          else
+            style "visibility" "hidden"
+        , style "transition" "opacity 400ms ease"
+        , if indexToDisplay == index then
+            style "opacity" "1"
+
+          else
+            style "opacity" "0"
+        ]
+        [ Html.h3 [] [ text (String.fromInt (index + 1) ++ ". " ++ prepStep.title) ]
+        , div []
             [ if prepStep.time == -1 then
                 text "∞"
 
@@ -349,31 +381,7 @@ pizzaPrepStepView i prepStep =
               else
                 text (String.fromInt prepStep.time ++ " mins")
             ]
-        , div
-            []
-            [ text prepStep.description ]
-        , div
-            [ class "mb-3"
-            , style "display" "grid"
-            , style "grid-template-columns" "1fr 1fr"
-            , style "gap" "0.75rem"
-            ]
-            [ button
-                [ onClick Prev
-                , class "btn btn-primary btn-lg"
-                , style "margin-top" "2rem"
-                , style "padding" "0.75rem 2rem"
-                ]
-                [ text "<--" ]
-            , button
-                [ onClick Next
-                , disabled (i >= List.length pizza.steps - 1)
-                , class "btn btn-primary btn-lg"
-                , style "margin-top" "2rem"
-                , style "padding" "0.75rem 2rem"
-                ]
-                [ text "-->" ]
-            ]
+        , div [] [ text prepStep.description ]
         ]
 
 
