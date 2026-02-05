@@ -508,7 +508,7 @@ type alias PrepStep =
 -- helper
 
 
-pencilIcon : Html.Html msg
+pencilIcon : Html msg
 pencilIcon =
     Html.img
         [ Html.Attributes.width 16
@@ -517,7 +517,7 @@ pencilIcon =
         []
 
 
-closeIcon : Html.Html msg
+closeIcon : Html msg
 closeIcon =
     Html.img
         [ Html.Attributes.width 16
