@@ -5292,7 +5292,7 @@ var $author$project$Main$samplePizza = {
 			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
 			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
 			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
-			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
+			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together will be together in the end'},
 			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
 			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
 			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
@@ -5473,7 +5473,7 @@ var $author$project$Main$pizzaPrepStepView = F3(
 					A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
 					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'visibility', 'visible') : A2($elm$html$Html$Attributes$style, 'visibility', 'hidden'),
-					A2($elm$html$Html$Attributes$style, 'transition', 'opacity 400ms ease'),
+					A2($elm$html$Html$Attributes$style, 'transition', 'opacity 1000ms ease'),
 					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'opacity', '1') : A2($elm$html$Html$Attributes$style, 'opacity', '0')
 				]),
 			_List_fromArray(

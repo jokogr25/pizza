@@ -366,7 +366,7 @@ pizzaPrepStepView indexToDisplay index prepStep =
 
           else
             style "visibility" "hidden"
-        , style "transition" "opacity 400ms ease"
+        , style "transition" "opacity 1000ms ease"
         , if indexToDisplay == index then
             style "opacity" "1"
 
@@ -396,22 +396,6 @@ type Unit
     = Gram
     | Mililiter
     | Teaspoon
-
-
-
-{-
-   unitToString : Unit -> String
-   unitToString unit =
-       case unit of
-           Gram ->
-               "grams"
-
-           Mililiter ->
-               "mililiters"
-
-           Teaspoon ->
-               "teaspoon"
--}
 
 
 unitToAbbr : Unit -> String
@@ -474,7 +458,7 @@ samplePizza =
           , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge"
           }
         , { time = 5
-          , title = "What belongs together, will be together in the end"
+          , title = "What belongs together will be together in the end"
           , description = "Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It's BLASFEMIA. Do it and I'll call the cops"
           }
         , { time = 0
