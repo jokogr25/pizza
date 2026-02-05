@@ -4,10 +4,7 @@ import Browser
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
-import List exposing (indexedMap)
-import ListHelper
-import Svg
-import Svg.Attributes
+import List
 
 
 
