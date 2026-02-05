@@ -5189,9 +5189,9 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$Calculator = F3(
-	function (a, b, c) {
-		return {$: 'Calculator', a: a, b: b, c: c};
+var $author$project$Main$Calculator = F4(
+	function (a, b, c, d) {
+		return {$: 'Calculator', a: a, b: b, c: c, d: d};
 	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$update = F2(
@@ -5200,32 +5200,37 @@ var $author$project$Main$update = F2(
 			case 'GoCarousel':
 				return $author$project$Main$Carousel;
 			case 'GoCalculator':
-				return A3($author$project$Main$Calculator, 0, 1, 'none');
+				var pizza = msg.a;
+				return A4($author$project$Main$Calculator, pizza, 0, 1, 'none');
 			case 'Edit':
 				var idToEdit = msg.a;
 				if (model.$ === 'Calculator') {
-					var indexToDisplay = model.a;
-					var ratio = model.b;
-					return A3($author$project$Main$Calculator, indexToDisplay, ratio, idToEdit);
+					var pizza = model.a;
+					var indexToDisplay = model.b;
+					var ratio = model.c;
+					return A4($author$project$Main$Calculator, pizza, indexToDisplay, ratio, idToEdit);
 				} else {
 					return model;
 				}
 			case 'Next':
 				if (model.$ === 'Calculator') {
-					var indexToDisplay = model.a;
-					var ratio = model.b;
-					var idToEdit = model.c;
-					return A3($author$project$Main$Calculator, indexToDisplay + 1, ratio, idToEdit);
+					var pizza = model.a;
+					var indexToDisplay = model.b;
+					var ratio = model.c;
+					var idToEdit = model.d;
+					return A4($author$project$Main$Calculator, pizza, indexToDisplay + 1, ratio, idToEdit);
 				} else {
 					return model;
 				}
 			case 'Prev':
 				if (model.$ === 'Calculator') {
-					var indexToDisplay = model.a;
-					var ratio = model.b;
-					var idToEdit = model.c;
-					return A3(
+					var pizza = model.a;
+					var indexToDisplay = model.b;
+					var ratio = model.c;
+					var idToEdit = model.d;
+					return A4(
 						$author$project$Main$Calculator,
+						pizza,
 						A2($elm$core$Basics$max, 0, indexToDisplay - 1),
 						ratio,
 						idToEdit);
@@ -5236,7 +5241,9 @@ var $author$project$Main$update = F2(
 				return model;
 		}
 	});
-var $author$project$Main$GoCalculator = {$: 'GoCalculator'};
+var $author$project$Main$GoCalculator = function (a) {
+	return {$: 'GoCalculator', a: a};
+};
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5265,6 +5272,34 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$html$Html$Events$on,
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$samplePizza = {
+	flour: 496,
+	honey: 1,
+	name: '7 hours pizza dough',
+	oliveoil: 12,
+	salt: 15,
+	steps: _List_fromArray(
+		[
+			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
+			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
+			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands', time: 10, title: 'imx'},
+			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
+			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
+			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
+			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
+			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
+			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
+			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
+			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
+			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
+			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones.', time: -1, title: 'I knew it'}
+		]),
+	water: 313,
+	yeast: 3.4
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -5301,7 +5336,8 @@ var $author$project$Main$frontView = A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
-					$elm$html$Html$Events$onClick($author$project$Main$GoCalculator),
+					$elm$html$Html$Events$onClick(
+					$author$project$Main$GoCalculator($author$project$Main$samplePizza)),
 					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5318,6 +5354,27 @@ var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $author$project$Main$Edit = function (a) {
 	return {$: 'Edit', a: a};
 };
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Main$closeIcon = A2(
+	$elm$html$Html$img,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$width(16),
+			$elm$html$Html$Attributes$src('src/img/icon/check.svg')
+		]),
+	_List_Nil);
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5329,16 +5386,17 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$pencilIcon = A2(
+	$elm$html$Html$img,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$width(16),
+			$elm$html$Html$Attributes$src('src/img/icon/pencil.svg')
+		]),
+	_List_Nil);
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
 	switch (unit.$) {
@@ -5349,12 +5407,6 @@ var $author$project$Main$unitToAbbr = function (unit) {
 		default:
 			return 'tsp';
 	}
-};
-var $elm$html$Html$Attributes$width = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'width',
-		$elm$core$String$fromInt(n));
 };
 var $author$project$Main$ingredientView = F5(
 	function (label, id, unit, value, idToEdit) {
@@ -5394,16 +5446,7 @@ var $author$project$Main$ingredientView = F5(
 							$author$project$Main$Edit('none'))
 						]),
 					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$img,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$width(16),
-									$elm$html$Html$Attributes$src('src/img/icon/check.svg')
-								]),
-							_List_Nil)
-						])) : A2(
+						[$author$project$Main$closeIcon])) : A2(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
@@ -5413,46 +5456,9 @@ var $author$project$Main$ingredientView = F5(
 							$author$project$Main$Edit(id))
 						]),
 					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$img,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$width(16),
-									$elm$html$Html$Attributes$src('src/img/icon/pencil.svg')
-								]),
-							_List_Nil)
-						]))
+						[$author$project$Main$pencilIcon]))
 				]));
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Main$pizza = {
-	flour: 496,
-	honey: 1,
-	name: '7 hours pizza dough',
-	oliveoil: 12,
-	salt: 15,
-	steps: _List_fromArray(
-		[
-			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
-			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
-			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands', time: 10, title: 'imx'},
-			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
-			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
-			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
-			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
-			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
-			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together, will be together in the end'},
-			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
-			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
-			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
-			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones.', time: -1, title: 'I knew it'}
-		]),
-	water: 313,
-	yeast: 3.4
-};
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$core$Basics$ge = _Utils_ge;
@@ -5539,7 +5545,7 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('<--')
+									$elm$html$Html$text('←')
 								])),
 							A2(
 							$elm$html$Html$button,
@@ -5556,13 +5562,13 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('-->')
+									$elm$html$Html$text('→')
 								]))
 						]))
 				]));
 	});
-var $author$project$Main$pizzaCalculatorView = F3(
-	function (stepIndex, ratio, idToEdit) {
+var $author$project$Main$pizzaCalculatorView = F4(
+	function (pizza, stepIndex, ratio, idToEdit) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5589,15 +5595,15 @@ var $author$project$Main$pizzaCalculatorView = F3(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text($author$project$Main$pizza.name)
+									$elm$html$Html$text(pizza.name)
 								])),
-							A5($author$project$Main$ingredientView, 'Flour', 'flourInput', $author$project$Main$Gram, $author$project$Main$pizza.flour * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Water', 'waterInput', $author$project$Main$Gram, $author$project$Main$pizza.water * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Yeast', 'yeastInput', $author$project$Main$Gram, $author$project$Main$pizza.yeast * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, $author$project$Main$pizza.salt * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, $author$project$Main$pizza.oliveoil * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Honey', 'honeyInput', $author$project$Main$Teaspoon, $author$project$Main$pizza.honey * ratio, idToEdit),
-							A2($author$project$Main$pizzaPrepStepsView, stepIndex, $author$project$Main$pizza.steps)
+							A5($author$project$Main$ingredientView, 'Flour', 'flourInput', $author$project$Main$Gram, pizza.flour * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Water', 'waterInput', $author$project$Main$Gram, pizza.water * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Yeast', 'yeastInput', $author$project$Main$Gram, pizza.yeast * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, pizza.salt * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, pizza.oliveoil * ratio, idToEdit),
+							A5($author$project$Main$ingredientView, 'Honey', 'honeyInput', $author$project$Main$Teaspoon, pizza.honey * ratio, idToEdit),
+							A2($author$project$Main$pizzaPrepStepsView, stepIndex, pizza.steps)
 						]))
 				]));
 	});
@@ -5704,10 +5710,11 @@ var $author$project$Main$view = function (model) {
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
 		default:
-			var indexToDisplay = model.a;
-			var ratio = model.b;
-			var idToEdit = model.c;
-			return A3($author$project$Main$pizzaCalculatorView, indexToDisplay, ratio, idToEdit);
+			var pizza = model.a;
+			var indexToDisplay = model.b;
+			var ratio = model.c;
+			var idToEdit = model.d;
+			return A4($author$project$Main$pizzaCalculatorView, pizza, indexToDisplay, ratio, idToEdit);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

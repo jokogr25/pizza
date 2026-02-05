@@ -27,7 +27,7 @@ main =
 type Model
     = Front
     | Carousel
-    | Calculator Int Float String
+    | Calculator Pizza Int Float String -- index, ratio, id
 
 
 
@@ -36,8 +36,8 @@ type Model
 
 type Msg
     = GoCarousel
-    | GoCalculator
-    | Edit String
+    | GoCalculator Pizza
+    | Edit String -- id
     | Next
     | Prev
     | NoOp
@@ -53,21 +53,26 @@ update msg model =
         GoCarousel ->
             Carousel
 
-        GoCalculator ->
-            Calculator 0 1 "none"
+        GoCalculator pizza ->
+            Calculator pizza 0 1 "none"
 
         Edit idToEdit ->
             case model of
-                Calculator indexToDisplay ratio _ ->
-                    Calculator indexToDisplay ratio idToEdit
+                Calculator pizza indexToDisplay ratio _ ->
+                    Calculator
+                        pizza
+                        indexToDisplay
+                        ratio
+                        idToEdit
 
                 _ ->
                     model
 
         Next ->
             case model of
-                Calculator indexToDisplay ratio idToEdit ->
+                Calculator pizza indexToDisplay ratio idToEdit ->
                     Calculator
+                        pizza
                         (indexToDisplay + 1)
                         ratio
                         idToEdit
@@ -77,8 +82,9 @@ update msg model =
 
         Prev ->
             case model of
-                Calculator indexToDisplay ratio idToEdit ->
+                Calculator pizza indexToDisplay ratio idToEdit ->
                     Calculator
+                        pizza
                         (max 0 (indexToDisplay - 1))
                         ratio
                         idToEdit
@@ -103,8 +109,12 @@ view model =
         Carousel ->
             viewCarousel1
 
-        Calculator indexToDisplay ratio idToEdit ->
-            pizzaCalculatorView indexToDisplay ratio idToEdit
+        Calculator pizza indexToDisplay ratio idToEdit ->
+            pizzaCalculatorView
+                pizza
+                indexToDisplay
+                ratio
+                idToEdit
 
 
 
@@ -130,7 +140,7 @@ frontView =
             ]
             [ text "dont we all need someone who looks at us the way joscha looks at pizza 🍕" ]
         , button
-            [ onClick GoCalculator
+            [ onClick (GoCalculator samplePizza)
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
@@ -213,8 +223,8 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
-pizzaCalculatorView : Int -> Float -> String -> Html Msg
-pizzaCalculatorView stepIndex ratio idToEdit =
+pizzaCalculatorView : Pizza -> Int -> Float -> String -> Html Msg
+pizzaCalculatorView pizza stepIndex ratio idToEdit =
     div
         [ class "card"
         , style "max-width" "700px"
@@ -290,11 +300,7 @@ ingredientView label id unit value idToEdit =
                 , class "btn btn-primary"
                 , onClick (Edit "none")
                 ]
-                [ img
-                    [ Html.Attributes.width 16
-                    , src "src/img/icon/check.svg"
-                    ]
-                    []
+                [ closeIcon
                 ]
 
           else
@@ -303,11 +309,7 @@ ingredientView label id unit value idToEdit =
                 , class "btn btn-primary"
                 , onClick (Edit id)
                 ]
-                [ img
-                    [ Html.Attributes.width 16
-                    , src "src/img/icon/pencil.svg"
-                    ]
-                    []
+                [ pencilIcon
                 ]
         ]
 
@@ -336,7 +338,7 @@ pizzaPrepStepsView indexToDisplay prepSteps =
                     , style "margin-top" "2rem"
                     , style "padding" "0.75rem 2rem"
                     ]
-                    [ text "<--" ]
+                    [ text "←" ]
                 , button
                     [ onClick Next
                     , disabled (indexToDisplay >= List.length prepSteps - 1)
@@ -344,7 +346,7 @@ pizzaPrepStepsView indexToDisplay prepSteps =
                     , style "margin-top" "2rem"
                     , style "padding" "0.75rem 2rem"
                     ]
-                    [ text "-->" ]
+                    [ text "→" ]
                 ]
             ]
 
@@ -371,7 +373,9 @@ pizzaPrepStepView indexToDisplay index prepStep =
           else
             style "opacity" "0"
         ]
-        [ Html.h3 [] [ text (String.fromInt (index + 1) ++ ". " ++ prepStep.title) ]
+        [ Html.h3
+            []
+            [ text (String.fromInt (index + 1) ++ ". " ++ prepStep.title) ]
         , div []
             [ if prepStep.time == -1 then
                 text "∞"
@@ -382,7 +386,9 @@ pizzaPrepStepView indexToDisplay index prepStep =
               else
                 text (String.fromInt prepStep.time ++ " mins")
             ]
-        , div [] [ text prepStep.description ]
+        , div
+            []
+            [ text prepStep.description ]
         ]
 
 
@@ -425,8 +431,8 @@ unitToAbbr unit =
 -- SAMPLE DATA
 
 
-pizza : Pizza
-pizza =
+samplePizza : Pizza
+samplePizza =
     { name = "7 hours pizza dough"
     , flour = 496
     , water = 313
@@ -512,3 +518,25 @@ type alias PrepStep =
     , title : String
     , description : String
     }
+
+
+
+-- helper
+
+
+pencilIcon : Html.Html msg
+pencilIcon =
+    Html.img
+        [ Html.Attributes.width 16
+        , Html.Attributes.src "src/img/icon/pencil.svg"
+        ]
+        []
+
+
+closeIcon : Html.Html msg
+closeIcon =
+    Html.img
+        [ Html.Attributes.width 16
+        , Html.Attributes.src "src/img/icon/check.svg"
+        ]
+        []
