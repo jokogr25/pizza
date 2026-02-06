@@ -5286,7 +5286,7 @@ var $author$project$Main$samplePizza = {
 		[
 			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
 			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
-			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands', time: 10, title: 'imx'},
+			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy', time: 10, title: 'imx'},
 			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
 			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
 			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},

@@ -435,7 +435,7 @@ samplePizza =
           }
         , { time = 10
           , title = "imx"
-          , description = "Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops sticking to bowl and hands"
+          , description = "Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy"
           }
         , { time = 7 * 60
           , title = "slumber time"
