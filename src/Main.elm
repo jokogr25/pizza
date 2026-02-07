@@ -226,9 +226,8 @@ carouselButton direction label btnClass iconClass =
 pizzaCalculatorView : Pizza -> Int -> Float -> String -> Html Msg
 pizzaCalculatorView pizza stepIndex ratio idToEdit =
     div
-        [ class "card"
+        [ class "card mx-auto my-md-3"
         , style "max-width" "700px"
-        , style "margin" "1em auto"
         ]
         [ div
             [ class "card-body"
@@ -281,36 +280,46 @@ ingredientView label id unit value idToEdit =
     div
         [ class "mb-3"
         , style "display" "grid"
-        , style "grid-template-columns" "minmax(120px, 1fr) 1fr auto"
+        , style "grid-template-columns" "minmax(120px, 1fr) 1fr"
         , style "gap" "0.75rem"
         , style "align-items" "center"
         ]
         [ text label
-        , input
-            [ Html.Attributes.id id
-            , type_ "number"
-            , class "form-control"
-            , placeholder (String.fromFloat value ++ " " ++ unitToAbbr unit)
-            , disabled (id /= idToEdit)
-            ]
-            []
-        , if id == idToEdit then
-            button
-                [ type_ "button"
-                , class "btn btn-primary"
-                , onClick (Edit "none")
-                ]
-                [ closeIcon
-                ]
 
-          else
-            button
+        -- INPUT CELL
+        , div
+            [ style "position" "relative" ]
+            [ input
+                [ Html.Attributes.id id
+                , type_ "number"
+                , class "form-control"
+                , placeholder (String.fromFloat value ++ " " ++ unitToAbbr unit)
+                , disabled (id /= idToEdit)
+                , style "padding-right" "2.5rem"
+                ]
+                []
+            , button
                 [ type_ "button"
-                , class "btn btn-primary"
-                , onClick (Edit id)
+                , class "btn btn-sm btn-link"
+                , style "position" "absolute"
+                , style "right" "0.5rem"
+                , style "top" "50%"
+                , style "transform" "translateY(-50%)"
+                , onClick
+                    (if id == idToEdit then
+                        Edit "none"
+
+                     else
+                        Edit id
+                    )
                 ]
-                [ pencilIcon
+                [ if id == idToEdit then
+                    closeIcon
+
+                  else
+                    pencilIcon
                 ]
+            ]
         ]
 
 

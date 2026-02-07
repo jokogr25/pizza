@@ -5416,7 +5416,7 @@ var $author$project$Main$ingredientView = F5(
 				[
 					$elm$html$Html$Attributes$class('mb-3'),
 					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr auto'),
+					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr'),
 					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
 				]),
@@ -5424,39 +5424,45 @@ var $author$project$Main$ingredientView = F5(
 				[
 					$elm$html$Html$text(label),
 					A2(
-					$elm$html$Html$input,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$id(id),
-							$elm$html$Html$Attributes$type_('number'),
-							$elm$html$Html$Attributes$class('form-control'),
-							$elm$html$Html$Attributes$placeholder(
-							$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit))),
-							$elm$html$Html$Attributes$disabled(
-							!_Utils_eq(id, idToEdit))
+							A2($elm$html$Html$Attributes$style, 'position', 'relative')
 						]),
-					_List_Nil),
-					_Utils_eq(id, idToEdit) ? A2(
-					$elm$html$Html$button,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$type_('button'),
-							$elm$html$Html$Attributes$class('btn btn-primary'),
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$Edit('none'))
-						]),
-					_List_fromArray(
-						[$author$project$Main$closeIcon])) : A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('button'),
-							$elm$html$Html$Attributes$class('btn btn-primary'),
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$Edit(id))
-						]),
-					_List_fromArray(
-						[$author$project$Main$pencilIcon]))
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$id(id),
+									$elm$html$Html$Attributes$type_('number'),
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$placeholder(
+									$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit))),
+									$elm$html$Html$Attributes$disabled(
+									!_Utils_eq(id, idToEdit)),
+									A2($elm$html$Html$Attributes$style, 'padding-right', '2.5rem')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('button'),
+									$elm$html$Html$Attributes$class('btn btn-sm btn-link'),
+									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+									A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
+									A2($elm$html$Html$Attributes$style, 'top', '50%'),
+									A2($elm$html$Html$Attributes$style, 'transform', 'translateY(-50%)'),
+									$elm$html$Html$Events$onClick(
+									_Utils_eq(id, idToEdit) ? $author$project$Main$Edit('none') : $author$project$Main$Edit(id))
+								]),
+							_List_fromArray(
+								[
+									_Utils_eq(id, idToEdit) ? $author$project$Main$closeIcon : $author$project$Main$pencilIcon
+								]))
+						]))
 				]));
 	});
 var $author$project$Main$Next = {$: 'Next'};
@@ -5573,9 +5579,8 @@ var $author$project$Main$pizzaCalculatorView = F4(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('card'),
-					A2($elm$html$Html$Attributes$style, 'max-width', '700px'),
-					A2($elm$html$Html$Attributes$style, 'margin', '1em auto')
+					$elm$html$Html$Attributes$class('card mx-auto my-md-3'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 				]),
 			_List_fromArray(
 				[
