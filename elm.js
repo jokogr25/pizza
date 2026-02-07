@@ -4378,6 +4378,107 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+// CREATE
+
+var _Regex_never = /.^/;
+
+var _Regex_fromStringWith = F2(function(options, string)
+{
+	var flags = 'g';
+	if (options.multiline) { flags += 'm'; }
+	if (options.caseInsensitive) { flags += 'i'; }
+
+	try
+	{
+		return $elm$core$Maybe$Just(new RegExp(string, flags));
+	}
+	catch(error)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+});
+
+
+// USE
+
+var _Regex_contains = F2(function(re, string)
+{
+	return string.match(re) !== null;
+});
+
+
+var _Regex_findAtMost = F3(function(n, re, str)
+{
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex == re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		out.push(A4($elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _List_fromArray(out);
+});
+
+
+var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
+{
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		return replacer(A4($elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
+	}
+	return string.replace(re, jsReplacer);
+});
+
+var _Regex_splitAtMost = F3(function(n, re, str)
+{
+	var string = str;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		var result = re.exec(string);
+		if (!result) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _List_fromArray(out);
+});
+
+var _Regex_infinity = Infinity;
 var $author$project$Main$Front = {$: 'Front'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
@@ -5389,7 +5490,7 @@ var $author$project$Main$samplePizzaRecipe = {
 	label: 'Seven hours pizza dough',
 	steps: _List_fromArray(
 		[
-			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
+			{description: 'Mix flour and roughly 3/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
 			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
 			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy', time: 10, title: 'imx'},
 			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
@@ -5659,8 +5760,121 @@ var $author$project$Main$newIngredientsView = F3(
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $author$project$Main$prepStepView = F3(
-	function (indexToDisplay, index, prepStep) {
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var $elm$regex$Regex$find = _Regex_findAtMost(_Regex_infinity);
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var $elm$regex$Regex$never = _Regex_never;
+var $author$project$Helper$safeRegexOf = function (s) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$elm$regex$Regex$never,
+		$elm$regex$Regex$fromString(s));
+};
+var $elm$core$String$words = _String_words;
+var $author$project$Main$replaceIngredientAmountFraction = F2(
+	function (ingredients, string) {
+		var parseFraction = function (str) {
+			var _v8 = A2($elm$core$String$split, '/', str);
+			if ((_v8.b && _v8.b.b) && (!_v8.b.b.b)) {
+				var numStr = _v8.a;
+				var _v9 = _v8.b;
+				var denomStr = _v9.a;
+				var _v10 = _Utils_Tuple2(
+					$elm$core$String$toFloat(numStr),
+					$elm$core$String$toFloat(denomStr));
+				if ((_v10.a.$ === 'Just') && (_v10.b.$ === 'Just')) {
+					var n = _v10.a.a;
+					var d = _v10.b.a;
+					return $elm$core$Maybe$Just(n / d);
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		};
+		var replaceMatch = F2(
+			function (match, str) {
+				var fullMatch = match.match;
+				var parts = $elm$core$String$words(fullMatch);
+				var maybeFraction = function () {
+					if ((((parts.b && parts.b.b) && (parts.b.a === 'of')) && parts.b.b.b) && (!parts.b.b.b.b)) {
+						var frac = parts.a;
+						var _v6 = parts.b;
+						var _v7 = _v6.b;
+						return parseFraction(frac);
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}();
+				var maybeIngredient = function () {
+					if (((parts.b && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
+						var _v2 = parts.b;
+						var _v3 = _v2.b;
+						var word = _v3.a;
+						var _v4 = A2(
+							$elm$core$List$filter,
+							function (ingredient) {
+								return _Utils_eq(ingredient.id, word) || _Utils_eq(ingredient.label, word);
+							},
+							ingredients);
+						if (_v4.b && (!_v4.b.b)) {
+							var ingredient = _v4.a;
+							return $elm$core$Maybe$Just(ingredient);
+						} else {
+							return $elm$core$Maybe$Nothing;
+						}
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}();
+				var _v0 = _Utils_Tuple2(maybeFraction, maybeIngredient);
+				if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+					var f = _v0.a.a;
+					var ing = _v0.b.a;
+					var newAmount = f * ing.amount;
+					return A3(
+						$elm$core$String$replace,
+						fullMatch,
+						$author$project$Helper$round2ToString(newAmount) + ($author$project$Main$unitToAbbr(ing.unit) + (' ' + ing.id)),
+						str);
+				} else {
+					return str;
+				}
+			});
+		var fractionOfWordRegex = $author$project$Helper$safeRegexOf('\\b\\d+/\\d+ of \\w+\\b');
+		var matches = A2($elm$regex$Regex$find, fractionOfWordRegex, string);
+		return A3($elm$core$List$foldl, replaceMatch, string, matches);
+	});
+var $author$project$Main$prepStepView = F4(
+	function (indexToDisplay, ingredients, index, prepStep) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5695,12 +5909,13 @@ var $author$project$Main$prepStepView = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(prepStep.description)
+							$elm$html$Html$text(
+							A2($author$project$Main$replaceIngredientAmountFraction, ingredients, prepStep.description))
 						]))
 				]));
 	});
-var $author$project$Main$prepStepsView = F2(
-	function (indexToDisplay, prepSteps) {
+var $author$project$Main$prepStepsView = F3(
+	function (indexToDisplay, ingredients, prepSteps) {
 		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5717,7 +5932,7 @@ var $author$project$Main$prepStepsView = F2(
 						]),
 					A2(
 						$elm$core$List$indexedMap,
-						$author$project$Main$prepStepView(indexToDisplay),
+						A2($author$project$Main$prepStepView, indexToDisplay, ingredients),
 						prepSteps)),
 					A2(
 					$elm$html$Html$div,
@@ -5873,7 +6088,7 @@ var $author$project$Main$recipeView = F4(
 									tabContent,
 									'prepSteps-content',
 									'prepSteps-tab',
-									A2($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.steps),
+									A3($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.ingredients, recipe.steps),
 									false,
 									false)
 								]))

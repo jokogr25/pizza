@@ -2,11 +2,13 @@ module Main exposing (Msg(..), main, update, view)
 
 import Browser
 import Browser.Dom exposing (Error(..))
-import Helper exposing (round2ToString)
+import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import List
+import Regex
+import String exposing (words)
 
 
 
@@ -361,13 +363,21 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 [ tabContent
                     "ingredients-content"
                     "ingredients-tab"
-                    (newIngredientsView recipe.ingredients selectedIngredient maybeNewAmount)
+                    (newIngredientsView
+                        recipe.ingredients
+                        selectedIngredient
+                        maybeNewAmount
+                    )
                     True
                     True
                 , tabContent
                     "prepSteps-content"
                     "prepSteps-tab"
-                    (prepStepsView currentDisplayedPrepStepIndex recipe.steps)
+                    (prepStepsView
+                        currentDisplayedPrepStepIndex
+                        recipe.ingredients
+                        recipe.steps
+                    )
                     False
                     False
                 ]
@@ -463,8 +473,8 @@ newIngredientView maybeSelectedIngredient maybeNewAmount ingredient =
         ]
 
 
-prepStepsView : Int -> List PrepStep -> Html Msg
-prepStepsView indexToDisplay prepSteps =
+prepStepsView : Int -> List Ingredient -> List PrepStep -> Html Msg
+prepStepsView indexToDisplay ingredients prepSteps =
     if List.length prepSteps == 0 then
         text "no steps :("
 
@@ -474,7 +484,7 @@ prepStepsView indexToDisplay prepSteps =
             [ div
                 [ style "display" "grid"
                 ]
-                (List.indexedMap (prepStepView indexToDisplay) prepSteps)
+                (List.indexedMap (prepStepView indexToDisplay ingredients) prepSteps)
             , div
                 [ class "mb-3"
                 , style "display" "grid"
@@ -505,8 +515,8 @@ prepStepsView indexToDisplay prepSteps =
 {- All elements are rendered but displayed conditionally by visibility. By this the layout is fixed on the start and does not crash -}
 
 
-prepStepView : Int -> Int -> PrepStep -> Html Msg
-prepStepView indexToDisplay index prepStep =
+prepStepView : Int -> List Ingredient -> Int -> PrepStep -> Html Msg
+prepStepView indexToDisplay ingredients index prepStep =
     div
         [ style "grid-row" "1"
         , style "grid-column" "1"
@@ -538,7 +548,12 @@ prepStepView indexToDisplay index prepStep =
             ]
         , div
             []
-            [ text prepStep.description ]
+            [ text
+                (replaceIngredientAmountFraction
+                    ingredients
+                    prepStep.description
+                )
+            ]
         ]
 
 
@@ -656,6 +671,125 @@ samplePizzaRecipe =
           }
         ]
     }
+
+
+replaceIngredientAmountFraction : List Ingredient -> String -> String
+replaceIngredientAmountFraction ingredients string =
+    let
+        -- Regex for "fraction of word"
+        fractionOfWordRegex : Regex.Regex
+        fractionOfWordRegex =
+            safeRegexOf "\\b\\d+/\\d+ of \\w+\\b"
+
+        -- Find matches
+        matches : List Regex.Match
+        matches =
+            Regex.find fractionOfWordRegex string
+
+        -- Parse fraction string like "4/5" -> 0.8
+        parseFraction : String -> Maybe Float
+        parseFraction str =
+            case String.split "/" str of
+                [ numStr, denomStr ] ->
+                    case ( String.toFloat numStr, String.toFloat denomStr ) of
+                        ( Just n, Just d ) ->
+                            Just (n / d)
+
+                        _ ->
+                            Nothing
+
+                _ ->
+                    Nothing
+
+        -- Replace one match in the string
+        replaceMatch : Regex.Match -> String -> String
+        replaceMatch match str =
+            let
+                fullMatch =
+                    match.match
+
+                parts =
+                    String.words fullMatch
+
+                -- ["4/5", "of", "sugar"]
+                maybeFraction : Maybe Float
+                maybeFraction =
+                    case parts of
+                        frac :: "of" :: _ :: [] ->
+                            parseFraction frac
+
+                        _ ->
+                            Nothing
+
+                maybeIngredient : Maybe Ingredient
+                maybeIngredient =
+                    case parts of
+                        _ :: _ :: word :: [] ->
+                            case
+                                List.filter
+                                    (\ingredient ->
+                                        ingredient.id == word || ingredient.label == word
+                                    )
+                                    ingredients
+                            of
+                                ingredient :: [] ->
+                                    Just ingredient
+
+                                _ ->
+                                    Nothing
+
+                        _ ->
+                            Nothing
+            in
+            case ( maybeFraction, maybeIngredient ) of
+                ( Just f, Just ing ) ->
+                    let
+                        newAmount =
+                            f * ing.amount
+                    in
+                    String.replace
+                        fullMatch
+                        (round2ToString newAmount
+                            ++ unitToAbbr ing.unit
+                            ++ " "
+                            ++ ing.id
+                        )
+                        str
+
+                _ ->
+                    str
+    in
+    -- Apply replacements for all matches
+    List.foldl replaceMatch string matches
+
+
+replaceIngredientAmount : List Ingredient -> String -> String
+replaceIngredientAmount ingredients description =
+    description
+        |> String.words
+        |> List.map
+            (\word ->
+                case
+                    List.filter
+                        (\ingredient ->
+                            ingredient.id == word || ingredient.label == word
+                        )
+                        ingredients
+                of
+                    ingredient :: _ ->
+                        -- Found a matching ingredient, replace with "id:amount"
+                        ingredient.id
+                            ++ " ("
+                            ++ round2ToString ingredient.amount
+                            ++ " "
+                            ++ unitToAbbr ingredient.unit
+                            ++ ")"
+
+                    [] ->
+                        -- No match, leave the word as-is
+                        word
+            )
+        |> String.join " "
 
 
 
