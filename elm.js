@@ -5190,13 +5190,55 @@ var $elm$browser$Browser$sandbox = function (impl) {
 		});
 };
 var $author$project$Main$Carousel = {$: 'Carousel'};
-var $author$project$Main$RecipeCalculator = F3(
-	function (a, b, c) {
-		return {$: 'RecipeCalculator', a: a, b: b, c: c};
+var $author$project$Main$RecipeCalculator = F4(
+	function (a, b, c, d) {
+		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d};
+	});
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
 	});
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$Main$ingredientApplyRatio = F2(
+	function (ratio, ingredient) {
+		return _Utils_update(
+			ingredient,
+			{amount: ingredient.amount * ratio});
+	});
+var $author$project$Main$recipeApplyRatio = F2(
+	function (ratio, recipe) {
+		return _Utils_update(
+			recipe,
+			{
+				ingredients: A2(
+					$elm$core$List$map,
+					$author$project$Main$ingredientApplyRatio(ratio),
+					recipe.ingredients)
+			});
+	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5205,13 +5247,56 @@ var $author$project$Main$update = F2(
 				return $author$project$Main$Carousel;
 			case 'GoRecipeCalculator':
 				var recipe = msg.a;
-				return A3($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0);
+				return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing);
 			case 'SelectIngredient':
 				var maybeIngredient = msg.a;
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
-					return A3($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex);
+					var maybeAmount = model.d;
+					return A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeAmount);
+				} else {
+					return model;
+				}
+			case 'InputNewAmount':
+				var amount = msg.a;
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var maybeIngredient = model.b;
+					var prepStepIndex = model.c;
+					return A4(
+						$author$project$Main$RecipeCalculator,
+						recipe,
+						maybeIngredient,
+						prepStepIndex,
+						$elm$core$String$toFloat(amount));
+				} else {
+					return model;
+				}
+			case 'CalculateRatio':
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var maybeIngredient = model.b;
+					var prepStepIndex = model.c;
+					var maybeNewAmount = model.d;
+					return A2(
+						$elm$core$Maybe$withDefault,
+						A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount),
+						A3(
+							$elm$core$Maybe$map2,
+							F2(
+								function (ingredient, newAmount) {
+									var oldAmount = ingredient.amount;
+									var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
+									return A4(
+										$author$project$Main$RecipeCalculator,
+										A2($author$project$Main$recipeApplyRatio, newRatio, recipe),
+										$elm$core$Maybe$Nothing,
+										prepStepIndex,
+										$elm$core$Maybe$Nothing);
+								}),
+							maybeIngredient,
+							maybeNewAmount));
 				} else {
 					return model;
 				}
@@ -5220,14 +5305,16 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
-					return A3(
+					var maybeAmount = model.d;
+					return A4(
 						$author$project$Main$RecipeCalculator,
 						recipe,
 						maybeIngredient,
 						A2(
 							$elm$core$Basics$min,
 							prepStepIndex + 1,
-							$elm$core$List$length(recipe.steps)));
+							$elm$core$List$length(recipe.steps)),
+						maybeAmount);
 				} else {
 					return model;
 				}
@@ -5236,11 +5323,13 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
-					return A3(
+					var maybeAmount = model.d;
+					return A4(
 						$author$project$Main$RecipeCalculator,
 						recipe,
 						maybeIngredient,
-						A2($elm$core$Basics$max, prepStepIndex - 1, 0));
+						A2($elm$core$Basics$max, prepStepIndex - 1, 0),
+						maybeAmount);
 				} else {
 					return model;
 				}
@@ -5372,6 +5461,10 @@ var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$li = _VirtualDom_node('li');
+var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
+var $author$project$Main$InputNewAmount = function (a) {
+	return {$: 'InputNewAmount', a: a};
+};
 var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
@@ -5405,9 +5498,42 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
-var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$core$Basics$not = _Basics_not;
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
 var $author$project$Main$pencilIcon = A2(
 	$elm$html$Html$img,
 	_List_fromArray(
@@ -5417,6 +5543,12 @@ var $author$project$Main$pencilIcon = A2(
 		]),
 	_List_Nil);
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Helper$round2ToString = function (x) {
+	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
+	return $elm$core$String$fromFloat(rounded);
+};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
 	switch (unit.$) {
@@ -5428,8 +5560,9 @@ var $author$project$Main$unitToAbbr = function (unit) {
 			return 'tsp';
 	}
 };
-var $author$project$Main$newIngredientView = F2(
-	function (maybeSelectedIngredient, ingredient) {
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$newIngredientView = F3(
+	function (maybeSelectedIngredient, maybeNewAmount, ingredient) {
 		var isSelected = function () {
 			if (maybeSelectedIngredient.$ === 'Nothing') {
 				return false;
@@ -5438,8 +5571,16 @@ var $author$project$Main$newIngredientView = F2(
 				return _Utils_eq(selectedIngredient.id, ingredient.id);
 			}
 		}();
-		var inputButton = F2(
-			function (onClickMessage, icon) {
+		var isNewAmountValid = function () {
+			if (maybeNewAmount.$ === 'Just') {
+				var newAmount = maybeNewAmount.a;
+				return newAmount >= 1;
+			} else {
+				return false;
+			}
+		}();
+		var inputButton = F3(
+			function (onClickMessage, icon, isDisabled) {
 				return A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -5450,11 +5591,13 @@ var $author$project$Main$newIngredientView = F2(
 							A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
 							A2($elm$html$Html$Attributes$style, 'top', '50%'),
 							A2($elm$html$Html$Attributes$style, 'transform', 'translateY(-50%)'),
+							$elm$html$Html$Attributes$disabled(isDisabled),
 							$elm$html$Html$Events$onClick(onClickMessage)
 						]),
 					_List_fromArray(
 						[icon]));
 			});
+		var checkDisabled = isSelected && (!isNewAmountValid);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5484,24 +5627,24 @@ var $author$project$Main$newIngredientView = F2(
 									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$class('form-control'),
 									$elm$html$Html$Attributes$placeholder(
-									$elm$core$String$fromFloat(ingredient.amount) + (' ' + $author$project$Main$unitToAbbr(ingredient.unit))),
+									$author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Main$unitToAbbr(ingredient.unit))),
 									$elm$html$Html$Attributes$disabled(!isSelected),
-									A2($elm$html$Html$Attributes$style, 'padding-right', '2.5rem')
+									isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value(''),
+									A2($elm$html$Html$Attributes$style, 'padding-right', '2.5rem'),
+									$elm$html$Html$Events$onInput($author$project$Main$InputNewAmount)
 								]),
 							_List_Nil),
-							isSelected ? A2(
-							inputButton,
-							$author$project$Main$SelectIngredient($elm$core$Maybe$Nothing),
-							$author$project$Main$checkIcon) : A2(
+							isSelected ? A3(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon, checkDisabled) : A3(
 							inputButton,
 							$author$project$Main$SelectIngredient(
 								$elm$core$Maybe$Just(ingredient)),
-							$author$project$Main$pencilIcon)
+							$author$project$Main$pencilIcon,
+							false)
 						]))
 				]));
 	});
-var $author$project$Main$newIngredientsView = F2(
-	function (ingredients, selectedIngredient) {
+var $author$project$Main$newIngredientsView = F3(
+	function (ingredients, selectedIngredient, maybeNewAmount) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5510,12 +5653,11 @@ var $author$project$Main$newIngredientsView = F2(
 				]),
 			A2(
 				$elm$core$List$map,
-				$author$project$Main$newIngredientView(selectedIngredient),
+				A2($author$project$Main$newIngredientView, selectedIngredient, maybeNewAmount),
 				ingredients));
 	});
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$prepStepView = F3(
 	function (indexToDisplay, index, prepStep) {
@@ -5623,8 +5765,8 @@ var $author$project$Main$prepStepsView = F2(
 				]));
 	});
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$recipeView = F3(
-	function (recipe, selectedIngredient, currentDisplayedPrepStepIndex) {
+var $author$project$Main$recipeView = F4(
+	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
 		var tabLi = F4(
 			function (buttonId, contentId, label, isActive) {
 				return A2(
@@ -5724,7 +5866,7 @@ var $author$project$Main$recipeView = F3(
 									tabContent,
 									'ingredients-content',
 									'ingredients-tab',
-									A2($author$project$Main$newIngredientsView, recipe.ingredients, selectedIngredient),
+									A3($author$project$Main$newIngredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
 									true,
 									true),
 									A5(
@@ -5836,7 +5978,8 @@ var $author$project$Main$view = function (model) {
 			var recipe = model.a;
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
-			return A3($author$project$Main$recipeView, recipe, selectedIngredient, prepStepIndex);
+			var maybeNewAmount = model.d;
+			return A4($author$project$Main$recipeView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

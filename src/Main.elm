@@ -2,9 +2,10 @@ module Main exposing (Msg(..), main, update, view)
 
 import Browser
 import Browser.Dom exposing (Error(..))
+import Helper exposing (round2ToString)
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import List
 
 
@@ -28,7 +29,7 @@ main =
 type Model
     = Front
     | Carousel
-    | RecipeCalculator Recipe (Maybe Ingredient) Int
+    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float)
 
 
 
@@ -39,6 +40,8 @@ type Msg
     = GoCarousel
     | GoRecipeCalculator Recipe
     | SelectIngredient (Maybe Ingredient)
+    | InputNewAmount String
+    | CalculateRatio
     | Next
     | Prev
     | NoOp
@@ -55,19 +58,66 @@ update msg model =
             Carousel
 
         GoRecipeCalculator recipe ->
-            RecipeCalculator recipe Nothing 0
+            RecipeCalculator recipe Nothing 0 Nothing
 
         SelectIngredient maybeIngredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex ->
-                    RecipeCalculator recipe maybeIngredient prepStepIndex
+                RecipeCalculator recipe _ prepStepIndex maybeAmount ->
+                    RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount
+
+                _ ->
+                    model
+
+        InputNewAmount amount ->
+            case model of
+                RecipeCalculator recipe maybeIngredient prepStepIndex _ ->
+                    RecipeCalculator
+                        recipe
+                        maybeIngredient
+                        prepStepIndex
+                        (String.toFloat amount)
+
+                _ ->
+                    model
+
+        CalculateRatio ->
+            case model of
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount ->
+                    Maybe.map2
+                        (\ingredient newAmount ->
+                            let
+                                oldAmount =
+                                    ingredient.amount
+
+                                newRatio =
+                                    if oldAmount <= 0 then
+                                        1
+
+                                    else
+                                        newAmount / oldAmount
+                            in
+                            RecipeCalculator
+                                (recipeApplyRatio newRatio recipe)
+                                Nothing
+                                prepStepIndex
+                                Nothing
+                        )
+                        maybeIngredient
+                        maybeNewAmount
+                        |> Maybe.withDefault
+                            (RecipeCalculator
+                                recipe
+                                maybeIngredient
+                                prepStepIndex
+                                maybeNewAmount
+                            )
 
                 _ ->
                     model
 
         Next ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
                     RecipeCalculator
                         recipe
                         maybeIngredient
@@ -75,13 +125,14 @@ update msg model =
                             (prepStepIndex + 1)
                             (List.length recipe.steps)
                         )
+                        maybeAmount
 
                 _ ->
                     model
 
         Prev ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
                     RecipeCalculator
                         recipe
                         maybeIngredient
@@ -89,6 +140,7 @@ update msg model =
                             (prepStepIndex - 1)
                             0
                         )
+                        maybeAmount
 
                 _ ->
                     model
@@ -110,10 +162,11 @@ view model =
         Carousel ->
             viewCarousel1
 
-        RecipeCalculator recipe selectedIngredient prepStepIndex ->
+        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
             recipeView
                 recipe
                 selectedIngredient
+                maybeNewAmount
                 prepStepIndex
 
 
@@ -223,8 +276,8 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
-recipeView : Recipe -> Maybe Ingredient -> Int -> Html Msg
-recipeView recipe selectedIngredient currentDisplayedPrepStepIndex =
+recipeView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
+recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
         tabLi buttonId contentId label isActive =
             Html.li
@@ -308,7 +361,7 @@ recipeView recipe selectedIngredient currentDisplayedPrepStepIndex =
                 [ tabContent
                     "ingredients-content"
                     "ingredients-tab"
-                    (newIngredientsView recipe.ingredients selectedIngredient)
+                    (newIngredientsView recipe.ingredients selectedIngredient maybeNewAmount)
                     True
                     True
                 , tabContent
@@ -322,16 +375,16 @@ recipeView recipe selectedIngredient currentDisplayedPrepStepIndex =
         ]
 
 
-newIngredientsView : List Ingredient -> Maybe Ingredient -> Html Msg
-newIngredientsView ingredients selectedIngredient =
+newIngredientsView : List Ingredient -> Maybe Ingredient -> Maybe Float -> Html Msg
+newIngredientsView ingredients selectedIngredient maybeNewAmount =
     div
         [ class "card-body"
         ]
-        (List.map (newIngredientView selectedIngredient) ingredients)
+        (List.map (newIngredientView selectedIngredient maybeNewAmount) ingredients)
 
 
-newIngredientView : Maybe Ingredient -> Ingredient -> Html Msg
-newIngredientView maybeSelectedIngredient ingredient =
+newIngredientView : Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
+newIngredientView maybeSelectedIngredient maybeNewAmount ingredient =
     let
         isSelected =
             case maybeSelectedIngredient of
@@ -341,7 +394,19 @@ newIngredientView maybeSelectedIngredient ingredient =
                 Just selectedIngredient ->
                     selectedIngredient.id == ingredient.id
 
-        inputButton onClickMessage icon =
+        isNewAmountValid =
+            case maybeNewAmount of
+                Just newAmount ->
+                    newAmount >= 1
+
+                Nothing ->
+                    False
+
+        checkDisabled =
+            isSelected
+                && not isNewAmountValid
+
+        inputButton onClickMessage icon isDisabled =
             button
                 [ type_ "button"
                 , class "btn btn-sm btn-link"
@@ -349,6 +414,7 @@ newIngredientView maybeSelectedIngredient ingredient =
                 , style "right" "0.5rem"
                 , style "top" "50%"
                 , style "transform" "translateY(-50%)"
+                , disabled isDisabled
                 , onClick onClickMessage
                 ]
                 [ icon ]
@@ -368,23 +434,31 @@ newIngredientView maybeSelectedIngredient ingredient =
                 , type_ "number"
                 , class "form-control"
                 , placeholder
-                    (String.fromFloat ingredient.amount
+                    (round2ToString ingredient.amount
                         ++ " "
                         ++ unitToAbbr ingredient.unit
                     )
                 , disabled (not isSelected)
+                , if isSelected then
+                    style "" ""
+
+                  else
+                    Html.Attributes.value ""
                 , style "padding-right" "2.5rem"
+                , onInput InputNewAmount
                 ]
                 []
             , if isSelected then
                 inputButton
-                    (SelectIngredient Nothing)
+                    CalculateRatio
                     checkIcon
+                    checkDisabled
 
               else
                 inputButton
                     (SelectIngredient (Just ingredient))
                     pencilIcon
+                    False
             ]
         ]
 
