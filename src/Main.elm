@@ -328,13 +328,13 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 ]
     in
     div
-        [ class "card mx-auto my-md-3"
+        [ class "mx-auto my-md-3 px-3 px-md-0"
         , style "max-width" "700px"
         ]
         [ div
-            [ class "card-body" ]
-            [ Html.h2
-                [ class "card-title" ]
+            []
+            [ Html.h1
+                []
                 [ text recipe.label ]
             , Html.ul
                 [ class "nav nav-tabs"

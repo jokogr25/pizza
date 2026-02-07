@@ -5592,7 +5592,7 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$Abort = {$: 'Abort'};
 var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
@@ -6077,25 +6077,19 @@ var $author$project$Main$recipeView = F4(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('card mx-auto my-md-3'),
+					$elm$html$Html$Attributes$class('mx-auto my-md-3 px-3 px-md-0'),
 					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 				]),
 			_List_fromArray(
 				[
 					A2(
 					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('card-body')
-						]),
+					_List_Nil,
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$h2,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('card-title')
-								]),
+							$elm$html$Html$h1,
+							_List_Nil,
 							_List_fromArray(
 								[
 									$elm$html$Html$text(recipe.label)
