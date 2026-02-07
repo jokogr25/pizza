@@ -80,190 +80,6 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = $elm$core$Set$toList(x);
-		y = $elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
 var _List_Nil_UNUSED = { $: 0 };
 var _List_Nil = { $: '[]' };
 
@@ -789,6 +605,190 @@ function _Debug_regionToString(region)
 		return 'on line ' + region.start.line;
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
+}
+
+
+
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = $elm$core$Set$toList(x);
+		y = $elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
 }
 
 
@@ -4479,11 +4479,33 @@ var _Regex_splitAtMost = F3(function(n, re, str)
 });
 
 var _Regex_infinity = Infinity;
-var $author$project$Main$Front = {$: 'Front'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
+var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var $elm$core$Array$foldr = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldr,
+			helper,
+			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var $elm$core$Array$toList = function (array) {
+	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
+};
 var $elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4536,30 +4558,8 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
-var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var $elm$core$Array$foldr = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldr,
-			helper,
-			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
-	});
-var $elm$core$Array$toList = function (array) {
-	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
-};
+var $elm$core$Basics$GT = {$: 'GT'};
+var $author$project$Main$Front = {$: 'Front'};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5268,27 +5268,448 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
+var $elm$browser$Browser$element = _Browser_element;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
+var $author$project$Main$NoOp = {$: 'NoOp'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$sandbox = function (impl) {
-	return _Browser_element(
-		{
-			init: function (_v0) {
-				return _Utils_Tuple2(impl.init, $elm$core$Platform$Cmd$none);
-			},
-			subscriptions: function (_v1) {
-				return $elm$core$Platform$Sub$none;
-			},
-			update: F2(
-				function (msg, model) {
-					return _Utils_Tuple2(
-						A2(impl.update, msg, model),
-						$elm$core$Platform$Cmd$none);
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$Enter = {$: 'Enter'};
+var $author$project$Main$Unknown = {$: 'Unknown'};
+var $author$project$Main$toKey = function (str) {
+	if (str === 'Enter') {
+		return $author$project$Main$Enter;
+	} else {
+		return $author$project$Main$Unknown;
+	}
+};
+var $author$project$Main$keyDecoder = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$Main$toKey,
+	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+var $elm$core$Platform$Sub$map = _Platform_map;
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
 				}),
-			view: impl.view
-		});
+			intermediateResult,
+			leftovers);
+	});
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $author$project$Main$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				A2(
+				$elm$core$Platform$Sub$map,
+				function (key) {
+					if (key.$ === 'Enter') {
+						if (model.$ === 'RecipeCalculator') {
+							return $author$project$Main$CalculateRatio;
+						} else {
+							return $author$project$Main$NoOp;
+						}
+					} else {
+						return $author$project$Main$NoOp;
+					}
+				},
+				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder))
+			]));
 };
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Main$RecipeAlbum = F2(
@@ -5299,6 +5720,39 @@ var $author$project$Main$RecipeCalculator = F4(
 	function (a, b, c, d) {
 		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d};
 	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $elm$browser$Browser$Dom$focus = _Browser_call('focus');
+var $author$project$Main$focus = function (id) {
+	return A2(
+		$elm$core$Task$attempt,
+		function (_v0) {
+			return $author$project$Main$NoOp;
+		},
+		$elm$browser$Browser$Dom$focus(id));
+};
 var $elm$core$Maybe$map2 = F3(
 	function (func, ma, mb) {
 		if (ma.$ === 'Nothing') {
@@ -5395,27 +5849,49 @@ var $elm$core$Maybe$withDefault = F2(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
+		var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		switch (msg.$) {
 			case 'GoCarousel':
-				return $author$project$Main$Carousel;
+				return _Utils_Tuple2($author$project$Main$Carousel, $elm$core$Platform$Cmd$none);
 			case 'GoRecipeCalculator':
 				var recipe = msg.a;
-				return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing);
+				return _Utils_Tuple2(
+					A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing),
+					$elm$core$Platform$Cmd$none);
 			case 'GoRecipeAlbum':
-				return A2(
-					$author$project$Main$RecipeAlbum,
-					_List_fromArray(
-						[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
-					$elm$core$Maybe$Nothing);
+				return _Utils_Tuple2(
+					A2(
+						$author$project$Main$RecipeAlbum,
+						_List_fromArray(
+							[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
+						$elm$core$Maybe$Nothing),
+					$elm$core$Platform$Cmd$none);
 			case 'SelectIngredient':
-				var maybeIngredient = msg.a;
+				var ingredient = msg.a;
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
-					return A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeAmount);
+					return _Utils_Tuple2(
+						A4(
+							$author$project$Main$RecipeCalculator,
+							recipe,
+							$elm$core$Maybe$Just(ingredient),
+							prepStepIndex,
+							maybeAmount),
+						$author$project$Main$focus(ingredient.id));
 				} else {
-					return model;
+					return noChange;
+				}
+			case 'UnselectIngredient':
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var prepStepIndex = model.c;
+					return _Utils_Tuple2(
+						A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
 				}
 			case 'InputNewAmount':
 				var amount = msg.a;
@@ -5423,25 +5899,29 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
-					return A4(
-						$author$project$Main$RecipeCalculator,
-						recipe,
-						maybeIngredient,
-						prepStepIndex,
-						$elm$core$String$toFloat(amount));
+					return _Utils_Tuple2(
+						A4(
+							$author$project$Main$RecipeCalculator,
+							recipe,
+							maybeIngredient,
+							prepStepIndex,
+							$elm$core$String$toFloat(amount)),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			case 'InputSearchTerm':
 				var searchTerm = msg.a;
 				if (model.$ === 'RecipeAlbum') {
 					var recipes = model.a;
-					return A2(
-						$author$project$Main$RecipeAlbum,
-						recipes,
-						$elm$core$Maybe$Just(searchTerm));
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeAlbum,
+							recipes,
+							$elm$core$Maybe$Just(searchTerm)),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			case 'CalculateRatio':
 				if (model.$ === 'RecipeCalculator') {
@@ -5449,34 +5929,38 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeNewAmount = model.d;
-					return A2(
-						$elm$core$Maybe$withDefault,
-						A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount),
-						A3(
-							$elm$core$Maybe$map2,
-							F2(
-								function (ingredient, newAmount) {
-									var oldAmount = ingredient.amount;
-									var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
-									return A4(
-										$author$project$Main$RecipeCalculator,
-										A2($author$project$Main$recipeApplyRatio, newRatio, recipe),
-										$elm$core$Maybe$Nothing,
-										prepStepIndex,
-										$elm$core$Maybe$Nothing);
-								}),
-							maybeIngredient,
-							maybeNewAmount));
+					return _Utils_Tuple2(
+						A2(
+							$elm$core$Maybe$withDefault,
+							A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount),
+							A3(
+								$elm$core$Maybe$map2,
+								F2(
+									function (ingredient, newAmount) {
+										var oldAmount = ingredient.amount;
+										var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
+										return A4(
+											$author$project$Main$RecipeCalculator,
+											A2($author$project$Main$recipeApplyRatio, newRatio, recipe),
+											$elm$core$Maybe$Nothing,
+											prepStepIndex,
+											$elm$core$Maybe$Nothing);
+									}),
+								maybeIngredient,
+								maybeNewAmount)),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			case 'Abort':
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
-					return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing);
+					return _Utils_Tuple2(
+						A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			case 'Next':
 				if (model.$ === 'RecipeCalculator') {
@@ -5484,17 +5968,19 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
-					return A4(
-						$author$project$Main$RecipeCalculator,
-						recipe,
-						maybeIngredient,
-						A2(
-							$elm$core$Basics$min,
-							prepStepIndex + 1,
-							$elm$core$List$length(recipe.steps)),
-						maybeAmount);
+					return _Utils_Tuple2(
+						A4(
+							$author$project$Main$RecipeCalculator,
+							recipe,
+							maybeIngredient,
+							A2(
+								$elm$core$Basics$min,
+								prepStepIndex + 1,
+								$elm$core$List$length(recipe.steps)),
+							maybeAmount),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			case 'Prev':
 				if (model.$ === 'RecipeCalculator') {
@@ -5502,17 +5988,19 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
-					return A4(
-						$author$project$Main$RecipeCalculator,
-						recipe,
-						maybeIngredient,
-						A2($elm$core$Basics$max, prepStepIndex - 1, 0),
-						maybeAmount);
+					return _Utils_Tuple2(
+						A4(
+							$author$project$Main$RecipeCalculator,
+							recipe,
+							maybeIngredient,
+							A2($elm$core$Basics$max, prepStepIndex - 1, 0),
+							maybeAmount),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					return model;
+					return noChange;
 				}
 			default:
-				return model;
+				return noChange;
 		}
 	});
 var $elm$core$List$any = F2(
@@ -5694,12 +6182,10 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -6141,13 +6627,13 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 var $author$project$Main$RecipeCalculatorTab = {$: 'RecipeCalculatorTab'};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$Abort = {$: 'Abort'};
-var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
 var $author$project$Main$InputNewAmount = function (a) {
 	return {$: 'InputNewAmount', a: a};
 };
 var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
+var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
 var $elm$html$Html$Attributes$width = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -6251,6 +6737,7 @@ var $author$project$Main$ingredientView = F3(
 								[
 									$elm$html$Html$Attributes$id(ingredient.id),
 									$elm$html$Html$Attributes$type_('number'),
+									$elm$html$Html$Attributes$autofocus(isSelected),
 									$elm$html$Html$Attributes$classList(
 									_List_fromArray(
 										[
@@ -6266,8 +6753,7 @@ var $author$project$Main$ingredientView = F3(
 							_List_Nil),
 							isSelected ? (isNewAmountValid ? A2(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon) : A2(inputButton, $author$project$Main$Abort, $author$project$Main$closeIcon)) : A2(
 							inputButton,
-							$author$project$Main$SelectIngredient(
-								$elm$core$Maybe$Just(ingredient)),
+							$author$project$Main$SelectIngredient(ingredient),
 							$author$project$Main$pencilIcon)
 						])),
 					(isSelected && (!isNewAmountValid)) ? A2(
@@ -6747,7 +7233,14 @@ var $author$project$Main$view = function (model) {
 			return A4($author$project$Main$recipeCalculatorView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
-var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{init: $author$project$Main$Front, update: $author$project$Main$update, view: $author$project$Main$view});
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{
+		init: function (_v0) {
+			return _Utils_Tuple2($author$project$Main$Front, $elm$core$Platform$Cmd$none);
+		},
+		subscriptions: $author$project$Main$subscriptions,
+		update: $author$project$Main$update,
+		view: $author$project$Main$view
+	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

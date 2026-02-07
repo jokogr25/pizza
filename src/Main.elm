@@ -2,13 +2,16 @@ module Main exposing (Msg(..), main, update, view)
 
 import Browser
 import Browser.Dom exposing (Error(..))
+import Browser.Events
 import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode as Decode
 import List
 import Regex
 import String
+import Task
 
 
 
@@ -17,10 +20,11 @@ import String
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = Front
-        , update = update
+    Browser.element
+        { init = \_ -> ( Front, Cmd.none )
         , view = view
+        , update = update
+        , subscriptions = subscriptions
         }
 
 
@@ -43,7 +47,8 @@ type Msg
     = GoCarousel
     | GoRecipeAlbum
     | GoRecipeCalculator Recipe
-    | SelectIngredient (Maybe Ingredient)
+    | SelectIngredient Ingredient
+    | UnselectIngredient
     | InputNewAmount String
     | InputSearchTerm String
     | CalculateRatio
@@ -54,67 +59,140 @@ type Msg
 
 
 
+-- SUBS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Sub.map
+            (\key ->
+                case key of
+                    Enter ->
+                        case model of
+                            RecipeCalculator _ _ _ _ ->
+                                CalculateRatio
+
+                            _ ->
+                                NoOp
+
+                    _ ->
+                        NoOp
+            )
+            (Browser.Events.onKeyDown keyDecoder)
+        ]
+
+
+keyDecoder : Decode.Decoder Key
+keyDecoder =
+    Decode.map toKey (Decode.field "key" Decode.string)
+
+
+type Key
+    = Enter
+    | Unknown
+
+
+toKey : String -> Key
+toKey str =
+    case str of
+        "Enter" ->
+            Enter
+
+        _ ->
+            Unknown
+
+
+
 -- UPDATE
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        noChange =
+            ( model, Cmd.none )
+    in
     case msg of
         GoCarousel ->
-            Carousel
+            ( Carousel, Cmd.none )
 
         GoRecipeCalculator recipe ->
-            RecipeCalculator
+            ( RecipeCalculator
                 recipe
                 Nothing
                 0
                 Nothing
+            , Cmd.none
+            )
 
         GoRecipeAlbum ->
-            RecipeAlbum
+            ( RecipeAlbum
                 [ samplePizzaRecipe
                 , sampleLasagneRecipe
                 ]
                 Nothing
+            , Cmd.none
+            )
 
-        SelectIngredient maybeIngredient ->
+        SelectIngredient ingredient ->
             case model of
                 RecipeCalculator recipe _ prepStepIndex maybeAmount ->
-                    RecipeCalculator
+                    ( RecipeCalculator
                         recipe
-                        maybeIngredient
+                        (Just ingredient)
                         prepStepIndex
                         maybeAmount
+                    , focus ingredient.id
+                    )
 
                 _ ->
-                    model
+                    noChange
+
+        UnselectIngredient ->
+            case model of
+                RecipeCalculator recipe _ prepStepIndex _ ->
+                    ( RecipeCalculator
+                        recipe
+                        Nothing
+                        prepStepIndex
+                        Nothing
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
 
         InputNewAmount amount ->
             case model of
                 RecipeCalculator recipe maybeIngredient prepStepIndex _ ->
-                    RecipeCalculator
+                    ( RecipeCalculator
                         recipe
                         maybeIngredient
                         prepStepIndex
                         (String.toFloat amount)
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         InputSearchTerm searchTerm ->
             case model of
                 RecipeAlbum recipes _ ->
-                    RecipeAlbum
+                    ( RecipeAlbum
                         recipes
                         (Just searchTerm)
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         CalculateRatio ->
             case model of
                 RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount ->
-                    Maybe.map2
+                    ( Maybe.map2
                         (\ingredient newAmount ->
                             let
                                 oldAmount =
@@ -142,26 +220,30 @@ update msg model =
                                 prepStepIndex
                                 maybeNewAmount
                             )
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         Abort ->
             case model of
                 RecipeCalculator recipe _ prepStepIndex _ ->
-                    RecipeCalculator
+                    ( RecipeCalculator
                         recipe
                         Nothing
                         prepStepIndex
                         Nothing
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         Next ->
             case model of
                 RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
-                    RecipeCalculator
+                    ( RecipeCalculator
                         recipe
                         maybeIngredient
                         (min
@@ -169,14 +251,16 @@ update msg model =
                             (List.length recipe.steps)
                         )
                         maybeAmount
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         Prev ->
             case model of
                 RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
-                    RecipeCalculator
+                    ( RecipeCalculator
                         recipe
                         maybeIngredient
                         (max
@@ -184,12 +268,14 @@ update msg model =
                             0
                         )
                         maybeAmount
+                    , Cmd.none
+                    )
 
                 _ ->
-                    model
+                    noChange
 
         NoOp ->
-            model
+            noChange
 
 
 
@@ -650,6 +736,12 @@ recipeCalculatorView recipe selectedIngredient maybeNewAmount currentDisplayedPr
         ]
 
 
+focus : String -> Cmd Msg
+focus id =
+    Browser.Dom.focus id
+        |> Task.attempt (\_ -> NoOp)
+
+
 ingredientsView : List Ingredient -> Maybe Ingredient -> Maybe Float -> Html Msg
 ingredientsView ingredients selectedIngredient maybeNewAmount =
     div
@@ -693,6 +785,7 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
             [ input
                 [ Html.Attributes.id ingredient.id
                 , type_ "number"
+                , Html.Attributes.autofocus isSelected
                 , classList
                     [ ( "form-control", True )
                     , ( "is-invalid", isSelected && not isNewAmountValid )
@@ -719,7 +812,7 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                     inputButton Abort closeIcon
 
               else
-                inputButton (SelectIngredient (Just ingredient)) pencilIcon
+                inputButton (SelectIngredient ingredient) pencilIcon
             ]
         , if isSelected && not isNewAmountValid then
             div
