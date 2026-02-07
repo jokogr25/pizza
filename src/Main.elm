@@ -294,21 +294,17 @@ carouselButton direction label btnClass iconClass =
 recipeView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
 recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
-        tabLi buttonId contentId label isActive =
+        tabListItem : String -> String -> String -> Bool -> Html msg
+        tabListItem buttonId contentId label isActive =
             Html.li
                 [ class "nav-item"
                 , attribute "role" "presentation"
                 ]
                 [ button
-                    [ class
-                        ("nav-link"
-                            ++ (if isActive then
-                                    " active"
-
-                                else
-                                    ""
-                               )
-                        )
+                    [ classList
+                        [ ( "nav-link", True )
+                        , ( "active", isActive )
+                        ]
                     , id buttonId
                     , attribute "data-bs-toggle" "tab"
                     , attribute "data-bs-target" ("#" ++ contentId)
@@ -322,21 +318,11 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
 
         tabContent contentId tabLiId content isShow isActive =
             div
-                [ class
-                    ("tab-pane"
-                        ++ (if isShow then
-                                " show"
-
-                            else
-                                ""
-                           )
-                        ++ (if isActive then
-                                " active"
-
-                            else
-                                ""
-                           )
-                    )
+                [ classList
+                    [ ( "tab-pane", True )
+                    , ( "show", isShow )
+                    , ( "active", isActive )
+                    ]
                 , id contentId
                 , attribute "role" "tabpanel"
                 , attribute "aria-labelledby" tabLiId
@@ -358,12 +344,12 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 , id "recipeTabs"
                 , attribute "role" "tablist"
                 ]
-                [ tabLi
+                [ tabListItem
                     "ingredients-tab"
                     "ingredients-content"
                     "Ingredients"
                     True
-                , tabLi
+                , tabListItem
                     "prepSteps-tab"
                     "prepSteps-content"
                     "Steps"

@@ -5567,6 +5567,31 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$Abort = {$: 'Abort'};
@@ -5598,31 +5623,6 @@ var $author$project$Main$checkIcon = A2(
 			$elm$html$Html$Attributes$src('src/img/icon/check.svg')
 		]),
 	_List_Nil);
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$html$Html$Attributes$classList = function (classes) {
-	return $elm$html$Html$Attributes$class(
-		A2(
-			$elm$core$String$join,
-			' ',
-			A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$first,
-				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
-};
 var $author$project$Main$closeIcon = A2(
 	$elm$html$Html$img,
 	_List_fromArray(
@@ -6035,7 +6035,7 @@ var $author$project$Main$prepStepsView = F3(
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$recipeView = F4(
 	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
-		var tabLi = F4(
+		var tabListItem = F4(
 			function (buttonId, contentId, label, isActive) {
 				return A2(
 					$elm$html$Html$li,
@@ -6050,8 +6050,12 @@ var $author$project$Main$recipeView = F4(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class(
-									'nav-link' + (isActive ? ' active' : '')),
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('nav-link', true),
+											_Utils_Tuple2('active', isActive)
+										])),
 									$elm$html$Html$Attributes$id(buttonId),
 									A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'tab'),
 									A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#' + contentId),
@@ -6072,8 +6076,13 @@ var $author$project$Main$recipeView = F4(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class(
-							'tab-pane' + ((isShow ? ' show' : '') + (isActive ? ' active' : ''))),
+							$elm$html$Html$Attributes$classList(
+							_List_fromArray(
+								[
+									_Utils_Tuple2('tab-pane', true),
+									_Utils_Tuple2('show', isShow),
+									_Utils_Tuple2('active', isActive)
+								])),
 							$elm$html$Html$Attributes$id(contentId),
 							A2($elm$html$Html$Attributes$attribute, 'role', 'tabpanel'),
 							A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', tabLiId)
@@ -6118,8 +6127,8 @@ var $author$project$Main$recipeView = F4(
 								]),
 							_List_fromArray(
 								[
-									A4(tabLi, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
-									A4(tabLi, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
+									A4(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
+									A4(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
 								])),
 							A2(
 							$elm$html$Html$div,
