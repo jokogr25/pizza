@@ -8,7 +8,7 @@ import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholde
 import Html.Events exposing (onClick, onInput)
 import List
 import Regex
-import String exposing (words)
+import String
 
 
 
@@ -761,35 +761,6 @@ replaceIngredientAmountFraction ingredients string =
     in
     -- Apply replacements for all matches
     List.foldl replaceMatch string matches
-
-
-replaceIngredientAmount : List Ingredient -> String -> String
-replaceIngredientAmount ingredients description =
-    description
-        |> String.words
-        |> List.map
-            (\word ->
-                case
-                    List.filter
-                        (\ingredient ->
-                            ingredient.id == word || ingredient.label == word
-                        )
-                        ingredients
-                of
-                    ingredient :: _ ->
-                        -- Found a matching ingredient, replace with "id:amount"
-                        ingredient.id
-                            ++ " ("
-                            ++ round2ToString ingredient.amount
-                            ++ " "
-                            ++ unitToAbbr ingredient.unit
-                            ++ ")"
-
-                    [] ->
-                        -- No match, leave the word as-is
-                        word
-            )
-        |> String.join " "
 
 
 

@@ -5490,7 +5490,7 @@ var $author$project$Main$samplePizzaRecipe = {
 	label: 'Seven hours pizza dough',
 	steps: _List_fromArray(
 		[
-			{description: 'Mix flour and roughly 3/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
+			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
 			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
 			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy', time: 10, title: 'imx'},
 			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
