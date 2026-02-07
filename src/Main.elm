@@ -619,18 +619,6 @@ ingredientApplyRatio ratio ingredient =
     }
 
 
-type alias Pizza =
-    { name : String
-    , flour : Float
-    , water : Float
-    , yeast : Float
-    , honey : Int
-    , oliveoil : Float
-    , salt : Float
-    , steps : List PrepStep
-    }
-
-
 type alias PrepStep =
     { time : Int
     , title : String
