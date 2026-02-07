@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom exposing (Error(..))
 import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, img, input, label, span, text)
-import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
+import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import List
 import Regex
@@ -44,6 +44,7 @@ type Msg
     | SelectIngredient (Maybe Ingredient)
     | InputNewAmount String
     | CalculateRatio
+    | Abort
     | Next
     | Prev
     | NoOp
@@ -113,6 +114,18 @@ update msg model =
                                 prepStepIndex
                                 maybeNewAmount
                             )
+
+                _ ->
+                    model
+
+        Abort ->
+            case model of
+                RecipeCalculator recipe _ prepStepIndex _ ->
+                    RecipeCalculator
+                        recipe
+                        Nothing
+                        prepStepIndex
+                        Nothing
 
                 _ ->
                     model
@@ -363,7 +376,7 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 [ tabContent
                     "ingredients-content"
                     "ingredients-tab"
-                    (newIngredientsView
+                    (ingredientsView
                         recipe.ingredients
                         selectedIngredient
                         maybeNewAmount
@@ -385,64 +398,49 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
         ]
 
 
-newIngredientsView : List Ingredient -> Maybe Ingredient -> Maybe Float -> Html Msg
-newIngredientsView ingredients selectedIngredient maybeNewAmount =
+ingredientsView : List Ingredient -> Maybe Ingredient -> Maybe Float -> Html Msg
+ingredientsView ingredients selectedIngredient maybeNewAmount =
     div
-        [ class "card-body"
-        ]
-        (List.map (newIngredientView selectedIngredient maybeNewAmount) ingredients)
+        []
+        (List.map (ingredientView selectedIngredient maybeNewAmount) ingredients)
 
 
-newIngredientView : Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
-newIngredientView maybeSelectedIngredient maybeNewAmount ingredient =
+ingredientView : Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
+ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
     let
         isSelected =
-            case maybeSelectedIngredient of
-                Nothing ->
-                    False
-
-                Just selectedIngredient ->
-                    selectedIngredient.id == ingredient.id
+            maybeSelectedIngredient
+                |> Maybe.map (\selected -> selected.id == ingredient.id)
+                |> Maybe.withDefault False
 
         isNewAmountValid =
-            case maybeNewAmount of
-                Just newAmount ->
-                    newAmount >= 1
+            maybeNewAmount
+                |> Maybe.map (\newAmount -> newAmount >= 1)
+                |> Maybe.withDefault False
 
-                Nothing ->
-                    False
-
-        checkDisabled =
-            isSelected
-                && not isNewAmountValid
-
-        inputButton onClickMessage icon isDisabled =
+        inputButton : Msg -> Html Msg -> Html Msg
+        inputButton onClickMessage icon =
             button
                 [ type_ "button"
-                , class "btn btn-sm btn-link"
-                , style "position" "absolute"
-                , style "right" "0.5rem"
-                , style "top" "50%"
-                , style "transform" "translateY(-50%)"
-                , disabled isDisabled
+                , class "btn btn-outline-secondary"
+                , style "border-left" "none"
+                , style "border-radius" "0 .25rem .25rem 0"
+                , style "padding" "0 0.75rem"
                 , onClick onClickMessage
                 ]
                 [ icon ]
     in
     div
-        [ class "mb-3"
-        , style "display" "grid"
-        , style "grid-template-columns" "minmax(120px, 1fr) 1fr"
-        , style "gap" "0.75rem"
-        , style "align-items" "center"
-        ]
-        [ text ingredient.label
-        , div
-            [ style "position" "relative" ]
+        [ class "mb-3" ]
+        [ label [] [ text ingredient.label ]
+        , div [ class "input-group" ]
             [ input
                 [ Html.Attributes.id ingredient.id
                 , type_ "number"
-                , class "form-control"
+                , classList
+                    [ ( "form-control", True )
+                    , ( "is-invalid", isSelected && not isNewAmountValid )
+                    ]
                 , placeholder
                     (round2ToString ingredient.amount
                         ++ " "
@@ -454,22 +452,24 @@ newIngredientView maybeSelectedIngredient maybeNewAmount ingredient =
 
                   else
                     Html.Attributes.value ""
-                , style "padding-right" "2.5rem"
                 , onInput InputNewAmount
                 ]
                 []
             , if isSelected then
-                inputButton
-                    CalculateRatio
-                    checkIcon
-                    checkDisabled
+                if isNewAmountValid then
+                    inputButton CalculateRatio checkIcon
+
+                else
+                    inputButton Abort closeIcon
 
               else
-                inputButton
-                    (SelectIngredient (Just ingredient))
-                    pencilIcon
-                    False
+                inputButton (SelectIngredient (Just ingredient)) pencilIcon
             ]
+        , if isSelected && not isNewAmountValid then
+            div [ class "invalid-feedback" ] [ text "Amount must be ≥ 1" ]
+
+          else
+            text ""
         ]
 
 
@@ -823,5 +823,14 @@ checkIcon =
     Html.img
         [ Html.Attributes.width 16
         , Html.Attributes.src "src/img/icon/check.svg"
+        ]
+        []
+
+
+closeIcon : Html msg
+closeIcon =
+    Html.img
+        [ Html.Attributes.width 16
+        , Html.Attributes.src "src/img/icon/close.svg"
         ]
         []

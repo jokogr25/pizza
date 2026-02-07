@@ -5401,6 +5401,14 @@ var $author$project$Main$update = F2(
 				} else {
 					return model;
 				}
+			case 'Abort':
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var prepStepIndex = model.c;
+					return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing);
+				} else {
+					return model;
+				}
 			case 'Next':
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
@@ -5561,7 +5569,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$li = _VirtualDom_node('li');
+var $author$project$Main$Abort = {$: 'Abort'};
 var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
 var $author$project$Main$InputNewAmount = function (a) {
 	return {$: 'InputNewAmount', a: a};
@@ -5590,6 +5598,39 @@ var $author$project$Main$checkIcon = A2(
 			$elm$html$Html$Attributes$src('src/img/icon/check.svg')
 		]),
 	_List_Nil);
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $author$project$Main$closeIcon = A2(
+	$elm$html$Html$img,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$width(16),
+			$elm$html$Html$Attributes$src('src/img/icon/close.svg')
+		]),
+	_List_Nil);
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5601,6 +5642,17 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -5662,61 +5714,62 @@ var $author$project$Main$unitToAbbr = function (unit) {
 	}
 };
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$newIngredientView = F3(
+var $author$project$Main$ingredientView = F3(
 	function (maybeSelectedIngredient, maybeNewAmount, ingredient) {
-		var isSelected = function () {
-			if (maybeSelectedIngredient.$ === 'Nothing') {
-				return false;
-			} else {
-				var selectedIngredient = maybeSelectedIngredient.a;
-				return _Utils_eq(selectedIngredient.id, ingredient.id);
-			}
-		}();
-		var isNewAmountValid = function () {
-			if (maybeNewAmount.$ === 'Just') {
-				var newAmount = maybeNewAmount.a;
-				return newAmount >= 1;
-			} else {
-				return false;
-			}
-		}();
-		var inputButton = F3(
-			function (onClickMessage, icon, isDisabled) {
+		var isSelected = A2(
+			$elm$core$Maybe$withDefault,
+			false,
+			A2(
+				$elm$core$Maybe$map,
+				function (selected) {
+					return _Utils_eq(selected.id, ingredient.id);
+				},
+				maybeSelectedIngredient));
+		var isNewAmountValid = A2(
+			$elm$core$Maybe$withDefault,
+			false,
+			A2(
+				$elm$core$Maybe$map,
+				function (newAmount) {
+					return newAmount >= 1;
+				},
+				maybeNewAmount));
+		var inputButton = F2(
+			function (onClickMessage, icon) {
 				return A2(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$type_('button'),
-							$elm$html$Html$Attributes$class('btn btn-sm btn-link'),
-							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-							A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
-							A2($elm$html$Html$Attributes$style, 'top', '50%'),
-							A2($elm$html$Html$Attributes$style, 'transform', 'translateY(-50%)'),
-							$elm$html$Html$Attributes$disabled(isDisabled),
+							$elm$html$Html$Attributes$class('btn btn-outline-secondary'),
+							A2($elm$html$Html$Attributes$style, 'border-left', 'none'),
+							A2($elm$html$Html$Attributes$style, 'border-radius', '0 .25rem .25rem 0'),
+							A2($elm$html$Html$Attributes$style, 'padding', '0 0.75rem'),
 							$elm$html$Html$Events$onClick(onClickMessage)
 						]),
 					_List_fromArray(
 						[icon]));
 			});
-		var checkDisabled = isSelected && (!isNewAmountValid);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('mb-3'),
-					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-					A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'minmax(120px, 1fr) 1fr'),
-					A2($elm$html$Html$Attributes$style, 'gap', '0.75rem'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+					$elm$html$Html$Attributes$class('mb-3')
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(ingredient.label),
+					A2(
+					$elm$html$Html$label,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(ingredient.label)
+						])),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'position', 'relative')
+							$elm$html$Html$Attributes$class('input-group')
 						]),
 					_List_fromArray(
 						[
@@ -5726,51 +5779,51 @@ var $author$project$Main$newIngredientView = F3(
 								[
 									$elm$html$Html$Attributes$id(ingredient.id),
 									$elm$html$Html$Attributes$type_('number'),
-									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$classList(
+									_List_fromArray(
+										[
+											_Utils_Tuple2('form-control', true),
+											_Utils_Tuple2('is-invalid', isSelected && (!isNewAmountValid))
+										])),
 									$elm$html$Html$Attributes$placeholder(
 									$author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Main$unitToAbbr(ingredient.unit))),
 									$elm$html$Html$Attributes$disabled(!isSelected),
 									isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value(''),
-									A2($elm$html$Html$Attributes$style, 'padding-right', '2.5rem'),
 									$elm$html$Html$Events$onInput($author$project$Main$InputNewAmount)
 								]),
 							_List_Nil),
-							isSelected ? A3(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon, checkDisabled) : A3(
+							isSelected ? (isNewAmountValid ? A2(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon) : A2(inputButton, $author$project$Main$Abort, $author$project$Main$closeIcon)) : A2(
 							inputButton,
 							$author$project$Main$SelectIngredient(
 								$elm$core$Maybe$Just(ingredient)),
-							$author$project$Main$pencilIcon,
-							false)
-						]))
+							$author$project$Main$pencilIcon)
+						])),
+					(isSelected && (!isNewAmountValid)) ? A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('invalid-feedback')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Amount must be ≥ 1')
+						])) : $elm$html$Html$text('')
 				]));
 	});
-var $author$project$Main$newIngredientsView = F3(
+var $author$project$Main$ingredientsView = F3(
 	function (ingredients, selectedIngredient, maybeNewAmount) {
 		return A2(
 			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('card-body')
-				]),
+			_List_Nil,
 			A2(
 				$elm$core$List$map,
-				A2($author$project$Main$newIngredientView, selectedIngredient, maybeNewAmount),
+				A2($author$project$Main$ingredientView, selectedIngredient, maybeNewAmount),
 				ingredients));
 	});
+var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
 		return {index: index, match: match, number: number, submatches: submatches};
@@ -6081,7 +6134,7 @@ var $author$project$Main$recipeView = F4(
 									tabContent,
 									'ingredients-content',
 									'ingredients-tab',
-									A3($author$project$Main$newIngredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
+									A3($author$project$Main$ingredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
 									true,
 									true),
 									A5(
