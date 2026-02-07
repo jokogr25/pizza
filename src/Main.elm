@@ -472,7 +472,7 @@ navbarView activeTab =
                 [ class "navbar-brand"
                 , Html.Attributes.href "#"
                 ]
-                [ text "Navbar" ]
+                [ text "Recipes" ]
             , button
                 [ class "navbar-toggler"
                 , type_ "button"

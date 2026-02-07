@@ -6283,7 +6283,7 @@ var $author$project$Main$navbarView = function (activeTab) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Navbar')
+								$elm$html$Html$text('Recipes')
 							])),
 						A2(
 						$elm$html$Html$button,
