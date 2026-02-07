@@ -5388,7 +5388,7 @@ var $elm$html$Html$Attributes$width = function (n) {
 		'width',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$closeIcon = A2(
+var $author$project$Main$checkIcon = A2(
 	$elm$html$Html$img,
 	_List_fromArray(
 		[
@@ -5492,7 +5492,7 @@ var $author$project$Main$newIngredientView = F2(
 							isSelected ? A2(
 							inputButton,
 							$author$project$Main$SelectIngredient($elm$core$Maybe$Nothing),
-							$author$project$Main$closeIcon) : A2(
+							$author$project$Main$checkIcon) : A2(
 							inputButton,
 							$author$project$Main$SelectIngredient(
 								$elm$core$Maybe$Just(ingredient)),

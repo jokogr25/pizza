@@ -379,7 +379,7 @@ newIngredientView maybeSelectedIngredient ingredient =
             , if isSelected then
                 inputButton
                     (SelectIngredient Nothing)
-                    closeIcon
+                    checkIcon
 
               else
                 inputButton
@@ -639,8 +639,8 @@ pencilIcon =
         []
 
 
-closeIcon : Html msg
-closeIcon =
+checkIcon : Html msg
+checkIcon =
     Html.img
         [ Html.Attributes.width 16
         , Html.Attributes.src "src/img/icon/check.svg"
