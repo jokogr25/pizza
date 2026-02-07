@@ -251,13 +251,10 @@ viewCarousel1 =
 carouselItem : Bool -> String -> Html msg
 carouselItem isActive imageSrc =
     div
-        [ class
-            (if isActive then
-                "carousel-item active"
-
-             else
-                "carousel-item"
-            )
+        [ classList
+            [ ( "carousel-item", True )
+            , ( "active", isActive )
+            ]
         , style "height" "100%"
         , style "display" "flex"
         , style "align-items" "center"
@@ -417,9 +414,13 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                 [ icon ]
     in
     div
-        [ class "mb-3" ]
-        [ label [] [ text ingredient.label ]
-        , div [ class "input-group" ]
+        [ class "mb-3"
+        ]
+        [ label
+            []
+            [ text ingredient.label ]
+        , div
+            [ class "input-group" ]
             [ input
                 [ Html.Attributes.id ingredient.id
                 , type_ "number"
@@ -452,7 +453,9 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                 inputButton (SelectIngredient (Just ingredient)) pencilIcon
             ]
         , if isSelected && not isNewAmountValid then
-            div [ class "invalid-feedback" ] [ text "Amount must be ≥ 1" ]
+            div
+                [ class "invalid-feedback" ]
+                [ text "Amount must be ≥ 1" ]
 
           else
             text ""
@@ -461,6 +464,18 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
 
 prepStepsView : Int -> List Ingredient -> List PrepStep -> Html Msg
 prepStepsView indexToDisplay ingredients prepSteps =
+    let
+        prepStepButton : msg -> Bool -> String -> Html msg
+        prepStepButton message isDisabled label =
+            button
+                [ onClick message
+                , disabled isDisabled
+                , class "btn btn-primary btn-lg"
+                , style "margin-top" "2rem"
+                , style "padding" "0.75rem 2rem"
+                ]
+                [ text label ]
+    in
     if List.length prepSteps == 0 then
         text "no steps :("
 
@@ -470,29 +485,24 @@ prepStepsView indexToDisplay ingredients prepSteps =
             [ div
                 [ style "display" "grid"
                 ]
-                (List.indexedMap (prepStepView indexToDisplay ingredients) prepSteps)
+                (List.indexedMap
+                    (prepStepView indexToDisplay ingredients)
+                    prepSteps
+                )
             , div
                 [ class "mb-3"
                 , style "display" "grid"
                 , style "grid-template-columns" "1fr 1fr"
                 , style "gap" "0.75rem"
                 ]
-                [ button
-                    [ onClick Prev
-                    , disabled (indexToDisplay <= 0)
-                    , class "btn btn-primary btn-lg"
-                    , style "margin-top" "2rem"
-                    , style "padding" "0.75rem 2rem"
-                    ]
-                    [ text "←" ]
-                , button
-                    [ onClick Next
-                    , disabled (indexToDisplay >= List.length prepSteps - 1)
-                    , class "btn btn-primary btn-lg"
-                    , style "margin-top" "2rem"
-                    , style "padding" "0.75rem 2rem"
-                    ]
-                    [ text "→" ]
+                [ prepStepButton
+                    Prev
+                    (indexToDisplay <= 0)
+                    "←"
+                , prepStepButton
+                    Next
+                    (indexToDisplay >= List.length prepSteps - 1)
+                    "→"
                 ]
             ]
 

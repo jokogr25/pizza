@@ -5969,6 +5969,23 @@ var $author$project$Main$prepStepView = F4(
 	});
 var $author$project$Main$prepStepsView = F3(
 	function (indexToDisplay, ingredients, prepSteps) {
+		var prepStepButton = F3(
+			function (message, isDisabled, label) {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick(message),
+							$elm$html$Html$Attributes$disabled(isDisabled),
+							$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+							A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+							A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(label)
+						]));
+			});
 		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5998,37 +6015,14 @@ var $author$project$Main$prepStepsView = F3(
 						]),
 					_List_fromArray(
 						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick($author$project$Main$Prev),
-									$elm$html$Html$Attributes$disabled(indexToDisplay <= 0),
-									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('←')
-								])),
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick($author$project$Main$Next),
-									$elm$html$Html$Attributes$disabled(
-									_Utils_cmp(
-										indexToDisplay,
-										$elm$core$List$length(prepSteps) - 1) > -1),
-									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
-									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('→')
-								]))
+							A3(prepStepButton, $author$project$Main$Prev, indexToDisplay <= 0, '←'),
+							A3(
+							prepStepButton,
+							$author$project$Main$Next,
+							_Utils_cmp(
+								indexToDisplay,
+								$elm$core$List$length(prepSteps) - 1) > -1,
+							'→')
 						]))
 				]));
 	});
@@ -6198,8 +6192,12 @@ var $author$project$Main$carouselItem = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class(
-					isActive ? 'carousel-item active' : 'carousel-item'),
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('carousel-item', true),
+							_Utils_Tuple2('active', isActive)
+						])),
 					A2($elm$html$Html$Attributes$style, 'height', '100%'),
 					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
 					A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
