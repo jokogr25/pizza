@@ -5189,51 +5189,58 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$Calculator = F4(
-	function (a, b, c, d) {
-		return {$: 'Calculator', a: a, b: b, c: c, d: d};
-	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
+var $author$project$Main$RecipeCalculator = F3(
+	function (a, b, c) {
+		return {$: 'RecipeCalculator', a: a, b: b, c: c};
+	});
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'GoCarousel':
 				return $author$project$Main$Carousel;
-			case 'GoCalculator':
-				var pizza = msg.a;
-				return A4($author$project$Main$Calculator, pizza, 0, 1, 'none');
-			case 'Edit':
-				var idToEdit = msg.a;
-				if (model.$ === 'Calculator') {
-					var pizza = model.a;
-					var indexToDisplay = model.b;
-					var ratio = model.c;
-					return A4($author$project$Main$Calculator, pizza, indexToDisplay, ratio, idToEdit);
+			case 'GoRecipeCalculator':
+				var recipe = msg.a;
+				return A3($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0);
+			case 'SelectIngredient':
+				var maybeIngredient = msg.a;
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var prepStepIndex = model.c;
+					return A3($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex);
 				} else {
 					return model;
 				}
 			case 'Next':
-				if (model.$ === 'Calculator') {
-					var pizza = model.a;
-					var indexToDisplay = model.b;
-					var ratio = model.c;
-					var idToEdit = model.d;
-					return A4($author$project$Main$Calculator, pizza, indexToDisplay + 1, ratio, idToEdit);
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var maybeIngredient = model.b;
+					var prepStepIndex = model.c;
+					return A3(
+						$author$project$Main$RecipeCalculator,
+						recipe,
+						maybeIngredient,
+						A2(
+							$elm$core$Basics$min,
+							prepStepIndex + 1,
+							$elm$core$List$length(recipe.steps)));
 				} else {
 					return model;
 				}
 			case 'Prev':
-				if (model.$ === 'Calculator') {
-					var pizza = model.a;
-					var indexToDisplay = model.b;
-					var ratio = model.c;
-					var idToEdit = model.d;
-					return A4(
-						$author$project$Main$Calculator,
-						pizza,
-						A2($elm$core$Basics$max, 0, indexToDisplay - 1),
-						ratio,
-						idToEdit);
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var maybeIngredient = model.b;
+					var prepStepIndex = model.c;
+					return A3(
+						$author$project$Main$RecipeCalculator,
+						recipe,
+						maybeIngredient,
+						A2($elm$core$Basics$max, prepStepIndex - 1, 0));
 				} else {
 					return model;
 				}
@@ -5241,10 +5248,10 @@ var $author$project$Main$update = F2(
 				return model;
 		}
 	});
-var $author$project$Main$GoCalculator = function (a) {
-	return {$: 'GoCalculator', a: a};
-};
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
+var $author$project$Main$GoRecipeCalculator = function (a) {
+	return {$: 'GoRecipeCalculator', a: a};
+};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5273,15 +5280,24 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
+var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$Main$samplePizza = {
-	flour: 496,
-	honey: 1,
-	name: '7 hours pizza dough',
-	oliveoil: 12,
-	salt: 15,
+var $author$project$Main$samplePizzaRecipe = {
+	id: 'seven-hours-pizza-dough',
+	ingredients: _List_fromArray(
+		[
+			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
+			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
+			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
+			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
+			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
+			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
+		]),
+	label: 'Seven hours pizza dough',
 	steps: _List_fromArray(
 		[
 			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
@@ -5297,9 +5313,7 @@ var $author$project$Main$samplePizza = {
 			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
 			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
 			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones.', time: -1, title: 'I knew it'}
-		]),
-	water: 313,
-	yeast: 3.4
+		])
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -5337,7 +5351,7 @@ var $author$project$Main$frontView = A2(
 			_List_fromArray(
 				[
 					$elm$html$Html$Events$onClick(
-					$author$project$Main$GoCalculator($author$project$Main$samplePizza)),
+					$author$project$Main$GoRecipeCalculator($author$project$Main$samplePizzaRecipe)),
 					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5347,12 +5361,19 @@ var $author$project$Main$frontView = A2(
 					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
-var $author$project$Main$Gram = {$: 'Gram'};
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $author$project$Main$Edit = function (a) {
-	return {$: 'Edit', a: a};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $author$project$Main$SelectIngredient = function (a) {
+	return {$: 'SelectIngredient', a: a};
 };
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
@@ -5385,9 +5406,8 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$pencilIcon = A2(
 	$elm$html$Html$img,
 	_List_fromArray(
@@ -5408,8 +5428,33 @@ var $author$project$Main$unitToAbbr = function (unit) {
 			return 'tsp';
 	}
 };
-var $author$project$Main$ingredientView = F5(
-	function (label, id, unit, value, idToEdit) {
+var $author$project$Main$newIngredientView = F2(
+	function (maybeSelectedIngredient, ingredient) {
+		var isSelected = function () {
+			if (maybeSelectedIngredient.$ === 'Nothing') {
+				return false;
+			} else {
+				var selectedIngredient = maybeSelectedIngredient.a;
+				return _Utils_eq(selectedIngredient.id, ingredient.id);
+			}
+		}();
+		var inputButton = F2(
+			function (onClickMessage, icon) {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('button'),
+							$elm$html$Html$Attributes$class('btn btn-sm btn-link'),
+							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+							A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
+							A2($elm$html$Html$Attributes$style, 'top', '50%'),
+							A2($elm$html$Html$Attributes$style, 'transform', 'translateY(-50%)'),
+							$elm$html$Html$Events$onClick(onClickMessage)
+						]),
+					_List_fromArray(
+						[icon]));
+			});
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5422,7 +5467,7 @@ var $author$project$Main$ingredientView = F5(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(label),
+					$elm$html$Html$text(ingredient.label),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -5435,41 +5480,44 @@ var $author$project$Main$ingredientView = F5(
 							$elm$html$Html$input,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$id(id),
+									$elm$html$Html$Attributes$id(ingredient.id),
 									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$class('form-control'),
 									$elm$html$Html$Attributes$placeholder(
-									$elm$core$String$fromFloat(value) + (' ' + $author$project$Main$unitToAbbr(unit))),
-									$elm$html$Html$Attributes$disabled(
-									!_Utils_eq(id, idToEdit)),
+									$elm$core$String$fromFloat(ingredient.amount) + (' ' + $author$project$Main$unitToAbbr(ingredient.unit))),
+									$elm$html$Html$Attributes$disabled(!isSelected),
 									A2($elm$html$Html$Attributes$style, 'padding-right', '2.5rem')
 								]),
 							_List_Nil),
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$type_('button'),
-									$elm$html$Html$Attributes$class('btn btn-sm btn-link'),
-									A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-									A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
-									A2($elm$html$Html$Attributes$style, 'top', '50%'),
-									A2($elm$html$Html$Attributes$style, 'transform', 'translateY(-50%)'),
-									$elm$html$Html$Events$onClick(
-									_Utils_eq(id, idToEdit) ? $author$project$Main$Edit('none') : $author$project$Main$Edit(id))
-								]),
-							_List_fromArray(
-								[
-									_Utils_eq(id, idToEdit) ? $author$project$Main$closeIcon : $author$project$Main$pencilIcon
-								]))
+							isSelected ? A2(
+							inputButton,
+							$author$project$Main$SelectIngredient($elm$core$Maybe$Nothing),
+							$author$project$Main$closeIcon) : A2(
+							inputButton,
+							$author$project$Main$SelectIngredient(
+								$elm$core$Maybe$Just(ingredient)),
+							$author$project$Main$pencilIcon)
 						]))
 				]));
+	});
+var $author$project$Main$newIngredientsView = F2(
+	function (ingredients, selectedIngredient) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('card-body')
+				]),
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$newIngredientView(selectedIngredient),
+				ingredients));
 	});
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $author$project$Main$pizzaPrepStepView = F3(
+var $author$project$Main$prepStepView = F3(
 	function (indexToDisplay, index, prepStep) {
 		return A2(
 			$elm$html$Html$div,
@@ -5509,7 +5557,7 @@ var $author$project$Main$pizzaPrepStepView = F3(
 						]))
 				]));
 	});
-var $author$project$Main$pizzaPrepStepsView = F2(
+var $author$project$Main$prepStepsView = F2(
 	function (indexToDisplay, prepSteps) {
 		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
 			$elm$html$Html$div,
@@ -5527,7 +5575,7 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 						]),
 					A2(
 						$elm$core$List$indexedMap,
-						$author$project$Main$pizzaPrepStepView(indexToDisplay),
+						$author$project$Main$prepStepView(indexToDisplay),
 						prepSteps)),
 					A2(
 					$elm$html$Html$div,
@@ -5545,6 +5593,7 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onClick($author$project$Main$Prev),
+									$elm$html$Html$Attributes$disabled(indexToDisplay <= 0),
 									$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 									A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 									A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5573,8 +5622,55 @@ var $author$project$Main$pizzaPrepStepsView = F2(
 						]))
 				]));
 	});
-var $author$project$Main$pizzaCalculatorView = F4(
-	function (pizza, stepIndex, ratio, idToEdit) {
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$recipeView = F3(
+	function (recipe, selectedIngredient, currentDisplayedPrepStepIndex) {
+		var tabLi = F4(
+			function (buttonId, contentId, label, isActive) {
+				return A2(
+					$elm$html$Html$li,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('nav-item'),
+							A2($elm$html$Html$Attributes$attribute, 'role', 'presentation')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class(
+									'nav-link' + (isActive ? ' active' : '')),
+									$elm$html$Html$Attributes$id(buttonId),
+									A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'tab'),
+									A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#' + contentId),
+									A2($elm$html$Html$Attributes$attribute, 'type', 'button'),
+									A2($elm$html$Html$Attributes$attribute, 'role', 'tab'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-controls', contentId),
+									A2($elm$html$Html$Attributes$attribute, 'aria-selected', 'true')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(label)
+								]))
+						]));
+			});
+		var tabContent = F5(
+			function (contentId, tabLiId, content, isShow, isActive) {
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class(
+							'tab-pane' + ((isShow ? ' show' : '') + (isActive ? ' active' : ''))),
+							$elm$html$Html$Attributes$id(contentId),
+							A2($elm$html$Html$Attributes$attribute, 'role', 'tabpanel'),
+							A2($elm$html$Html$Attributes$attribute, 'aria-labelledby', tabLiId)
+						]),
+					_List_fromArray(
+						[content]));
+			});
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -5600,26 +5696,48 @@ var $author$project$Main$pizzaCalculatorView = F4(
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text(pizza.name)
+									$elm$html$Html$text(recipe.label)
 								])),
-							A5($author$project$Main$ingredientView, 'Flour', 'flourInput', $author$project$Main$Gram, pizza.flour * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Water', 'waterInput', $author$project$Main$Gram, pizza.water * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Yeast', 'yeastInput', $author$project$Main$Gram, pizza.yeast * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Salt', 'saltInput', $author$project$Main$Gram, pizza.salt * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Olive oil', 'oliveoilInput', $author$project$Main$Mililiter, pizza.oliveoil * ratio, idToEdit),
-							A5($author$project$Main$ingredientView, 'Honey', 'honeyInput', $author$project$Main$Teaspoon, pizza.honey * ratio, idToEdit),
-							A2($author$project$Main$pizzaPrepStepsView, stepIndex, pizza.steps)
+							A2(
+							$elm$html$Html$ul,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('nav nav-tabs'),
+									$elm$html$Html$Attributes$id('recipeTabs'),
+									A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
+								]),
+							_List_fromArray(
+								[
+									A4(tabLi, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
+									A4(tabLi, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('tab-content'),
+									$elm$html$Html$Attributes$id('recipeTabsContent')
+								]),
+							_List_fromArray(
+								[
+									A5(
+									tabContent,
+									'ingredients-content',
+									'ingredients-tab',
+									A2($author$project$Main$newIngredientsView, recipe.ingredients, selectedIngredient),
+									true,
+									true),
+									A5(
+									tabContent,
+									'prepSteps-content',
+									'prepSteps-tab',
+									A2($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.steps),
+									false,
+									false)
+								]))
 						]))
 				]));
 	});
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
@@ -5715,11 +5833,10 @@ var $author$project$Main$view = function (model) {
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
 		default:
-			var pizza = model.a;
-			var indexToDisplay = model.b;
-			var ratio = model.c;
-			var idToEdit = model.d;
-			return A4($author$project$Main$pizzaCalculatorView, pizza, indexToDisplay, ratio, idToEdit);
+			var recipe = model.a;
+			var selectedIngredient = model.b;
+			var prepStepIndex = model.c;
+			return A3($author$project$Main$recipeView, recipe, selectedIngredient, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

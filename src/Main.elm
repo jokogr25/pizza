@@ -1,6 +1,7 @@
 module Main exposing (Msg(..), main, update, view)
 
 import Browser
+import Browser.Dom exposing (Error(..))
 import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, disabled, id, placeholder, src, style, type_)
 import Html.Events exposing (onClick)
@@ -27,7 +28,7 @@ main =
 type Model
     = Front
     | Carousel
-    | Calculator Pizza Int Float String -- index, ratio, id
+    | RecipeCalculator Recipe (Maybe Ingredient) Int
 
 
 
@@ -36,8 +37,8 @@ type Model
 
 type Msg
     = GoCarousel
-    | GoCalculator Pizza
-    | Edit String -- id
+    | GoRecipeCalculator Recipe
+    | SelectIngredient (Maybe Ingredient)
     | Next
     | Prev
     | NoOp
@@ -53,41 +54,41 @@ update msg model =
         GoCarousel ->
             Carousel
 
-        GoCalculator pizza ->
-            Calculator pizza 0 1 "none"
+        GoRecipeCalculator recipe ->
+            RecipeCalculator recipe Nothing 0
 
-        Edit idToEdit ->
+        SelectIngredient maybeIngredient ->
             case model of
-                Calculator pizza indexToDisplay ratio _ ->
-                    Calculator
-                        pizza
-                        indexToDisplay
-                        ratio
-                        idToEdit
+                RecipeCalculator recipe _ prepStepIndex ->
+                    RecipeCalculator recipe maybeIngredient prepStepIndex
 
                 _ ->
                     model
 
         Next ->
             case model of
-                Calculator pizza indexToDisplay ratio idToEdit ->
-                    Calculator
-                        pizza
-                        (indexToDisplay + 1)
-                        ratio
-                        idToEdit
+                RecipeCalculator recipe maybeIngredient prepStepIndex ->
+                    RecipeCalculator
+                        recipe
+                        maybeIngredient
+                        (min
+                            (prepStepIndex + 1)
+                            (List.length recipe.steps)
+                        )
 
                 _ ->
                     model
 
         Prev ->
             case model of
-                Calculator pizza indexToDisplay ratio idToEdit ->
-                    Calculator
-                        pizza
-                        (max 0 (indexToDisplay - 1))
-                        ratio
-                        idToEdit
+                RecipeCalculator recipe maybeIngredient prepStepIndex ->
+                    RecipeCalculator
+                        recipe
+                        maybeIngredient
+                        (max
+                            (prepStepIndex - 1)
+                            0
+                        )
 
                 _ ->
                     model
@@ -109,12 +110,11 @@ view model =
         Carousel ->
             viewCarousel1
 
-        Calculator pizza indexToDisplay ratio idToEdit ->
-            pizzaCalculatorView
-                pizza
-                indexToDisplay
-                ratio
-                idToEdit
+        RecipeCalculator recipe selectedIngredient prepStepIndex ->
+            recipeView
+                recipe
+                selectedIngredient
+                prepStepIndex
 
 
 
@@ -140,7 +140,7 @@ frontView =
             ]
             [ text "dont we all need someone who looks at us the way joscha looks at pizza 🍕" ]
         , button
-            [ onClick (GoCalculator samplePizza)
+            [ onClick (GoRecipeCalculator samplePizzaRecipe)
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
@@ -223,60 +223,136 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
-pizzaCalculatorView : Pizza -> Int -> Float -> String -> Html Msg
-pizzaCalculatorView pizza stepIndex ratio idToEdit =
+recipeView : Recipe -> Maybe Ingredient -> Int -> Html Msg
+recipeView recipe selectedIngredient currentDisplayedPrepStepIndex =
+    let
+        tabLi buttonId contentId label isActive =
+            Html.li
+                [ class "nav-item"
+                , attribute "role" "presentation"
+                ]
+                [ button
+                    [ class
+                        ("nav-link"
+                            ++ (if isActive then
+                                    " active"
+
+                                else
+                                    ""
+                               )
+                        )
+                    , id buttonId
+                    , attribute "data-bs-toggle" "tab"
+                    , attribute "data-bs-target" ("#" ++ contentId)
+                    , attribute "type" "button"
+                    , attribute "role" "tab"
+                    , attribute "aria-controls" contentId
+                    , attribute "aria-selected" "true"
+                    ]
+                    [ text label ]
+                ]
+
+        tabContent contentId tabLiId content isShow isActive =
+            div
+                [ class
+                    ("tab-pane"
+                        ++ (if isShow then
+                                " show"
+
+                            else
+                                ""
+                           )
+                        ++ (if isActive then
+                                " active"
+
+                            else
+                                ""
+                           )
+                    )
+                , id contentId
+                , attribute "role" "tabpanel"
+                , attribute "aria-labelledby" tabLiId
+                ]
+                [ content
+                ]
+    in
     div
         [ class "card mx-auto my-md-3"
         , style "max-width" "700px"
         ]
         [ div
-            [ class "card-body"
-            ]
+            [ class "card-body" ]
             [ Html.h2
                 [ class "card-title" ]
-                [ text pizza.name ]
-            , ingredientView
-                "Flour"
-                "flourInput"
-                Gram
-                (pizza.flour * ratio)
-                idToEdit
-            , ingredientView "Water"
-                "waterInput"
-                Gram
-                (pizza.water * ratio)
-                idToEdit
-            , ingredientView
-                "Yeast"
-                "yeastInput"
-                Gram
-                (pizza.yeast * ratio)
-                idToEdit
-            , ingredientView
-                "Salt"
-                "saltInput"
-                Gram
-                (pizza.salt * ratio)
-                idToEdit
-            , ingredientView
-                "Olive oil"
-                "oliveoilInput"
-                Mililiter
-                (pizza.oliveoil * ratio)
-                idToEdit
-            , ingredientView
-                "Honey"
-                "honeyInput"
-                Teaspoon
-                (toFloat pizza.honey * ratio)
-                idToEdit
-            , pizzaPrepStepsView stepIndex pizza.steps
+                [ text recipe.label ]
+            , Html.ul
+                [ class "nav nav-tabs"
+                , id "recipeTabs"
+                , attribute "role" "tablist"
+                ]
+                [ tabLi
+                    "ingredients-tab"
+                    "ingredients-content"
+                    "Ingredients"
+                    True
+                , tabLi
+                    "prepSteps-tab"
+                    "prepSteps-content"
+                    "Steps"
+                    False
+                ]
+            , div
+                [ class "tab-content"
+                , id "recipeTabsContent"
+                ]
+                [ tabContent
+                    "ingredients-content"
+                    "ingredients-tab"
+                    (newIngredientsView recipe.ingredients selectedIngredient)
+                    True
+                    True
+                , tabContent
+                    "prepSteps-content"
+                    "prepSteps-tab"
+                    (prepStepsView currentDisplayedPrepStepIndex recipe.steps)
+                    False
+                    False
+                ]
             ]
         ]
 
 
-ingredientView : String -> String -> Unit -> Float -> String -> Html Msg
-ingredientView label id unit value idToEdit =
+newIngredientsView : List Ingredient -> Maybe Ingredient -> Html Msg
+newIngredientsView ingredients selectedIngredient =
+    div
+        [ class "card-body"
+        ]
+        (List.map (newIngredientView selectedIngredient) ingredients)
+
+
+newIngredientView : Maybe Ingredient -> Ingredient -> Html Msg
+newIngredientView maybeSelectedIngredient ingredient =
+    let
+        isSelected =
+            case maybeSelectedIngredient of
+                Nothing ->
+                    False
+
+                Just selectedIngredient ->
+                    selectedIngredient.id == ingredient.id
+
+        inputButton onClickMessage icon =
+            button
+                [ type_ "button"
+                , class "btn btn-sm btn-link"
+                , style "position" "absolute"
+                , style "right" "0.5rem"
+                , style "top" "50%"
+                , style "transform" "translateY(-50%)"
+                , onClick onClickMessage
+                ]
+                [ icon ]
+    in
     div
         [ class "mb-3"
         , style "display" "grid"
@@ -284,47 +360,37 @@ ingredientView label id unit value idToEdit =
         , style "gap" "0.75rem"
         , style "align-items" "center"
         ]
-        [ text label
-
-        -- INPUT CELL
+        [ text ingredient.label
         , div
             [ style "position" "relative" ]
             [ input
-                [ Html.Attributes.id id
+                [ Html.Attributes.id ingredient.id
                 , type_ "number"
                 , class "form-control"
-                , placeholder (String.fromFloat value ++ " " ++ unitToAbbr unit)
-                , disabled (id /= idToEdit)
+                , placeholder
+                    (String.fromFloat ingredient.amount
+                        ++ " "
+                        ++ unitToAbbr ingredient.unit
+                    )
+                , disabled (not isSelected)
                 , style "padding-right" "2.5rem"
                 ]
                 []
-            , button
-                [ type_ "button"
-                , class "btn btn-sm btn-link"
-                , style "position" "absolute"
-                , style "right" "0.5rem"
-                , style "top" "50%"
-                , style "transform" "translateY(-50%)"
-                , onClick
-                    (if id == idToEdit then
-                        Edit "none"
-
-                     else
-                        Edit id
-                    )
-                ]
-                [ if id == idToEdit then
+            , if isSelected then
+                inputButton
+                    (SelectIngredient Nothing)
                     closeIcon
 
-                  else
+              else
+                inputButton
+                    (SelectIngredient (Just ingredient))
                     pencilIcon
-                ]
             ]
         ]
 
 
-pizzaPrepStepsView : Int -> List PrepStep -> Html Msg
-pizzaPrepStepsView indexToDisplay prepSteps =
+prepStepsView : Int -> List PrepStep -> Html Msg
+prepStepsView indexToDisplay prepSteps =
     if List.length prepSteps == 0 then
         text "no steps :("
 
@@ -334,7 +400,7 @@ pizzaPrepStepsView indexToDisplay prepSteps =
             [ div
                 [ style "display" "grid"
                 ]
-                (List.indexedMap (pizzaPrepStepView indexToDisplay) prepSteps)
+                (List.indexedMap (prepStepView indexToDisplay) prepSteps)
             , div
                 [ class "mb-3"
                 , style "display" "grid"
@@ -343,6 +409,7 @@ pizzaPrepStepsView indexToDisplay prepSteps =
                 ]
                 [ button
                     [ onClick Prev
+                    , disabled (indexToDisplay <= 0)
                     , class "btn btn-primary btn-lg"
                     , style "margin-top" "2rem"
                     , style "padding" "0.75rem 2rem"
@@ -364,8 +431,8 @@ pizzaPrepStepsView indexToDisplay prepSteps =
 {- All elements are rendered but displayed conditionally by visibility. By this the layout is fixed on the start and does not crash -}
 
 
-pizzaPrepStepView : Int -> Int -> PrepStep -> Html Msg
-pizzaPrepStepView indexToDisplay index prepStep =
+prepStepView : Int -> Int -> PrepStep -> Html Msg
+prepStepView indexToDisplay index prepStep =
     div
         [ style "grid-row" "1"
         , style "grid-column" "1"
@@ -424,15 +491,42 @@ unitToAbbr unit =
 -- SAMPLE DATA
 
 
-samplePizza : Pizza
-samplePizza =
-    { name = "7 hours pizza dough"
-    , flour = 496
-    , water = 313
-    , yeast = 3.4
-    , oliveoil = 12
-    , honey = 1
-    , salt = 15
+samplePizzaRecipe : Recipe
+samplePizzaRecipe =
+    { id = "seven-hours-pizza-dough"
+    , label = "Seven hours pizza dough"
+    , ingredients =
+        [ { id = "flour"
+          , label = "Flour"
+          , amount = 496
+          , unit = Gram
+          }
+        , { id = "water"
+          , label = "Water"
+          , amount = 313
+          , unit = Gram
+          }
+        , { id = "yeast"
+          , label = "Yeast"
+          , amount = 3.4
+          , unit = Gram
+          }
+        , { id = "oliveoil"
+          , label = "Olive oil"
+          , amount = 12
+          , unit = Mililiter
+          }
+        , { id = "salt"
+          , label = "Salt"
+          , amount = 15
+          , unit = Gram
+          }
+        , { id = "honey"
+          , label = "Honey"
+          , amount = 1
+          , unit = Teaspoon
+          }
+        ]
     , steps =
         [ { time = 15
           , title = "Pre mix"
@@ -492,6 +586,37 @@ samplePizza =
 
 
 -- DOMAIN MODELS
+
+
+type alias Recipe =
+    { id : String
+    , label : String
+    , ingredients : List Ingredient
+    , steps : List PrepStep
+    }
+
+
+type alias Ingredient =
+    { id : String
+    , label : String
+    , amount : Float
+    , unit : Unit
+    }
+
+
+recipeApplyRatio : Float -> Recipe -> Recipe
+recipeApplyRatio ratio recipe =
+    { recipe
+        | ingredients =
+            List.map (ingredientApplyRatio ratio) recipe.ingredients
+    }
+
+
+ingredientApplyRatio : Float -> Ingredient -> Ingredient
+ingredientApplyRatio ratio ingredient =
+    { ingredient
+        | amount = ingredient.amount * ratio
+    }
 
 
 type alias Pizza =
