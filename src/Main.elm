@@ -9,7 +9,6 @@ import Html.Events exposing (onClick, onInput)
 import List
 import Regex
 import String
-import Svg.Attributes exposing (mode)
 
 
 
@@ -197,7 +196,6 @@ view model =
 
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
             recipeCalculatorView
-                model
                 recipe
                 selectedIngredient
                 maybeNewAmount
@@ -394,7 +392,6 @@ navbarView activeTab =
                                 , ( "dropdown-toggle", True )
                                 , ( "disabled", not hasHistory )
                                 ]
-                            , class "nav-link dropdown-toggle"
                             , Html.Attributes.href "#"
                             , attribute "role" "button"
                             , attribute "data-bs-toggle" "dropdown"
@@ -439,10 +436,15 @@ navbarView activeTab =
                     , attribute "role" "search"
                     ]
                     [ input
-                        [ class "form-control me-2"
+                        [ classList
+                            [ ( "form-control", True )
+                            , ( "me-2", True )
+                            , ( "disabled", not isRecipeAlbumActive )
+                            ]
                         , type_ "search"
                         , placeholder "Search"
                         , attribute "aria-label" "Search"
+                        , disabled (not isRecipeAlbumActive)
                         ]
                         []
                     ]
@@ -509,8 +511,8 @@ recipeAlbumCardView recipe =
         ]
 
 
-recipeCalculatorView : Model -> Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
-recipeCalculatorView currentModel recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
+recipeCalculatorView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
+recipeCalculatorView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
         tabListItem : String -> String -> String -> Bool -> Html msg
         tabListItem buttonId contentId label isActive =

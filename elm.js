@@ -5603,6 +5603,15 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -5752,7 +5761,6 @@ var $author$project$Main$navbarView = function (activeTab) {
 																_Utils_Tuple2('dropdown-toggle', true),
 																_Utils_Tuple2('disabled', !hasHistory)
 															])),
-														$elm$html$Html$Attributes$class('nav-link dropdown-toggle'),
 														$elm$html$Html$Attributes$href('#'),
 														A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
 														A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
@@ -5850,10 +5858,17 @@ var $author$project$Main$navbarView = function (activeTab) {
 										$elm$html$Html$input,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('form-control me-2'),
+												$elm$html$Html$Attributes$classList(
+												_List_fromArray(
+													[
+														_Utils_Tuple2('form-control', true),
+														_Utils_Tuple2('me-2', true),
+														_Utils_Tuple2('disabled', !isRecipeAlbumActive)
+													])),
 												$elm$html$Html$Attributes$type_('search'),
 												$elm$html$Html$Attributes$placeholder('Search'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Search')
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Search'),
+												$elm$html$Html$Attributes$disabled(!isRecipeAlbumActive)
 											]),
 										_List_Nil)
 									]))
@@ -6031,15 +6046,6 @@ var $author$project$Main$genericIcon = function (path) {
 };
 var $author$project$Main$checkIcon = $author$project$Main$genericIcon('src/img/icon/check.svg');
 var $author$project$Main$closeIcon = $author$project$Main$genericIcon('src/img/icon/close.svg');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Maybe$map = F2(
@@ -6414,8 +6420,8 @@ var $author$project$Main$prepStepsView = F3(
 						]))
 				]));
 	});
-var $author$project$Main$recipeCalculatorView = F5(
-	function (currentModel, recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
+var $author$project$Main$recipeCalculatorView = F4(
+	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
 		var tabListItem = F4(
 			function (buttonId, contentId, label, isActive) {
 				return A2(
@@ -6643,7 +6649,7 @@ var $author$project$Main$view = function (model) {
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
 			var maybeNewAmount = model.d;
-			return A5($author$project$Main$recipeCalculatorView, model, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
+			return A4($author$project$Main$recipeCalculatorView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
