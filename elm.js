@@ -5335,11 +5335,19 @@ var $author$project$Main$recipeApplyRatio = F2(
 					recipe.ingredients)
 			});
 	});
-var $author$project$Main$Gram = {$: 'Gram'};
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
 var $author$project$Main$Path = function (a) {
 	return {$: 'Path', a: a};
 };
+var $author$project$Main$sampleLasagneRecipe = {
+	description: '',
+	id: 'lasanche',
+	image: $author$project$Main$Path(''),
+	ingredients: _List_Nil,
+	label: 'Lasanche',
+	steps: _List_Nil
+};
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
 var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5397,7 +5405,7 @@ var $author$project$Main$update = F2(
 				return A2(
 					$author$project$Main$RecipeAlbum,
 					_List_fromArray(
-						[$author$project$Main$samplePizzaRecipe]),
+						[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
 					$elm$core$Maybe$Nothing);
 			case 'SelectIngredient':
 				var maybeIngredient = msg.a;
@@ -5954,6 +5962,13 @@ var $author$project$Main$GoRecipeCalculator = function (a) {
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -6038,7 +6053,16 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 											]),
 										_List_fromArray(
 											[
-												A2(
+												($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps)) ? A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn btn-sm btn-outline-primary disabled')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Under construction :(')
+													])) : A2(
 												$elm$html$Html$button,
 												_List_fromArray(
 													[

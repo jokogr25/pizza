@@ -72,7 +72,9 @@ update msg model =
 
         GoRecipeAlbum ->
             RecipeAlbum
-                [ samplePizzaRecipe ]
+                [ samplePizzaRecipe
+                , sampleLasagneRecipe
+                ]
                 Nothing
 
         SelectIngredient maybeIngredient ->
@@ -525,11 +527,18 @@ recipeAlbumCardView recipe =
                     [ class "d-flex justify-content-between align-items-center mt-2" ]
                     [ div
                         [ class "btn-group" ]
-                        [ button
-                            [ class "btn btn-sm btn-outline-primary"
-                            , onClick (GoRecipeCalculator recipe)
-                            ]
-                            [ text "Open" ]
+                        [ if List.isEmpty recipe.ingredients && List.isEmpty recipe.steps then
+                            button
+                                [ class "btn btn-sm btn-outline-primary disabled"
+                                ]
+                                [ text "Under construction :(" ]
+
+                          else
+                            button
+                                [ class "btn btn-sm btn-outline-primary"
+                                , onClick (GoRecipeCalculator recipe)
+                                ]
+                                [ text "Open" ]
                         ]
                     ]
                 ]
@@ -826,6 +835,17 @@ unitToAbbr unit =
 
 
 -- SAMPLE DATA
+
+
+sampleLasagneRecipe : Recipe
+sampleLasagneRecipe =
+    { id = "lasanche"
+    , label = "Lasanche"
+    , image = Path ""
+    , description = ""
+    , ingredients = []
+    , steps = []
+    }
 
 
 samplePizzaRecipe : Recipe
