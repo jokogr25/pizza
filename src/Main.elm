@@ -465,7 +465,7 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
 prepStepsView : Int -> List Ingredient -> List PrepStep -> Html Msg
 prepStepsView indexToDisplay ingredients prepSteps =
     let
-        prepStepButton : msg -> Bool -> String -> Html msg
+        prepStepButton : Msg -> Bool -> String -> Html Msg
         prepStepButton message isDisabled label =
             button
                 [ onClick message
@@ -672,7 +672,6 @@ samplePizzaRecipe =
 replaceIngredientAmountFraction : List Ingredient -> String -> String
 replaceIngredientAmountFraction ingredients string =
     let
-        -- Regex for "fraction of word"
         fractionOfWordRegex : Regex.Regex
         fractionOfWordRegex =
             safeRegexOf "\\b\\d+/\\d+ of \\w+\\b"
@@ -682,7 +681,6 @@ replaceIngredientAmountFraction ingredients string =
         matches =
             Regex.find fractionOfWordRegex string
 
-        -- Parse fraction string like "4/5" -> 0.8
         parseFraction : String -> Maybe Float
         parseFraction str =
             case String.split "/" str of
@@ -697,7 +695,6 @@ replaceIngredientAmountFraction ingredients string =
                 _ ->
                     Nothing
 
-        -- Replace one match in the string
         replaceMatch : Regex.Match -> String -> String
         replaceMatch match str =
             let
@@ -755,7 +752,6 @@ replaceIngredientAmountFraction ingredients string =
                 _ ->
                     str
     in
-    -- Apply replacements for all matches
     List.foldl replaceMatch string matches
 
 
@@ -807,26 +803,23 @@ type alias PrepStep =
 
 pencilIcon : Html msg
 pencilIcon =
-    Html.img
-        [ Html.Attributes.width 16
-        , Html.Attributes.src "src/img/icon/pencil.svg"
-        ]
-        []
+    genericIcon "src/img/icon/pencil.svg"
 
 
 checkIcon : Html msg
 checkIcon =
-    Html.img
-        [ Html.Attributes.width 16
-        , Html.Attributes.src "src/img/icon/check.svg"
-        ]
-        []
+    genericIcon "src/img/icon/check.svg"
 
 
 closeIcon : Html msg
 closeIcon =
+    genericIcon "src/img/icon/close.svg"
+
+
+genericIcon : String -> Html msg
+genericIcon path =
     Html.img
         [ Html.Attributes.width 16
-        , Html.Attributes.src "src/img/icon/close.svg"
+        , Html.Attributes.src path
         ]
         []

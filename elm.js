@@ -5615,22 +5615,18 @@ var $elm$html$Html$Attributes$width = function (n) {
 		'width',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$checkIcon = A2(
-	$elm$html$Html$img,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$width(16),
-			$elm$html$Html$Attributes$src('src/img/icon/check.svg')
-		]),
-	_List_Nil);
-var $author$project$Main$closeIcon = A2(
-	$elm$html$Html$img,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$width(16),
-			$elm$html$Html$Attributes$src('src/img/icon/close.svg')
-		]),
-	_List_Nil);
+var $author$project$Main$genericIcon = function (path) {
+	return A2(
+		$elm$html$Html$img,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$width(16),
+				$elm$html$Html$Attributes$src(path)
+			]),
+		_List_Nil);
+};
+var $author$project$Main$checkIcon = $author$project$Main$genericIcon('src/img/icon/check.svg');
+var $author$project$Main$closeIcon = $author$project$Main$genericIcon('src/img/icon/close.svg');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5687,14 +5683,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $author$project$Main$pencilIcon = A2(
-	$elm$html$Html$img,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$width(16),
-			$elm$html$Html$Attributes$src('src/img/icon/pencil.svg')
-		]),
-	_List_Nil);
+var $author$project$Main$pencilIcon = $author$project$Main$genericIcon('src/img/icon/pencil.svg');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
