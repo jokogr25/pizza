@@ -345,7 +345,7 @@ frontView =
 
 carouselItems : List (Html msg)
 carouselItems =
-    [ carouselItem True "src/img/IMG_4365.jpeg"
+    [ carouselItem True "public/img/IMG_4365.jpeg"
     ]
 
 
@@ -472,7 +472,7 @@ navbarView activeTab =
                 [ class "navbar-brand"
                 , Html.Attributes.href "#"
                 ]
-                [ text "Recipes" ]
+                [ genericIcon "public/img/icon/pizza.svg" 32 ]
             , button
                 [ class "navbar-toggler"
                 , type_ "button"
@@ -942,7 +942,7 @@ sampleLasagneRecipe : Recipe
 sampleLasagneRecipe =
     { id = "lasanche"
     , label = "Lasanche"
-    , image = Path "src/img/lasanche.jpg"
+    , image = Path "public/img/lasanche.jpg"
     , description = ""
     , ingredients = []
     , steps = []
@@ -953,7 +953,7 @@ samplePizzaRecipe : Recipe
 samplePizzaRecipe =
     { id = "seven-hours-pizza-dough"
     , label = "Pizza dough (7 hours)"
-    , image = Path "src/img/7-hours-pizza-dough.jpg"
+    , image = Path "public/img/7-hours-pizza-dough.jpg"
     , description = ""
     , ingredients =
         [ { id = "flour"
@@ -1184,23 +1184,23 @@ type alias PrepStep =
 
 pencilIcon : Html msg
 pencilIcon =
-    genericIcon "src/img/icon/pencil.svg"
+    genericIcon "public/img/icon/pencil.svg" 16
 
 
 checkIcon : Html msg
 checkIcon =
-    genericIcon "src/img/icon/check.svg"
+    genericIcon "public/img/icon/check.svg" 16
 
 
 closeIcon : Html msg
 closeIcon =
-    genericIcon "src/img/icon/close.svg"
+    genericIcon "public/img/icon/close.svg" 16
 
 
-genericIcon : String -> Html msg
-genericIcon path =
+genericIcon : String -> Int -> Html msg
+genericIcon path width =
     Html.img
-        [ Html.Attributes.width 16
+        [ Html.Attributes.width width
         , Html.Attributes.src path
         ]
         []

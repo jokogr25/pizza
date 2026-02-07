@@ -5795,7 +5795,7 @@ var $author$project$Main$Path = function (a) {
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
-	image: $author$project$Main$Path('src/img/lasanche.jpg'),
+	image: $author$project$Main$Path('public/img/lasanche.jpg'),
 	ingredients: _List_Nil,
 	label: 'Lasanche',
 	steps: _List_Nil
@@ -5809,7 +5809,7 @@ var $elm$core$Basics$negate = function (n) {
 var $author$project$Main$samplePizzaRecipe = {
 	description: '',
 	id: 'seven-hours-pizza-dough',
-	image: $author$project$Main$Path('src/img/7-hours-pizza-dough.jpg'),
+	image: $author$project$Main$Path('public/img/7-hours-pizza-dough.jpg'),
 	ingredients: _List_fromArray(
 		[
 			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
@@ -6147,6 +6147,30 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Main$genericIcon = F2(
+	function (path, width) {
+		return A2(
+			$elm$html$Html$img,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$width(width),
+					$elm$html$Html$Attributes$src(path)
+				]),
+			_List_Nil);
+	});
 var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6283,7 +6307,7 @@ var $author$project$Main$navbarView = function (activeTab) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Recipes')
+								A2($author$project$Main$genericIcon, 'public/img/icon/pizza.svg', 32)
 							])),
 						A2(
 						$elm$html$Html$button,
@@ -6470,7 +6494,6 @@ var $author$project$Main$GoRecipeCalculator = function (a) {
 };
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
-var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -6479,12 +6502,6 @@ var $elm$core$List$isEmpty = function (xs) {
 	}
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
 var $author$project$Main$recipeAlbumCardView = function (recipe) {
 	return A2(
 		$elm$html$Html$div,
@@ -6634,27 +6651,11 @@ var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
-var $elm$html$Html$Attributes$width = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'width',
-		$elm$core$String$fromInt(n));
-};
-var $author$project$Main$genericIcon = function (path) {
-	return A2(
-		$elm$html$Html$img,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$width(16),
-				$elm$html$Html$Attributes$src(path)
-			]),
-		_List_Nil);
-};
-var $author$project$Main$checkIcon = $author$project$Main$genericIcon('src/img/icon/check.svg');
-var $author$project$Main$closeIcon = $author$project$Main$genericIcon('src/img/icon/close.svg');
+var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'public/img/icon/check.svg', 16);
+var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'public/img/icon/close.svg', 16);
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$label = _VirtualDom_node('label');
-var $author$project$Main$pencilIcon = $author$project$Main$genericIcon('src/img/icon/pencil.svg');
+var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'public/img/icon/pencil.svg', 16);
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
@@ -7175,7 +7176,7 @@ var $author$project$Main$carouselItem = F2(
 	});
 var $author$project$Main$carouselItems = _List_fromArray(
 	[
-		A2($author$project$Main$carouselItem, true, 'src/img/IMG_4365.jpeg')
+		A2($author$project$Main$carouselItem, true, 'public/img/IMG_4365.jpeg')
 	]);
 var $author$project$Main$viewCarousel1 = A2(
 	$elm$html$Html$div,
