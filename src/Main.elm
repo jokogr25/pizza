@@ -31,7 +31,7 @@ main =
 type Model
     = Front
     | Carousel
-    | RecipeAlbum (List Recipe)
+    | RecipeAlbum (List Recipe) (Maybe String)
     | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float)
 
 
@@ -45,6 +45,7 @@ type Msg
     | GoRecipeCalculator Recipe
     | SelectIngredient (Maybe Ingredient)
     | InputNewAmount String
+    | InputSearchTerm String
     | CalculateRatio
     | Abort
     | Next
@@ -72,6 +73,7 @@ update msg model =
         GoRecipeAlbum ->
             RecipeAlbum
                 [ samplePizzaRecipe ]
+                Nothing
 
         SelectIngredient maybeIngredient ->
             case model of
@@ -93,6 +95,16 @@ update msg model =
                         maybeIngredient
                         prepStepIndex
                         (String.toFloat amount)
+
+                _ ->
+                    model
+
+        InputSearchTerm searchTerm ->
+            case model of
+                RecipeAlbum recipes _ ->
+                    RecipeAlbum
+                        recipes
+                        (Just searchTerm)
 
                 _ ->
                     model
@@ -191,8 +203,21 @@ view model =
         Carousel ->
             viewCarousel1
 
-        RecipeAlbum recipes ->
-            recipeAlbumView recipes
+        RecipeAlbum recipes maybeSearchTerm ->
+            recipeAlbumView
+                (case maybeSearchTerm of
+                    Just searchTerm ->
+                        List.filter
+                            (\recipe ->
+                                List.any
+                                    (String.contains searchTerm)
+                                    [ recipe.label, recipe.id ]
+                            )
+                            recipes
+
+                    Nothing ->
+                        recipes
+                )
 
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
             recipeCalculatorView
@@ -306,7 +331,7 @@ type ActiveTab
     | RecipeCalculatorTab
 
 
-navbarView : ActiveTab -> Html msg
+navbarView : ActiveTab -> Html Msg
 navbarView activeTab =
     let
         isRecipeAlbumActive =
@@ -445,6 +470,7 @@ navbarView activeTab =
                         , placeholder "Search"
                         , attribute "aria-label" "Search"
                         , disabled (not isRecipeAlbumActive)
+                        , onInput InputSearchTerm
                         ]
                         []
                     ]

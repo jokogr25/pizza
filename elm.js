@@ -5291,9 +5291,10 @@ var $elm$browser$Browser$sandbox = function (impl) {
 		});
 };
 var $author$project$Main$Carousel = {$: 'Carousel'};
-var $author$project$Main$RecipeAlbum = function (a) {
-	return {$: 'RecipeAlbum', a: a};
-};
+var $author$project$Main$RecipeAlbum = F2(
+	function (a, b) {
+		return {$: 'RecipeAlbum', a: a, b: b};
+	});
 var $author$project$Main$RecipeCalculator = F4(
 	function (a, b, c, d) {
 		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d};
@@ -5393,9 +5394,11 @@ var $author$project$Main$update = F2(
 				var recipe = msg.a;
 				return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing);
 			case 'GoRecipeAlbum':
-				return $author$project$Main$RecipeAlbum(
+				return A2(
+					$author$project$Main$RecipeAlbum,
 					_List_fromArray(
-						[$author$project$Main$samplePizzaRecipe]));
+						[$author$project$Main$samplePizzaRecipe]),
+					$elm$core$Maybe$Nothing);
 			case 'SelectIngredient':
 				var maybeIngredient = msg.a;
 				if (model.$ === 'RecipeCalculator') {
@@ -5418,6 +5421,17 @@ var $author$project$Main$update = F2(
 						maybeIngredient,
 						prepStepIndex,
 						$elm$core$String$toFloat(amount));
+				} else {
+					return model;
+				}
+			case 'InputSearchTerm':
+				var searchTerm = msg.a;
+				if (model.$ === 'RecipeAlbum') {
+					var recipes = model.a;
+					return A2(
+						$author$project$Main$RecipeAlbum,
+						recipes,
+						$elm$core$Maybe$Just(searchTerm));
 				} else {
 					return model;
 				}
@@ -5492,6 +5506,38 @@ var $author$project$Main$update = F2(
 			default:
 				return model;
 		}
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
 var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
@@ -5569,6 +5615,9 @@ var $author$project$Main$frontView = A2(
 				]))
 		]));
 var $author$project$Main$RecipeAlbumTab = {$: 'RecipeAlbumTab'};
+var $author$project$Main$InputSearchTerm = function (a) {
+	return {$: 'InputSearchTerm', a: a};
+};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
@@ -5578,17 +5627,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -5625,6 +5663,39 @@ var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$core$Basics$not = _Basics_not;
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -5868,7 +5939,8 @@ var $author$project$Main$navbarView = function (activeTab) {
 												$elm$html$Html$Attributes$type_('search'),
 												$elm$html$Html$Attributes$placeholder('Search'),
 												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Search'),
-												$elm$html$Html$Attributes$disabled(!isRecipeAlbumActive)
+												$elm$html$Html$Attributes$disabled(!isRecipeAlbumActive),
+												$elm$html$Html$Events$onInput($author$project$Main$InputSearchTerm)
 											]),
 										_List_Nil)
 									]))
@@ -6058,39 +6130,6 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
 var $author$project$Main$pencilIcon = $author$project$Main$genericIcon('src/img/icon/pencil.svg');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
@@ -6643,7 +6682,25 @@ var $author$project$Main$view = function (model) {
 			return $author$project$Main$viewCarousel1;
 		case 'RecipeAlbum':
 			var recipes = model.a;
-			return $author$project$Main$recipeAlbumView(recipes);
+			var maybeSearchTerm = model.b;
+			return $author$project$Main$recipeAlbumView(
+				function () {
+					if (maybeSearchTerm.$ === 'Just') {
+						var searchTerm = maybeSearchTerm.a;
+						return A2(
+							$elm$core$List$filter,
+							function (recipe) {
+								return A2(
+									$elm$core$List$any,
+									$elm$core$String$contains(searchTerm),
+									_List_fromArray(
+										[recipe.label, recipe.id]));
+							},
+							recipes);
+					} else {
+						return recipes;
+					}
+				}());
 		default:
 			var recipe = model.a;
 			var selectedIngredient = model.b;
