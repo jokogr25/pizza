@@ -5669,6 +5669,16 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -5709,8 +5719,8 @@ var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$navbarView = function (activeTab) {
-	var navListItem = F2(
-		function (isActive, label) {
+	var navListItem = F3(
+		function (isActive, label, message) {
 			return A2(
 				$elm$html$Html$li,
 				_List_fromArray(
@@ -5730,7 +5740,16 @@ var $author$project$Main$navbarView = function (activeTab) {
 										_Utils_Tuple2('active', isActive)
 									])),
 								isActive ? A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page') : A2($elm$html$Html$Attributes$style, '', ''),
-								$elm$html$Html$Attributes$href('#')
+								$elm$html$Html$Attributes$href('#'),
+								A2(
+								$elm$core$Maybe$withDefault,
+								A2($elm$html$Html$Attributes$style, '', ''),
+								A2(
+									$elm$core$Maybe$map,
+									function (msg) {
+										return $elm$html$Html$Events$onClick(msg);
+									},
+									message))
 							]),
 						_List_fromArray(
 							[
@@ -5819,8 +5838,12 @@ var $author$project$Main$navbarView = function (activeTab) {
 									]),
 								_List_fromArray(
 									[
-										A2(navListItem, isRecipeAlbumActive, 'Recipes'),
-										A2(navListItem, isRecipeCalculatorActive, 'Calculatore'),
+										A3(
+										navListItem,
+										isRecipeAlbumActive,
+										'Recipes',
+										$elm$core$Maybe$Just($author$project$Main$GoRecipeAlbum)),
+										A3(navListItem, isRecipeCalculatorActive, 'Calculatore', $elm$core$Maybe$Nothing),
 										A2(
 										$elm$html$Html$li,
 										_List_fromArray(
@@ -6091,7 +6114,7 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('album py-5 bg-body-tertiary')
+						$elm$html$Html$Attributes$class('album py-5')
 					]),
 				_List_fromArray(
 					[
@@ -6099,7 +6122,8 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('container')
+								$elm$html$Html$Attributes$class('container'),
+								A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 							]),
 						_List_fromArray(
 							[
@@ -6144,16 +6168,6 @@ var $author$project$Main$checkIcon = $author$project$Main$genericIcon('src/img/i
 var $author$project$Main$closeIcon = $author$project$Main$genericIcon('src/img/icon/close.svg');
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $author$project$Main$pencilIcon = $author$project$Main$genericIcon('src/img/icon/pencil.svg');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
