@@ -952,7 +952,7 @@ sampleLasagneRecipe =
 samplePizzaRecipe : Recipe
 samplePizzaRecipe =
     { id = "seven-hours-pizza-dough"
-    , label = "Seven hours pizza dough"
+    , label = "Pizza dough (7 hours)"
     , image = Path "src/img/7-hours-pizza-dough.jpg"
     , description = ""
     , ingredients =

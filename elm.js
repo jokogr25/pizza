@@ -5819,7 +5819,7 @@ var $author$project$Main$samplePizzaRecipe = {
 			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
 			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
 		]),
-	label: 'Seven hours pizza dough',
+	label: 'Pizza dough (7 hours)',
 	steps: _List_fromArray(
 		[
 			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
