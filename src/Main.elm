@@ -849,7 +849,7 @@ sampleLasagneRecipe : Recipe
 sampleLasagneRecipe =
     { id = "lasanche"
     , label = "Lasanche"
-    , image = Path ""
+    , image = Path "src/img/lasanche.jpg"
     , description = ""
     , ingredients = []
     , steps = []

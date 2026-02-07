@@ -5341,7 +5341,7 @@ var $author$project$Main$Path = function (a) {
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
-	image: $author$project$Main$Path(''),
+	image: $author$project$Main$Path('src/img/lasanche.jpg'),
 	ingredients: _List_Nil,
 	label: 'Lasanche',
 	steps: _List_Nil
