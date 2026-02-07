@@ -9,6 +9,7 @@ import Html.Events exposing (onClick, onInput)
 import List
 import Regex
 import String
+import Svg.Attributes exposing (mode)
 
 
 
@@ -195,7 +196,8 @@ view model =
             recipeAlbumView recipes
 
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
-            recipeView
+            recipeCalculatorView
+                model
                 recipe
                 selectedIngredient
                 maybeNewAmount
@@ -301,15 +303,166 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
+type ActiveTab
+    = RecipeAlbumTab
+    | RecipeCalculatorTab
+
+
+navbarView : ActiveTab -> Html msg
+navbarView activeTab =
+    let
+        isRecipeAlbumActive =
+            case activeTab of
+                RecipeAlbumTab ->
+                    True
+
+                _ ->
+                    False
+
+        isRecipeCalculatorActive =
+            case activeTab of
+                RecipeCalculatorTab ->
+                    True
+
+                _ ->
+                    False
+
+        hasHistory =
+            False
+
+        navListItem isActive label =
+            Html.li
+                [ class "nav-item" ]
+                [ Html.a
+                    [ classList
+                        [ ( "nav-link", True )
+                        , ( "active", isActive )
+                        ]
+                    , if isActive then
+                        attribute "aria-current" "page"
+
+                      else
+                        style "" ""
+                    , Html.Attributes.href "#"
+                    ]
+                    [ text label ]
+                ]
+    in
+    Html.nav
+        [ class "navbar navbar-expand-lg bg-body-tertiary"
+        ]
+        [ div
+            [ class "container-fluid" ]
+            [ Html.a
+                [ class "navbar-brand"
+                , Html.Attributes.href "#"
+                ]
+                [ text "Navbar" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarSupportedContent"
+                , attribute "aria-controls" "navbarSupportedContent"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span
+                    [ class "navbar-toggler-icon"
+                    ]
+                    []
+                ]
+            , div
+                [ class "collapse navbar-collapse"
+                , id "navbarSupportedContent"
+                ]
+                [ Html.ul
+                    [ class "navbar-nav me-auto mb-2 mb-lg-0"
+                    ]
+                    [ navListItem
+                        isRecipeAlbumActive
+                        "Recipes"
+                    , navListItem
+                        isRecipeCalculatorActive
+                        "Calculatore"
+                    , Html.li
+                        [ class "nav-item dropdown"
+                        ]
+                        [ Html.a
+                            [ classList
+                                [ ( "nav-link", True )
+                                , ( "dropdown-toggle", True )
+                                , ( "disabled", not hasHistory )
+                                ]
+                            , class "nav-link dropdown-toggle"
+                            , Html.Attributes.href "#"
+                            , attribute "role" "button"
+                            , attribute "data-bs-toggle" "dropdown"
+                            , attribute "aria-expanded" "false"
+                            ]
+                            [ text "History" ]
+                        , Html.ul
+                            [ class "dropdown-menu" ]
+                            [ Html.li []
+                                [ Html.a
+                                    [ class "dropdown-item"
+                                    , Html.Attributes.href "#"
+                                    ]
+                                    [ text "Action" ]
+                                ]
+                            , Html.li []
+                                [ Html.a
+                                    [ class "dropdown-item"
+                                    , Html.Attributes.href "#"
+                                    ]
+                                    [ text "Another action" ]
+                                ]
+                            , Html.li
+                                []
+                                [ Html.hr
+                                    [ class "dropdown-divider" ]
+                                    []
+                                ]
+                            , Html.li
+                                []
+                                [ Html.a
+                                    [ class "dropdown-item"
+                                    , Html.Attributes.href "#"
+                                    ]
+                                    [ text "Something else here" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                , Html.form
+                    [ class "d-flex"
+                    , attribute "role" "search"
+                    ]
+                    [ input
+                        [ class "form-control me-2"
+                        , type_ "search"
+                        , placeholder "Search"
+                        , attribute "aria-label" "Search"
+                        ]
+                        []
+                    ]
+                ]
+            ]
+        ]
+
+
 recipeAlbumView : List Recipe -> Html Msg
 recipeAlbumView recipes =
-    div
-        [ class "album py-5 bg-body-tertiary" ]
-        [ div
-            [ class "container" ]
+    div []
+        [ navbarView RecipeAlbumTab
+        , div
+            [ class "album py-5 bg-body-tertiary" ]
             [ div
-                [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
-                (List.map recipeAlbumCardView recipes)
+                [ class "container" ]
+                [ div
+                    [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
+                    (List.map recipeAlbumCardView recipes)
+                ]
             ]
         ]
 
@@ -356,8 +509,8 @@ recipeAlbumCardView recipe =
         ]
 
 
-recipeView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
-recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
+recipeCalculatorView : Model -> Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
+recipeCalculatorView currentModel recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
         tabListItem : String -> String -> String -> Bool -> Html msg
         tabListItem buttonId contentId label isActive =
@@ -395,55 +548,58 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 [ content
                 ]
     in
-    div
-        [ class "mx-auto my-md-3 px-3 px-md-0"
-        , style "max-width" "700px"
-        ]
-        [ div
-            []
-            [ Html.h1
+    div []
+        [ navbarView RecipeCalculatorTab
+        , div
+            [ class "mx-auto my-md-3 px-3 px-md-0"
+            , style "max-width" "700px"
+            ]
+            [ div
                 []
-                [ text recipe.label ]
-            , Html.ul
-                [ class "nav nav-tabs"
-                , id "recipeTabs"
-                , attribute "role" "tablist"
-                ]
-                [ tabListItem
-                    "ingredients-tab"
-                    "ingredients-content"
-                    "Ingredients"
-                    True
-                , tabListItem
-                    "prepSteps-tab"
-                    "prepSteps-content"
-                    "Steps"
-                    False
-                ]
-            , div
-                [ class "tab-content"
-                , id "recipeTabsContent"
-                ]
-                [ tabContent
-                    "ingredients-content"
-                    "ingredients-tab"
-                    (ingredientsView
-                        recipe.ingredients
-                        selectedIngredient
-                        maybeNewAmount
-                    )
-                    True
-                    True
-                , tabContent
-                    "prepSteps-content"
-                    "prepSteps-tab"
-                    (prepStepsView
-                        currentDisplayedPrepStepIndex
-                        recipe.ingredients
-                        recipe.steps
-                    )
-                    False
-                    False
+                [ Html.h1
+                    []
+                    [ text recipe.label ]
+                , Html.ul
+                    [ class "nav nav-tabs"
+                    , id "recipeTabs"
+                    , attribute "role" "tablist"
+                    ]
+                    [ tabListItem
+                        "ingredients-tab"
+                        "ingredients-content"
+                        "Ingredients"
+                        True
+                    , tabListItem
+                        "prepSteps-tab"
+                        "prepSteps-content"
+                        "Steps"
+                        False
+                    ]
+                , div
+                    [ class "tab-content"
+                    , id "recipeTabsContent"
+                    ]
+                    [ tabContent
+                        "ingredients-content"
+                        "ingredients-tab"
+                        (ingredientsView
+                            recipe.ingredients
+                            selectedIngredient
+                            maybeNewAmount
+                        )
+                        True
+                        True
+                    , tabContent
+                        "prepSteps-content"
+                        "prepSteps-tab"
+                        (prepStepsView
+                            currentDisplayedPrepStepIndex
+                            recipe.ingredients
+                            recipe.steps
+                        )
+                        False
+                        False
+                    ]
                 ]
             ]
         ]

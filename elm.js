@@ -5568,6 +5568,299 @@ var $author$project$Main$frontView = A2(
 					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
+var $author$project$Main$RecipeAlbumTab = {$: 'RecipeAlbumTab'};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$hr = _VirtualDom_node('hr');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$core$Basics$not = _Basics_not;
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$navbarView = function (activeTab) {
+	var navListItem = F2(
+		function (isActive, label) {
+			return A2(
+				$elm$html$Html$li,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('nav-item')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('nav-link', true),
+										_Utils_Tuple2('active', isActive)
+									])),
+								isActive ? A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page') : A2($elm$html$Html$Attributes$style, '', ''),
+								$elm$html$Html$Attributes$href('#')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(label)
+							]))
+					]));
+		});
+	var isRecipeCalculatorActive = function () {
+		if (activeTab.$ === 'RecipeCalculatorTab') {
+			return true;
+		} else {
+			return false;
+		}
+	}();
+	var isRecipeAlbumActive = function () {
+		if (activeTab.$ === 'RecipeAlbumTab') {
+			return true;
+		} else {
+			return false;
+		}
+	}();
+	var hasHistory = false;
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar navbar-expand-lg bg-body-tertiary')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container-fluid')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-brand'),
+								$elm$html$Html$Attributes$href('#')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Navbar')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-toggler'),
+								$elm$html$Html$Attributes$type_('button'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
+								A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarSupportedContent'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarSupportedContent'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-toggler-icon')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('collapse navbar-collapse'),
+								$elm$html$Html$Attributes$id('navbarSupportedContent')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$ul,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('navbar-nav me-auto mb-2 mb-lg-0')
+									]),
+								_List_fromArray(
+									[
+										A2(navListItem, isRecipeAlbumActive, 'Recipes'),
+										A2(navListItem, isRecipeCalculatorActive, 'Calculatore'),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('nav-item dropdown')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$classList(
+														_List_fromArray(
+															[
+																_Utils_Tuple2('nav-link', true),
+																_Utils_Tuple2('dropdown-toggle', true),
+																_Utils_Tuple2('disabled', !hasHistory)
+															])),
+														$elm$html$Html$Attributes$class('nav-link dropdown-toggle'),
+														$elm$html$Html$Attributes$href('#'),
+														A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+														A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'dropdown'),
+														A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('History')
+													])),
+												A2(
+												$elm$html$Html$ul,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('dropdown-menu')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$li,
+														_List_Nil,
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$a,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('dropdown-item'),
+																		$elm$html$Html$Attributes$href('#')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text('Action')
+																	]))
+															])),
+														A2(
+														$elm$html$Html$li,
+														_List_Nil,
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$a,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('dropdown-item'),
+																		$elm$html$Html$Attributes$href('#')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text('Another action')
+																	]))
+															])),
+														A2(
+														$elm$html$Html$li,
+														_List_Nil,
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$hr,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('dropdown-divider')
+																	]),
+																_List_Nil)
+															])),
+														A2(
+														$elm$html$Html$li,
+														_List_Nil,
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$a,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('dropdown-item'),
+																		$elm$html$Html$Attributes$href('#')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text('Something else here')
+																	]))
+															]))
+													]))
+											]))
+									])),
+								A2(
+								$elm$html$Html$form,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('d-flex'),
+										A2($elm$html$Html$Attributes$attribute, 'role', 'search')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control me-2'),
+												$elm$html$Html$Attributes$type_('search'),
+												$elm$html$Html$Attributes$placeholder('Search'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Search')
+											]),
+										_List_Nil)
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$Main$GoRecipeCalculator = function (a) {
 	return {$: 'GoRecipeCalculator', a: a};
 };
@@ -5679,17 +5972,15 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 var $author$project$Main$recipeAlbumView = function (recipes) {
 	return A2(
 		$elm$html$Html$div,
+		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('album py-5 bg-body-tertiary')
-			]),
-		_List_fromArray(
-			[
+				$author$project$Main$navbarView($author$project$Main$RecipeAlbumTab),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('container')
+						$elm$html$Html$Attributes$class('album py-5 bg-body-tertiary')
 					]),
 				_List_fromArray(
 					[
@@ -5697,47 +5988,23 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
+								$elm$html$Html$Attributes$class('container')
 							]),
-						A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes))
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
+									]),
+								A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes))
+							]))
 					]))
 			]));
 };
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$html$Html$Attributes$classList = function (classes) {
-	return $elm$html$Html$Attributes$class(
-		A2(
-			$elm$core$String$join,
-			' ',
-			A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$first,
-				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
-};
+var $author$project$Main$RecipeCalculatorTab = {$: 'RecipeCalculatorTab'};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $author$project$Main$Abort = {$: 'Abort'};
 var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
 var $author$project$Main$InputNewAmount = function (a) {
@@ -5774,7 +6041,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$core$Basics$ge = _Utils_ge;
-var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -5786,7 +6052,6 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5821,14 +6086,12 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $author$project$Main$pencilIcon = $author$project$Main$genericIcon('src/img/icon/pencil.svg');
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
 	return $elm$core$String$fromFloat(rounded);
 };
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$unitToAbbr = function (unit) {
 	switch (unit.$) {
 		case 'Gram':
@@ -5946,7 +6209,6 @@ var $author$project$Main$ingredientsView = F3(
 				A2($author$project$Main$ingredientView, selectedIngredient, maybeNewAmount),
 				ingredients));
 	});
-var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
@@ -6152,9 +6414,8 @@ var $author$project$Main$prepStepsView = F3(
 						]))
 				]));
 	});
-var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$recipeView = F4(
-	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
+var $author$project$Main$recipeCalculatorView = F5(
+	function (currentModel, recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
 		var tabListItem = F4(
 			function (buttonId, contentId, label, isActive) {
 				return A2(
@@ -6212,66 +6473,72 @@ var $author$project$Main$recipeView = F4(
 			});
 		return A2(
 			$elm$html$Html$div,
+			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('mx-auto my-md-3 px-3 px-md-0'),
-					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
-				]),
-			_List_fromArray(
-				[
+					$author$project$Main$navbarView($author$project$Main$RecipeCalculatorTab),
 					A2(
 					$elm$html$Html$div,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mx-auto my-md-3 px-3 px-md-0'),
+							A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$h1,
+							$elm$html$Html$div,
 							_List_Nil,
 							_List_fromArray(
 								[
-									$elm$html$Html$text(recipe.label)
-								])),
-							A2(
-							$elm$html$Html$ul,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('nav nav-tabs'),
-									$elm$html$Html$Attributes$id('recipeTabs'),
-									A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
-								]),
-							_List_fromArray(
-								[
-									A4(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
-									A4(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('tab-content'),
-									$elm$html$Html$Attributes$id('recipeTabsContent')
-								]),
-							_List_fromArray(
-								[
-									A5(
-									tabContent,
-									'ingredients-content',
-									'ingredients-tab',
-									A3($author$project$Main$ingredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
-									true,
-									true),
-									A5(
-									tabContent,
-									'prepSteps-content',
-									'prepSteps-tab',
-									A3($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.ingredients, recipe.steps),
-									false,
-									false)
+									A2(
+									$elm$html$Html$h1,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(recipe.label)
+										])),
+									A2(
+									$elm$html$Html$ul,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('nav nav-tabs'),
+											$elm$html$Html$Attributes$id('recipeTabs'),
+											A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
+										]),
+									_List_fromArray(
+										[
+											A4(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
+											A4(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
+										])),
+									A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('tab-content'),
+											$elm$html$Html$Attributes$id('recipeTabsContent')
+										]),
+									_List_fromArray(
+										[
+											A5(
+											tabContent,
+											'ingredients-content',
+											'ingredients-tab',
+											A3($author$project$Main$ingredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
+											true,
+											true),
+											A5(
+											tabContent,
+											'prepSteps-content',
+											'prepSteps-tab',
+											A3($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.ingredients, recipe.steps),
+											false,
+											false)
+										]))
 								]))
 						]))
 				]));
 	});
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(
@@ -6376,7 +6643,7 @@ var $author$project$Main$view = function (model) {
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
 			var maybeNewAmount = model.d;
-			return A4($author$project$Main$recipeView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
+			return A5($author$project$Main$recipeCalculatorView, model, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
