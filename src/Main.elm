@@ -31,6 +31,7 @@ main =
 type Model
     = Front
     | Carousel
+    | RecipeAlbum (List Recipe)
     | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float)
 
 
@@ -40,6 +41,7 @@ type Model
 
 type Msg
     = GoCarousel
+    | GoRecipeAlbum
     | GoRecipeCalculator Recipe
     | SelectIngredient (Maybe Ingredient)
     | InputNewAmount String
@@ -61,12 +63,24 @@ update msg model =
             Carousel
 
         GoRecipeCalculator recipe ->
-            RecipeCalculator recipe Nothing 0 Nothing
+            RecipeCalculator
+                recipe
+                Nothing
+                0
+                Nothing
+
+        GoRecipeAlbum ->
+            RecipeAlbum
+                [ samplePizzaRecipe ]
 
         SelectIngredient maybeIngredient ->
             case model of
                 RecipeCalculator recipe _ prepStepIndex maybeAmount ->
-                    RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount
+                    RecipeCalculator
+                        recipe
+                        maybeIngredient
+                        prepStepIndex
+                        maybeAmount
 
                 _ ->
                     model
@@ -177,16 +191,15 @@ view model =
         Carousel ->
             viewCarousel1
 
+        RecipeAlbum recipes ->
+            recipeAlbumView recipes
+
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
             recipeView
                 recipe
                 selectedIngredient
                 maybeNewAmount
                 prepStepIndex
-
-
-
--- FRONT PAGE
 
 
 frontView : Html Msg
@@ -208,7 +221,7 @@ frontView =
             ]
             [ text "dont we all need someone who looks at us the way joscha looks at pizza 🍕" ]
         , button
-            [ onClick (GoRecipeCalculator samplePizzaRecipe)
+            [ onClick GoRecipeAlbum
             , class "btn btn-primary btn-lg"
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
@@ -285,6 +298,61 @@ carouselButton direction label btnClass iconClass =
             ]
             []
         , span [ class "visually-hidden" ] [ text label ]
+        ]
+
+
+recipeAlbumView : List Recipe -> Html Msg
+recipeAlbumView recipes =
+    div
+        [ class "album py-5 bg-body-tertiary" ]
+        [ div
+            [ class "container" ]
+            [ div
+                [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
+                (List.map recipeAlbumCardView recipes)
+            ]
+        ]
+
+
+recipeAlbumCardView : Recipe -> Html Msg
+recipeAlbumCardView recipe =
+    div
+        [ class "col" ]
+        [ div
+            [ class "card shadow-sm h-100" ]
+            [ Html.img
+                [ class "card-img-top"
+                , src
+                    (case recipe.image of
+                        Path path ->
+                            path
+                    )
+                , alt recipe.label
+                , style "object-fit" "cover"
+                , style "height" "225px"
+                ]
+                []
+            , div
+                [ class "card-body d-flex flex-column" ]
+                [ Html.h5
+                    [ class "card-title" ]
+                    [ text recipe.label ]
+                , Html.p
+                    [ class "card-text flex-grow-1" ]
+                    [ text recipe.description ]
+                , div
+                    [ class "d-flex justify-content-between align-items-center mt-2" ]
+                    [ div
+                        [ class "btn-group" ]
+                        [ button
+                            [ class "btn btn-sm btn-outline-primary"
+                            , onClick (GoRecipeCalculator recipe)
+                            ]
+                            [ text "Open" ]
+                        ]
+                    ]
+                ]
+            ]
         ]
 
 
@@ -580,6 +648,8 @@ samplePizzaRecipe : Recipe
 samplePizzaRecipe =
     { id = "seven-hours-pizza-dough"
     , label = "Seven hours pizza dough"
+    , image = Path "src/img/7-hours-pizza-dough.jpg"
+    , description = ""
     , ingredients =
         [ { id = "flour"
           , label = "Flour"
@@ -762,9 +832,15 @@ replaceIngredientAmountFraction ingredients string =
 type alias Recipe =
     { id : String
     , label : String
+    , description : String
     , ingredients : List Ingredient
     , steps : List PrepStep
+    , image : RecipeImage
     }
+
+
+type RecipeImage
+    = Path String
 
 
 type alias Ingredient =

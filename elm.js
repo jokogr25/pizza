@@ -5291,6 +5291,9 @@ var $elm$browser$Browser$sandbox = function (impl) {
 		});
 };
 var $author$project$Main$Carousel = {$: 'Carousel'};
+var $author$project$Main$RecipeAlbum = function (a) {
+	return {$: 'RecipeAlbum', a: a};
+};
 var $author$project$Main$RecipeCalculator = F4(
 	function (a, b, c, d) {
 		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d};
@@ -5331,6 +5334,46 @@ var $author$project$Main$recipeApplyRatio = F2(
 					recipe.ingredients)
 			});
 	});
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
+var $author$project$Main$Path = function (a) {
+	return {$: 'Path', a: a};
+};
+var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$samplePizzaRecipe = {
+	description: '',
+	id: 'seven-hours-pizza-dough',
+	image: $author$project$Main$Path('src/img/7-hours-pizza-dough.jpg'),
+	ingredients: _List_fromArray(
+		[
+			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
+			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
+			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
+			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
+			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
+			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
+		]),
+	label: 'Seven hours pizza dough',
+	steps: _List_fromArray(
+		[
+			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
+			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
+			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy', time: 10, title: 'imx'},
+			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
+			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
+			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
+			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
+			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
+			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together will be together in the end'},
+			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
+			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
+			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
+			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones.', time: -1, title: 'I knew it'}
+		])
+};
 var $elm$core$String$toFloat = _String_toFloat;
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -5349,6 +5392,10 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeCalculator':
 				var recipe = msg.a;
 				return A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing);
+			case 'GoRecipeAlbum':
+				return $author$project$Main$RecipeAlbum(
+					_List_fromArray(
+						[$author$project$Main$samplePizzaRecipe]));
 			case 'SelectIngredient':
 				var maybeIngredient = msg.a;
 				if (model.$ === 'RecipeCalculator') {
@@ -5447,9 +5494,7 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
-var $author$project$Main$GoRecipeCalculator = function (a) {
-	return {$: 'GoRecipeCalculator', a: a};
-};
+var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5477,41 +5522,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$html$Html$Events$on,
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
-};
-var $author$project$Main$Gram = {$: 'Gram'};
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Main$samplePizzaRecipe = {
-	id: 'seven-hours-pizza-dough',
-	ingredients: _List_fromArray(
-		[
-			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
-			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
-			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
-			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
-			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
-			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
-		]),
-	label: 'Seven hours pizza dough',
-	steps: _List_fromArray(
-		[
-			{description: 'Mix flour and roughly π/4 of water in a bowl, leave it.', time: 15, title: 'Pre mix'},
-			{description: 'Mix rest of the water with yeast and honey, leave it.', time: 15, title: 'BRING THE YEAST TO LIFE'},
-			{description: 'Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy', time: 10, title: 'imx'},
-			{description: 'Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo', time: 7 * 60, title: 'slumber time'},
-			{description: 'Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball.', time: 5, title: 'Roll it, baby'},
-			{description: 'After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box.', time: 60, title: 'stueckgare'},
-			{description: 'Pre-heat oven to max', time: 5, title: 'MAX POWER'},
-			{description: 'Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they\'re very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge', time: 5, title: 'Don\'t we all need a little stretch when we\'re older?'},
-			{description: 'Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It\'s BLASFEMIA. Do it and I\'ll call the cops', time: 5, title: 'What belongs together will be together in the end'},
-			{description: 'You did it, right? That\'s okay. Pizza is for everyone, even taste-impaired germans.', time: 0, title: 'Ich bin nicht sauer, ich bin enttäuscht'},
-			{description: 'Put pizza in oven until cheese starts bubbling and the circle of life gets a little color', time: 0, title: 'CIIIIIIRCLEE OF LIIIIFEE'},
-			{description: 'You need instructions for that too?', time: 0, title: 'Enjoy'},
-			{description: 'Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones.', time: -1, title: 'I knew it'}
-		])
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -5548,8 +5558,7 @@ var $author$project$Main$frontView = A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
-					$elm$html$Html$Events$onClick(
-					$author$project$Main$GoRecipeCalculator($author$project$Main$samplePizzaRecipe)),
+					$elm$html$Html$Events$onClick($author$project$Main$GoRecipeAlbum),
 					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
@@ -5559,6 +5568,141 @@ var $author$project$Main$frontView = A2(
 					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
+var $author$project$Main$GoRecipeCalculator = function (a) {
+	return {$: 'GoRecipeCalculator', a: a};
+};
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Main$recipeAlbumCardView = function (recipe) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('col')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('card shadow-sm h-100')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-img-top'),
+								$elm$html$Html$Attributes$src(
+								function () {
+									var _v0 = recipe.image;
+									var path = _v0.a;
+									return path;
+								}()),
+								$elm$html$Html$Attributes$alt(recipe.label),
+								A2($elm$html$Html$Attributes$style, 'object-fit', 'cover'),
+								A2($elm$html$Html$Attributes$style, 'height', '225px')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-body d-flex flex-column')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$h5,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-title')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(recipe.label)
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-text flex-grow-1')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(recipe.description)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('d-flex justify-content-between align-items-center mt-2')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('btn-group')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn btn-sm btn-outline-primary'),
+														$elm$html$Html$Events$onClick(
+														$author$project$Main$GoRecipeCalculator(recipe))
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Open')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Main$recipeAlbumView = function (recipes) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('album py-5 bg-body-tertiary')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
+							]),
+						A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes))
+					]))
+			]));
+};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -5601,13 +5745,6 @@ var $author$project$Main$InputNewAmount = function (a) {
 };
 var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
-};
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
 var $elm$html$Html$Attributes$width = function (n) {
 	return A2(
@@ -6168,7 +6305,6 @@ var $author$project$Main$carouselButton = F4(
 						]))
 				]));
 	});
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Main$carouselItem = F2(
 	function (isActive, imageSrc) {
 		return A2(
@@ -6232,6 +6368,9 @@ var $author$project$Main$view = function (model) {
 			return $author$project$Main$frontView;
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
+		case 'RecipeAlbum':
+			var recipes = model.a;
+			return $author$project$Main$recipeAlbumView(recipes);
 		default:
 			var recipe = model.a;
 			var selectedIngredient = model.b;
