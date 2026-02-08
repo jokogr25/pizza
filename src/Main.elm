@@ -84,7 +84,23 @@ subscriptions model =
                             _ ->
                                 NoOp
 
-                    _ ->
+                    Left ->
+                        case model of
+                            RecipeCalculator _ _ _ _ _ RecipeStepsPage ->
+                                Prev
+
+                            _ ->
+                                NoOp
+
+                    Right ->
+                        case model of
+                            RecipeCalculator _ _ _ _ _ RecipeStepsPage ->
+                                Next
+
+                            _ ->
+                                NoOp
+
+                    Unknown ->
                         NoOp
             )
             (Browser.Events.onKeyDown keyDecoder)
@@ -98,6 +114,8 @@ keyDecoder =
 
 type Key
     = Enter
+    | Left
+    | Right
     | Unknown
 
 
@@ -106,6 +124,12 @@ toKey str =
     case str of
         "Enter" ->
             Enter
+
+        "ArrowLeft" ->
+            Left
+
+        "ArrowRight" ->
+            Right
 
         _ ->
             Unknown
@@ -305,7 +329,7 @@ update msg model =
                         maybeIngredient
                         (min
                             (prepStepIndex + 1)
-                            (List.length recipe.steps)
+                            (List.length recipe.steps - 1)
                         )
                         maybeAmount
                         ratio
@@ -381,6 +405,7 @@ view model =
                     selectedIngredient
                     maybeNewAmount
                     prepStepIndex
+                    page
                 )
                 (case page of
                     RecipeIngredientsPage ->
@@ -743,18 +768,22 @@ recipeAlbumCardView recipe =
         ]
 
 
-recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
-recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
+recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> ActivePage -> Html Msg
+recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex activePage =
     let
         tabListItem : String -> String -> String -> Bool -> ActivePage -> Html Msg
         tabListItem buttonId contentId label isActive pageToActivate =
             Html.li
-                [ class "nav-item"
+                [ class "nav-item flex-fill"
                 , attribute "role" "presentation"
                 ]
                 [ button
                     [ classList
                         [ ( "nav-link", True )
+                        , ( "w-100", True )
+                        , ( "justify-content-center", True )
+                        , ( "text-center", True )
+                        , ( "text-muted", not isActive )
                         , ( "active", isActive )
                         ]
                     , id buttonId
@@ -803,13 +832,25 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                         "ingredients-tab"
                         "ingredients-content"
                         "Ingredients"
-                        True
+                        (case activePage of
+                            RecipeIngredientsPage ->
+                                True
+
+                            _ ->
+                                False
+                        )
                         RecipeIngredientsPage
                     , tabListItem
                         "prepSteps-tab"
                         "prepSteps-content"
                         "Steps"
-                        False
+                        (case activePage of
+                            RecipeStepsPage ->
+                                True
+
+                            _ ->
+                                False
+                        )
                         RecipeStepsPage
                     ]
                 , div

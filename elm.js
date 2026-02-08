@@ -5272,18 +5272,27 @@ var $elm$browser$Browser$element = _Browser_element;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
+var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$NoOp = {$: 'NoOp'};
+var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$Enter = {$: 'Enter'};
+var $author$project$Main$Left = {$: 'Left'};
+var $author$project$Main$Right = {$: 'Right'};
 var $author$project$Main$Unknown = {$: 'Unknown'};
 var $author$project$Main$toKey = function (str) {
-	if (str === 'Enter') {
-		return $author$project$Main$Enter;
-	} else {
-		return $author$project$Main$Unknown;
+	switch (str) {
+		case 'Enter':
+			return $author$project$Main$Enter;
+		case 'ArrowLeft':
+			return $author$project$Main$Left;
+		case 'ArrowRight':
+			return $author$project$Main$Right;
+		default:
+			return $author$project$Main$Unknown;
 	}
 };
 var $author$project$Main$keyDecoder = A2(
@@ -5699,15 +5708,30 @@ var $author$project$Main$subscriptions = function (model) {
 				A2(
 				$elm$core$Platform$Sub$map,
 				function (key) {
-					if (key.$ === 'Enter') {
-						if (((model.$ === 'RecipeCalculator') && (model.b.$ === 'Just')) && (model.d.$ === 'Just')) {
-							var newAmount = model.d.a;
-							return (newAmount >= 1) ? $author$project$Main$CalculateRatio : $author$project$Main$NoOp;
-						} else {
+					switch (key.$) {
+						case 'Enter':
+							if (((model.$ === 'RecipeCalculator') && (model.b.$ === 'Just')) && (model.d.$ === 'Just')) {
+								var newAmount = model.d.a;
+								return (newAmount >= 1) ? $author$project$Main$CalculateRatio : $author$project$Main$NoOp;
+							} else {
+								return $author$project$Main$NoOp;
+							}
+						case 'Left':
+							if ((model.$ === 'RecipeCalculator') && (model.f.$ === 'RecipeStepsPage')) {
+								var _v3 = model.f;
+								return $author$project$Main$Prev;
+							} else {
+								return $author$project$Main$NoOp;
+							}
+						case 'Right':
+							if ((model.$ === 'RecipeCalculator') && (model.f.$ === 'RecipeStepsPage')) {
+								var _v5 = model.f;
+								return $author$project$Main$Next;
+							} else {
+								return $author$project$Main$NoOp;
+							}
+						default:
 							return $author$project$Main$NoOp;
-						}
-					} else {
-						return $author$project$Main$NoOp;
 					}
 				},
 				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder))
@@ -5997,7 +6021,7 @@ var $author$project$Main$update = F2(
 							A2(
 								$elm$core$Basics$min,
 								prepStepIndex + 1,
-								$elm$core$List$length(recipe.steps)),
+								$elm$core$List$length(recipe.steps) - 1),
 							maybeAmount,
 							ratio,
 							page),
@@ -6545,8 +6569,6 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 					[$author$project$Main$resetIcon]))
 			]));
 };
-var $author$project$Main$Next = {$: 'Next'};
-var $author$project$Main$Prev = {$: 'Prev'};
 var $author$project$Main$arrowLeftIcon = A2($author$project$Main$genericIcon, 'arrow-left.svg', 32);
 var $author$project$Main$arrowRightIcon = A2($author$project$Main$genericIcon, 'arrow-right.svg', 32);
 var $author$project$Main$prepStepsViewActions = F2(
@@ -7051,15 +7073,15 @@ var $author$project$Main$prepStepsView = F3(
 						prepSteps))
 				]));
 	});
-var $author$project$Main$recipeView = F5(
-	function (recipe, ratio, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
+var $author$project$Main$recipeView = F6(
+	function (recipe, ratio, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex, activePage) {
 		var tabListItem = F5(
 			function (buttonId, contentId, label, isActive, pageToActivate) {
 				return A2(
 					$elm$html$Html$li,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('nav-item'),
+							$elm$html$Html$Attributes$class('nav-item flex-fill'),
 							A2($elm$html$Html$Attributes$attribute, 'role', 'presentation')
 						]),
 					_List_fromArray(
@@ -7072,6 +7094,10 @@ var $author$project$Main$recipeView = F5(
 									_List_fromArray(
 										[
 											_Utils_Tuple2('nav-link', true),
+											_Utils_Tuple2('w-100', true),
+											_Utils_Tuple2('justify-content-center', true),
+											_Utils_Tuple2('text-center', true),
+											_Utils_Tuple2('text-muted', !isActive),
 											_Utils_Tuple2('active', isActive)
 										])),
 									$elm$html$Html$Attributes$id(buttonId),
@@ -7146,8 +7172,32 @@ var $author$project$Main$recipeView = F5(
 										]),
 									_List_fromArray(
 										[
-											A5(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true, $author$project$Main$RecipeIngredientsPage),
-											A5(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false, $author$project$Main$RecipeStepsPage)
+											A5(
+											tabListItem,
+											'ingredients-tab',
+											'ingredients-content',
+											'Ingredients',
+											function () {
+												if (activePage.$ === 'RecipeIngredientsPage') {
+													return true;
+												} else {
+													return false;
+												}
+											}(),
+											$author$project$Main$RecipeIngredientsPage),
+											A5(
+											tabListItem,
+											'prepSteps-tab',
+											'prepSteps-content',
+											'Steps',
+											function () {
+												if (activePage.$ === 'RecipeStepsPage') {
+													return true;
+												} else {
+													return false;
+												}
+											}(),
+											$author$project$Main$RecipeStepsPage)
 										])),
 									A2(
 									$elm$html$Html$div,
@@ -7310,7 +7360,7 @@ var $author$project$Main$view = function (model) {
 			return A3(
 				$author$project$Main$contentView,
 				page,
-				A5($author$project$Main$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex),
+				A6($author$project$Main$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex, page),
 				function () {
 					switch (page.$) {
 						case 'RecipeIngredientsPage':
