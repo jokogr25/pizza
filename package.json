@@ -1,9 +1,14 @@
 {
-  "dependencies": {
-    "parcel": "^2.16.4"
-  },
-  "devDependencies": {
-    "@parcel/transformer-elm": "^2.16.4",
-    "elm": "^0.19.1-5"
-  }
+    "scripts": {
+        "make": "elm make src/Main.elm --output elm.js",
+        "start": "elm make src/Main.elm --output elm.js && elm reactor",
+        "hot": "parcel index.html"
+    },
+    "dependencies": {
+        "parcel": "^2.16.4"
+    },
+    "devDependencies": {
+        "@parcel/transformer-elm": "^2.16.4",
+        "elm": "^0.19.1-5"
+    }
 }
