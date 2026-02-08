@@ -5746,6 +5746,9 @@ var $author$project$Main$RecipeCalculator = F6(
 	function (a, b, c, d, e, f) {
 		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d, e: e, f: f};
 	});
+var $author$project$Main$RecipeCreator = function (a) {
+	return {$: 'RecipeCreator', a: a};
+};
 var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -5878,6 +5881,15 @@ var $author$project$Main$update = F2(
 							[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
 						$elm$core$Maybe$Nothing),
 					$elm$core$Platform$Cmd$none);
+			case 'GoRecipeCreator':
+				if (model.$ === 'RecipeAlbum') {
+					var recipes = model.a;
+					return _Utils_Tuple2(
+						$author$project$Main$RecipeCreator(recipes),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
 			case 'SelectPage':
 				var page = msg.a;
 				if (model.$ === 'RecipeCalculator') {
@@ -6055,6 +6067,7 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
+var $author$project$Main$RecipeCreatorPage = {$: 'RecipeCreatorPage'};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -6485,6 +6498,8 @@ var $author$project$Main$contentView = F3(
 					return false;
 				case 'RecipeIngredientsPage':
 					return true;
+				case 'RecipeStepsPage':
+					return true;
 				default:
 					return true;
 			}
@@ -6603,6 +6618,8 @@ var $author$project$Main$prepStepsViewActions = F2(
 					$author$project$Main$arrowRightIcon)
 				]));
 	});
+var $author$project$Main$GoRecipeCreator = {$: 'GoRecipeCreator'};
+var $author$project$Main$plusIcon = A2($author$project$Main$genericIcon, 'plus.svg', 64);
 var $author$project$Main$GoRecipeCalculator = function (a) {
 	return {$: 'GoRecipeCalculator', a: a};
 };
@@ -6750,11 +6767,36 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 									[
 										$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
 									]),
-								A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes))
+								_Utils_ap(
+									A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('col')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('card shadow-sm h-100 d-flex justify-content-center align-items-center'),
+															A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
+															A2($elm$html$Html$Attributes$style, 'min-height', '128px'),
+															$elm$html$Html$Events$onClick($author$project$Main$GoRecipeCreator)
+														]),
+													_List_fromArray(
+														[$author$project$Main$plusIcon]))
+												]))
+										])))
 							]))
 					]))
 			]));
 };
+var $author$project$Main$recipeCreatorView = $elm$html$Html$text('recipeCreatorView construction :(');
 var $author$project$Main$RecipeStepsPage = {$: 'RecipeStepsPage'};
 var $author$project$Main$SelectPage = function (a) {
 	return {$: 'SelectPage', a: a};
@@ -7350,7 +7392,7 @@ var $author$project$Main$view = function (model) {
 						}
 					}()),
 				$elm$html$Html$text(''));
-		default:
+		case 'RecipeCalculator':
 			var recipe = model.a;
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
@@ -7374,6 +7416,15 @@ var $author$project$Main$view = function (model) {
 							return $elm$html$Html$text('');
 					}
 				}());
+		default:
+			var recipes = model.a;
+			return A3(
+				$author$project$Main$contentView,
+				$author$project$Main$RecipeCreatorPage,
+				$author$project$Main$recipeCreatorView,
+				$elm$html$Html$text(
+					'Existing recipes: ' + $elm$core$String$fromInt(
+						$elm$core$List$length(recipes))));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

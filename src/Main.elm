@@ -38,6 +38,7 @@ type Model
     | Carousel
     | RecipeAlbum (List Recipe) (Maybe String)
     | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
+    | RecipeCreator (List Recipe)
 
 
 
@@ -49,6 +50,7 @@ type Msg
     | GoCarousel
     | GoRecipeAlbum
     | GoRecipeCalculator Recipe
+    | GoRecipeCreator
     | ResetCalculator
     | SelectIngredient Ingredient
     | SelectPage ActivePage
@@ -171,6 +173,16 @@ update msg model =
                 Nothing
             , Cmd.none
             )
+
+        GoRecipeCreator ->
+            case model of
+                RecipeAlbum recipes _ ->
+                    ( RecipeCreator recipes
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
 
         SelectPage page ->
             case model of
@@ -420,6 +432,16 @@ view model =
                         text ""
                 )
 
+        RecipeCreator recipes ->
+            contentView
+                RecipeCreatorPage
+                recipeCreatorView
+                (text
+                    ("Existing recipes: "
+                        ++ String.fromInt (List.length recipes)
+                    )
+                )
+
 
 frontView : Html Msg
 frontView =
@@ -524,6 +546,7 @@ type ActivePage
     = RecipeAlbumPage
     | RecipeIngredientsPage
     | RecipeStepsPage
+    | RecipeCreatorPage
 
 
 contentView : ActivePage -> Html Msg -> Html Msg -> Html Msg
@@ -538,6 +561,9 @@ contentView activePage content actions =
                     True
 
                 RecipeStepsPage ->
+                    True
+
+                RecipeCreatorPage ->
                     True
     in
     div
@@ -711,7 +737,21 @@ recipeAlbumView recipes =
                 ]
                 [ div
                     [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
-                    (List.map recipeAlbumCardView recipes)
+                    (List.map recipeAlbumCardView recipes
+                        ++ [ div
+                                [ class "col"
+                                ]
+                                [ div
+                                    [ class "card shadow-sm h-100 d-flex justify-content-center align-items-center"
+                                    , style "min-width" "220px"
+                                    , style "min-height" "128px"
+                                    , onClick GoRecipeCreator
+                                    ]
+                                    [ plusIcon
+                                    ]
+                                ]
+                           ]
+                    )
                 ]
             ]
         ]
@@ -1112,6 +1152,12 @@ prepStepView indexToDisplay ingredients index prepStep =
         ]
 
 
+recipeCreatorView : Html Msg
+recipeCreatorView =
+    text
+        "recipeCreatorView construction :("
+
+
 
 -- TYPES
 
@@ -1397,6 +1443,11 @@ arrowRightIcon =
 pizzaIcon : Html msg
 pizzaIcon =
     genericIcon "pizza.svg" 32
+
+
+plusIcon : Html msg
+plusIcon =
+    genericIcon "plus.svg" 64
 
 
 genericIcon : String -> Int -> Html msg
