@@ -814,9 +814,13 @@ contentView activePage content maybeActions =
         [ class "d-flex flex-column vh-100"
         ]
         [ navbarView activePage
-        , content
+        , div
+            [ class "flex-grow-1 overflow-auto"
+            ]
+            [ content
+            ]
         , maybeActions
-            |> Maybe.map (\m -> footerView m)
+            |> Maybe.map footerView
             |> Maybe.withDefault (text "")
         ]
 
@@ -824,9 +828,9 @@ contentView activePage content maybeActions =
 footerView : Html Msg -> Html Msg
 footerView actions =
     div
-        [ class "p-3 border-top fixed-bottom d-flex justify-content-around" ]
-        [ actions
+        [ class "p-3 border-top d-flex justify-content-around"
         ]
+        [ actions ]
 
 
 navbarView : ActivePage -> Html Msg
@@ -1397,7 +1401,7 @@ prepStepView indexToDisplay ingredients index prepStep =
 recipeCreatorView : Recipe -> Html Msg
 recipeCreatorView draft =
     div
-        [ class "container my-4"
+        [ class "container my-4 flex-grow-1"
         , style "max-width" "700px"
         ]
         [ Html.h2

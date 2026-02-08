@@ -6340,7 +6340,7 @@ var $author$project$Main$footerView = function (actions) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('p-3 border-top fixed-bottom d-flex justify-content-around')
+				$elm$html$Html$Attributes$class('p-3 border-top d-flex justify-content-around')
 			]),
 		_List_fromArray(
 			[actions]));
@@ -6747,16 +6747,18 @@ var $author$project$Main$contentView = F3(
 			_List_fromArray(
 				[
 					$author$project$Main$navbarView(activePage),
-					content,
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('flex-grow-1 overflow-auto')
+						]),
+					_List_fromArray(
+						[content])),
 					A2(
 					$elm$core$Maybe$withDefault,
 					$elm$html$Html$text(''),
-					A2(
-						$elm$core$Maybe$map,
-						function (m) {
-							return $author$project$Main$footerView(m);
-						},
-						maybeActions))
+					A2($elm$core$Maybe$map, $author$project$Main$footerView, maybeActions))
 				]));
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
@@ -7207,7 +7209,7 @@ var $author$project$Main$recipeCreatorView = function (draft) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('container my-4'),
+				$elm$html$Html$Attributes$class('container my-4 flex-grow-1'),
 				A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 			]),
 		_List_fromArray(
