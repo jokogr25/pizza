@@ -37,7 +37,7 @@ type Model
     = Front
     | Carousel
     | RecipeAlbum (List Recipe) (Maybe String)
-    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
+    | RecipeViewer Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
     | RecipeCreator (List Recipe)
 
 
@@ -49,9 +49,9 @@ type Msg
     = GoFront
     | GoCarousel
     | GoRecipeAlbum
-    | GoRecipeCalculator Recipe
+    | GoRecipeViewer Recipe
     | GoRecipeCreator
-    | ResetCalculator
+    | ResetRecipeViewer
     | SelectIngredient Ingredient
     | SelectPage ActivePage
     | UnselectIngredient
@@ -76,7 +76,7 @@ subscriptions model =
                 case key of
                     Enter ->
                         case model of
-                            RecipeCalculator _ (Just _) _ (Just newAmount) _ _ ->
+                            RecipeViewer _ (Just _) _ (Just newAmount) _ _ ->
                                 if newAmount >= 1 then
                                     CalculateRatio
 
@@ -88,7 +88,7 @@ subscriptions model =
 
                     Left ->
                         case model of
-                            RecipeCalculator _ _ _ _ _ RecipeStepsPage ->
+                            RecipeViewer _ _ _ _ _ RecipeStepsPage ->
                                 Prev
 
                             _ ->
@@ -96,7 +96,7 @@ subscriptions model =
 
                     Right ->
                         case model of
-                            RecipeCalculator _ _ _ _ _ RecipeStepsPage ->
+                            RecipeViewer _ _ _ _ _ RecipeStepsPage ->
                                 Next
 
                             _ ->
@@ -154,8 +154,8 @@ update msg model =
         GoCarousel ->
             ( Carousel, Cmd.none )
 
-        GoRecipeCalculator recipe ->
-            ( RecipeCalculator
+        GoRecipeViewer recipe ->
+            ( RecipeViewer
                 recipe
                 Nothing
                 0
@@ -186,8 +186,8 @@ update msg model =
 
         SelectPage page ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio _ ->
-                    ( RecipeCalculator
+                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio _ ->
+                    ( RecipeViewer
                         recipe
                         maybeIngredient
                         prepStepIndex
@@ -202,8 +202,8 @@ update msg model =
 
         SelectIngredient ingredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                    ( RecipeViewer
                         recipe
                         (Just ingredient)
                         prepStepIndex
@@ -218,8 +218,8 @@ update msg model =
 
         UnselectIngredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                    ( RecipeViewer
                         recipe
                         Nothing
                         prepStepIndex
@@ -232,10 +232,10 @@ update msg model =
                 _ ->
                     noChange
 
-        ResetCalculator ->
+        ResetRecipeViewer ->
             case model of
-                RecipeCalculator recipe _ _ _ _ page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe _ _ _ _ page ->
+                    ( RecipeViewer
                         recipe
                         Nothing
                         0
@@ -250,8 +250,8 @@ update msg model =
 
         InputNewAmount amount ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex _ ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe maybeIngredient prepStepIndex _ ratio page ->
+                    ( RecipeViewer
                         recipe
                         maybeIngredient
                         prepStepIndex
@@ -278,7 +278,7 @@ update msg model =
 
         CalculateRatio ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount _ page ->
+                RecipeViewer recipe maybeIngredient prepStepIndex maybeNewAmount _ page ->
                     ( Maybe.map2
                         (\ingredient newAmount ->
                             let
@@ -292,7 +292,7 @@ update msg model =
                                     else
                                         newAmount / oldAmount
                             in
-                            RecipeCalculator
+                            RecipeViewer
                                 recipe
                                 Nothing
                                 prepStepIndex
@@ -303,7 +303,7 @@ update msg model =
                         maybeIngredient
                         maybeNewAmount
                         |> Maybe.withDefault
-                            (RecipeCalculator
+                            (RecipeViewer
                                 recipe
                                 maybeIngredient
                                 prepStepIndex
@@ -319,8 +319,8 @@ update msg model =
 
         Abort ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                    ( RecipeViewer
                         recipe
                         Nothing
                         prepStepIndex
@@ -335,8 +335,8 @@ update msg model =
 
         Next ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
+                    ( RecipeViewer
                         recipe
                         maybeIngredient
                         (min
@@ -354,8 +354,8 @@ update msg model =
 
         Prev ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
-                    ( RecipeCalculator
+                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
+                    ( RecipeViewer
                         recipe
                         maybeIngredient
                         (max
@@ -408,7 +408,7 @@ view model =
                 )
                 Nothing
 
-        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
+        RecipeViewer recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
             contentView
                 page
                 (recipeView
@@ -785,7 +785,7 @@ recipeAlbumCardView recipe =
                           else
                             button
                                 [ class "btn btn-sm btn-outline-primary"
-                                , onClick (GoRecipeCalculator recipe)
+                                , onClick (GoRecipeViewer recipe)
                                 ]
                                 [ text "Open" ]
                         ]
@@ -940,7 +940,7 @@ ingredientsViewActions ratio =
         [ button
             [ type_ "button"
             , class "btn btn-primary"
-            , onClick ResetCalculator
+            , onClick ResetRecipeViewer
             , disabled (ratio == 1)
             ]
             [ resetIcon

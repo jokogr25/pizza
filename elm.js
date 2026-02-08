@@ -5710,21 +5710,21 @@ var $author$project$Main$subscriptions = function (model) {
 				function (key) {
 					switch (key.$) {
 						case 'Enter':
-							if (((model.$ === 'RecipeCalculator') && (model.b.$ === 'Just')) && (model.d.$ === 'Just')) {
+							if (((model.$ === 'RecipeViewer') && (model.b.$ === 'Just')) && (model.d.$ === 'Just')) {
 								var newAmount = model.d.a;
 								return (newAmount >= 1) ? $author$project$Main$CalculateRatio : $author$project$Main$NoOp;
 							} else {
 								return $author$project$Main$NoOp;
 							}
 						case 'Left':
-							if ((model.$ === 'RecipeCalculator') && (model.f.$ === 'RecipeStepsPage')) {
+							if ((model.$ === 'RecipeViewer') && (model.f.$ === 'RecipeStepsPage')) {
 								var _v3 = model.f;
 								return $author$project$Main$Prev;
 							} else {
 								return $author$project$Main$NoOp;
 							}
 						case 'Right':
-							if ((model.$ === 'RecipeCalculator') && (model.f.$ === 'RecipeStepsPage')) {
+							if ((model.$ === 'RecipeViewer') && (model.f.$ === 'RecipeStepsPage')) {
 								var _v5 = model.f;
 								return $author$project$Main$Next;
 							} else {
@@ -5742,14 +5742,14 @@ var $author$project$Main$RecipeAlbum = F2(
 	function (a, b) {
 		return {$: 'RecipeAlbum', a: a, b: b};
 	});
-var $author$project$Main$RecipeCalculator = F6(
-	function (a, b, c, d, e, f) {
-		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d, e: e, f: f};
-	});
 var $author$project$Main$RecipeCreator = function (a) {
 	return {$: 'RecipeCreator', a: a};
 };
 var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
+var $author$project$Main$RecipeViewer = F6(
+	function (a, b, c, d, e, f) {
+		return {$: 'RecipeViewer', a: a, b: b, c: c, d: d, e: e, f: f};
+	});
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -5868,10 +5868,10 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2($author$project$Main$Front, $elm$core$Platform$Cmd$none);
 			case 'GoCarousel':
 				return _Utils_Tuple2($author$project$Main$Carousel, $elm$core$Platform$Cmd$none);
-			case 'GoRecipeCalculator':
+			case 'GoRecipeViewer':
 				var recipe = msg.a;
 				return _Utils_Tuple2(
-					A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
+					A6($author$project$Main$RecipeViewer, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
 					$elm$core$Platform$Cmd$none);
 			case 'GoRecipeAlbum':
 				return _Utils_Tuple2(
@@ -5892,28 +5892,28 @@ var $author$project$Main$update = F2(
 				}
 			case 'SelectPage':
 				var page = msg.a;
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
 					var ratio = model.e;
 					return _Utils_Tuple2(
-						A6($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeAmount, ratio, page),
+						A6($author$project$Main$RecipeViewer, recipe, maybeIngredient, prepStepIndex, maybeAmount, ratio, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
 			case 'SelectIngredient':
 				var ingredient = msg.a;
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
 					var page = model.f;
 					return _Utils_Tuple2(
 						A6(
-							$author$project$Main$RecipeCalculator,
+							$author$project$Main$RecipeViewer,
 							recipe,
 							$elm$core$Maybe$Just(ingredient),
 							prepStepIndex,
@@ -5925,30 +5925,30 @@ var $author$project$Main$update = F2(
 					return noChange;
 				}
 			case 'UnselectIngredient':
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
 					var page = model.f;
 					return _Utils_Tuple2(
-						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
+						A6($author$project$Main$RecipeViewer, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
-			case 'ResetCalculator':
-				if (model.$ === 'RecipeCalculator') {
+			case 'ResetRecipeViewer':
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var page = model.f;
 					return _Utils_Tuple2(
-						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
+						A6($author$project$Main$RecipeViewer, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
 			case 'InputNewAmount':
 				var amount = msg.a;
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
@@ -5956,7 +5956,7 @@ var $author$project$Main$update = F2(
 					var page = model.f;
 					return _Utils_Tuple2(
 						A6(
-							$author$project$Main$RecipeCalculator,
+							$author$project$Main$RecipeViewer,
 							recipe,
 							maybeIngredient,
 							prepStepIndex,
@@ -5981,7 +5981,7 @@ var $author$project$Main$update = F2(
 					return noChange;
 				}
 			case 'CalculateRatio':
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
@@ -5990,14 +5990,14 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						A2(
 							$elm$core$Maybe$withDefault,
-							A6($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount, 1, page),
+							A6($author$project$Main$RecipeViewer, recipe, maybeIngredient, prepStepIndex, maybeNewAmount, 1, page),
 							A3(
 								$elm$core$Maybe$map2,
 								F2(
 									function (ingredient, newAmount) {
 										var oldAmount = ingredient.amount;
 										var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
-										return A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, newRatio, page);
+										return A6($author$project$Main$RecipeViewer, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, newRatio, page);
 									}),
 								maybeIngredient,
 								maybeNewAmount)),
@@ -6006,19 +6006,19 @@ var $author$project$Main$update = F2(
 					return noChange;
 				}
 			case 'Abort':
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
 					var page = model.f;
 					return _Utils_Tuple2(
-						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
+						A6($author$project$Main$RecipeViewer, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
 			case 'Next':
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
@@ -6027,7 +6027,7 @@ var $author$project$Main$update = F2(
 					var page = model.f;
 					return _Utils_Tuple2(
 						A6(
-							$author$project$Main$RecipeCalculator,
+							$author$project$Main$RecipeViewer,
 							recipe,
 							maybeIngredient,
 							A2(
@@ -6042,7 +6042,7 @@ var $author$project$Main$update = F2(
 					return noChange;
 				}
 			case 'Prev':
-				if (model.$ === 'RecipeCalculator') {
+				if (model.$ === 'RecipeViewer') {
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
@@ -6051,7 +6051,7 @@ var $author$project$Main$update = F2(
 					var page = model.f;
 					return _Utils_Tuple2(
 						A6(
-							$author$project$Main$RecipeCalculator,
+							$author$project$Main$RecipeViewer,
 							recipe,
 							maybeIngredient,
 							A2($elm$core$Basics$max, prepStepIndex - 1, 0),
@@ -6565,7 +6565,7 @@ var $author$project$Main$frontView = A2(
 					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
-var $author$project$Main$ResetCalculator = {$: 'ResetCalculator'};
+var $author$project$Main$ResetRecipeViewer = {$: 'ResetRecipeViewer'};
 var $author$project$Main$resetIcon = A2($author$project$Main$genericIcon, 'reset.svg', 32);
 var $author$project$Main$ingredientsViewActions = function (ratio) {
 	return A2(
@@ -6583,7 +6583,7 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 					[
 						$elm$html$Html$Attributes$type_('button'),
 						$elm$html$Html$Attributes$class('btn btn-primary'),
-						$elm$html$Html$Events$onClick($author$project$Main$ResetCalculator),
+						$elm$html$Html$Events$onClick($author$project$Main$ResetRecipeViewer),
 						$elm$html$Html$Attributes$disabled(ratio === 1)
 					]),
 				_List_fromArray(
@@ -6626,8 +6626,8 @@ var $author$project$Main$prepStepsViewActions = F2(
 	});
 var $author$project$Main$GoRecipeCreator = {$: 'GoRecipeCreator'};
 var $author$project$Main$plusIcon = A2($author$project$Main$genericIcon, 'plus.svg', 64);
-var $author$project$Main$GoRecipeCalculator = function (a) {
-	return {$: 'GoRecipeCalculator', a: a};
+var $author$project$Main$GoRecipeViewer = function (a) {
+	return {$: 'GoRecipeViewer', a: a};
 };
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
@@ -6732,7 +6732,7 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 													[
 														$elm$html$Html$Attributes$class('btn btn-sm btn-outline-primary'),
 														$elm$html$Html$Events$onClick(
-														$author$project$Main$GoRecipeCalculator(recipe))
+														$author$project$Main$GoRecipeViewer(recipe))
 													]),
 												_List_fromArray(
 													[
@@ -7388,7 +7388,7 @@ var $author$project$Main$view = function (model) {
 						}
 					}()),
 				$elm$core$Maybe$Nothing);
-		case 'RecipeCalculator':
+		case 'RecipeViewer':
 			var recipe = model.a;
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
