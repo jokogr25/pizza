@@ -45,7 +45,8 @@ type Model
 
 
 type Msg
-    = GoCarousel
+    = GoFront
+    | GoCarousel
     | GoRecipeAlbum
     | GoRecipeCalculator Recipe
     | ResetCalculator
@@ -121,6 +122,9 @@ update msg model =
             ( model, Cmd.none )
     in
     case msg of
+        GoFront ->
+            ( Front, Cmd.none )
+
         GoCarousel ->
             ( Carousel, Cmd.none )
 
@@ -499,12 +503,28 @@ type ActivePage
 
 contentView : ActivePage -> Html Msg -> Html Msg -> Html Msg
 contentView activePage content actions =
+    let
+        hasActions =
+            case activePage of
+                RecipeAlbumPage ->
+                    False
+
+                RecipeIngredientsPage ->
+                    True
+
+                RecipeStepsPage ->
+                    True
+    in
     div
         [ class "d-flex flex-column vh-100"
         ]
         [ navbarView activePage
         , content
-        , footerView actions
+        , if hasActions then
+            footerView actions
+
+          else
+            text ""
         ]
 
 
@@ -556,7 +576,7 @@ navbarView activePage =
             [ class "container-fluid" ]
             [ Html.a
                 [ class "navbar-brand"
-                , Html.Attributes.href "#"
+                , onClick GoFront
                 ]
                 [ pizzaIcon ]
             , button

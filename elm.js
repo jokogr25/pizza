@@ -5837,6 +5837,8 @@ var $author$project$Main$update = F2(
 	function (msg, model) {
 		var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		switch (msg.$) {
+			case 'GoFront':
+				return _Utils_Tuple2($author$project$Main$Front, $elm$core$Platform$Cmd$none);
 			case 'GoCarousel':
 				return _Utils_Tuple2($author$project$Main$Carousel, $elm$core$Platform$Cmd$none);
 			case 'GoRecipeCalculator':
@@ -6070,6 +6072,7 @@ var $author$project$Main$footerView = function (actions) {
 		_List_fromArray(
 			[actions]));
 };
+var $author$project$Main$GoFront = {$: 'GoFront'};
 var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
 var $author$project$Main$InputSearchTerm = function (a) {
 	return {$: 'InputSearchTerm', a: a};
@@ -6271,7 +6274,7 @@ var $author$project$Main$navbarView = function (activePage) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$class('navbar-brand'),
-								$elm$html$Html$Attributes$href('#')
+								$elm$html$Html$Events$onClick($author$project$Main$GoFront)
 							]),
 						_List_fromArray(
 							[$author$project$Main$pizzaIcon])),
@@ -6452,6 +6455,16 @@ var $author$project$Main$navbarView = function (activePage) {
 };
 var $author$project$Main$contentView = F3(
 	function (activePage, content, actions) {
+		var hasActions = function () {
+			switch (activePage.$) {
+				case 'RecipeAlbumPage':
+					return false;
+				case 'RecipeIngredientsPage':
+					return true;
+				default:
+					return true;
+			}
+		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6462,7 +6475,7 @@ var $author$project$Main$contentView = F3(
 				[
 					$author$project$Main$navbarView(activePage),
 					content,
-					$author$project$Main$footerView(actions)
+					hasActions ? $author$project$Main$footerView(actions) : $elm$html$Html$text('')
 				]));
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
