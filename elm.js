@@ -7821,6 +7821,13 @@ var $author$project$Main$recipeView = F6(
 						]))
 				]));
 	});
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -7847,13 +7854,18 @@ var $author$project$Main$uniqueStrings = function (list) {
 				list)));
 };
 var $author$project$Main$validateIngredients = function (ingredients) {
-	return (!$elm$core$List$isEmpty(ingredients)) && $author$project$Main$uniqueStrings(
+	return (!$elm$core$List$isEmpty(ingredients)) && ($author$project$Main$uniqueStrings(
 		A2(
 			$elm$core$List$map,
 			function (ingredient) {
 				return ingredient.id;
 			},
-			ingredients));
+			ingredients)) && A2(
+		$elm$core$List$all,
+		function (i) {
+			return i.amount > 0;
+		},
+		ingredients));
 };
 var $author$project$Main$validateSteps = function (steps) {
 	return !$elm$core$List$isEmpty(steps);

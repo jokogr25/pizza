@@ -677,6 +677,9 @@ validateIngredients ingredients =
                 (\ingredient -> ingredient.id)
                 ingredients
             )
+        && List.all
+            (\i -> i.amount > 0)
+            ingredients
 
 
 validateSteps : List PrepStep -> Bool
