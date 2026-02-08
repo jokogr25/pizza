@@ -6632,7 +6632,6 @@ var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty
 var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'public/img/icon/check.svg', 16);
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'public/img/icon/close.svg', 16);
 var $elm$core$Basics$ge = _Utils_ge;
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6663,7 +6662,7 @@ var $author$project$Pizza$Model$Types$unitToAbbr = function (unit) {
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$ingredientView = F3(
 	function (maybeSelectedIngredient, maybeNewAmount, ingredient) {
-		var placeholder = $author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit));
+		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount) + (' ' + ($author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit) + ')'))));
 		var isSelected = A2(
 			$elm$core$Maybe$withDefault,
 			false,
@@ -6673,6 +6672,7 @@ var $author$project$Main$ingredientView = F3(
 					return _Utils_eq(selected.id, ingredient.id);
 				},
 				maybeSelectedIngredient));
+		var purgeValue = isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value('');
 		var isNewAmountValid = A2(
 			$elm$core$Maybe$withDefault,
 			false,
@@ -6698,26 +6698,23 @@ var $author$project$Main$ingredientView = F3(
 					_List_fromArray(
 						[icon]));
 			});
+		var btn = isSelected ? (isNewAmountValid ? A2(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon) : A2(inputButton, $author$project$Main$Abort, $author$project$Main$closeIcon)) : A2(
+			inputButton,
+			$author$project$Main$SelectIngredient(ingredient),
+			$author$project$Main$pencilIcon);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('mb-3')
+					$elm$html$Html$Attributes$class('mt-3')
 				]),
 			_List_fromArray(
 				[
 					A2(
-					$elm$html$Html$label,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text(ingredient.label)
-						])),
-					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('input-group')
+							$elm$html$Html$Attributes$class('input-group mb-3')
 						]),
 					_List_fromArray(
 						[
@@ -6726,24 +6723,21 @@ var $author$project$Main$ingredientView = F3(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$id(ingredient.id),
-									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$autofocus(isSelected),
+									$elm$html$Html$Attributes$placeholder(placeholder),
+									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$classList(
 									_List_fromArray(
 										[
 											_Utils_Tuple2('form-control', true),
 											_Utils_Tuple2('is-invalid', isSelected && (!isNewAmountValid))
 										])),
-									$elm$html$Html$Attributes$placeholder(placeholder),
 									$elm$html$Html$Attributes$disabled(!isSelected),
-									isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value(''),
+									purgeValue,
 									$elm$html$Html$Events$onInput($author$project$Main$InputNewAmount)
 								]),
 							_List_Nil),
-							isSelected ? (isNewAmountValid ? A2(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon) : A2(inputButton, $author$project$Main$Abort, $author$project$Main$closeIcon)) : A2(
-							inputButton,
-							$author$project$Main$SelectIngredient(ingredient),
-							$author$project$Main$pencilIcon)
+							btn
 						])),
 					(isSelected && (!isNewAmountValid)) ? A2(
 					$elm$html$Html$div,

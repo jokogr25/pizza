@@ -776,47 +776,52 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                 ]
 
         placeholder =
-            round2ToString ingredient.amount
+            ingredient.label
+                ++ " ("
+                ++ round2ToString ingredient.amount
                 ++ " "
                 ++ unitToAbbr ingredient.unit
-    in
-    div
-        [ class "mb-3"
-        ]
-        [ label
-            []
-            [ text ingredient.label
-            ]
-        , div
-            [ class "input-group"
-            ]
-            [ input
-                [ Html.Attributes.id ingredient.id
-                , type_ "number"
-                , Html.Attributes.autofocus isSelected
-                , classList
-                    [ ( "form-control", True )
-                    , ( "is-invalid", isSelected && not isNewAmountValid )
-                    ]
-                , Html.Attributes.placeholder placeholder
-                , disabled (not isSelected)
-                , if isSelected then
-                    style "" ""
+                ++ ")"
 
-                  else
-                    Html.Attributes.value ""
-                , onInput InputNewAmount
-                ]
-                []
-            , if isSelected then
+        purgeValue =
+            if isSelected then
+                Html.Attributes.style "" ""
+
+            else
+                Html.Attributes.value ""
+
+        btn =
+            if isSelected then
                 if isNewAmountValid then
                     inputButton CalculateRatio checkIcon
 
                 else
                     inputButton Abort closeIcon
 
-              else
+            else
                 inputButton (SelectIngredient ingredient) pencilIcon
+    in
+    div
+        [ class "mt-3"
+        ]
+        [ div
+            [ class "input-group mb-3"
+            ]
+            [ input
+                [ Html.Attributes.id ingredient.id
+                , Html.Attributes.autofocus isSelected
+                , Html.Attributes.placeholder placeholder
+                , type_ "number"
+                , classList
+                    [ ( "form-control", True )
+                    , ( "is-invalid", isSelected && not isNewAmountValid )
+                    ]
+                , disabled (not isSelected)
+                , purgeValue
+                , onInput InputNewAmount
+                ]
+                []
+            , btn
             ]
         , if isSelected && not isNewAmountValid then
             div
