@@ -5808,6 +5808,7 @@ var $author$project$Main$focus = function (id) {
 		},
 		$elm$browser$Browser$Dom$focus(id));
 };
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Maybe$map2 = F3(
 	function (func, ma, mb) {
 		if (ma.$ === 'Nothing') {
@@ -5829,6 +5830,20 @@ var $elm$core$Basics$min = F2(
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
+var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
+var $author$project$Main$parseUnit = function (s) {
+	switch (s) {
+		case 'g':
+			return $elm$core$Maybe$Just($author$project$Main$Gram);
+		case 'ml':
+			return $elm$core$Maybe$Just($author$project$Main$Mililiter);
+		case 'tsp':
+			return $elm$core$Maybe$Just($author$project$Main$Teaspoon);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
@@ -5837,8 +5852,6 @@ var $author$project$Main$sampleLasagneRecipe = {
 	label: 'Lasanche',
 	steps: _List_Nil
 };
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -6359,6 +6372,41 @@ var $author$project$Main$update = F2(
 					} else {
 						return noChange;
 					}
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientUnit':
+				var gUnit = msg.a;
+				var parsedUnit = A2(
+					$elm$core$Debug$log,
+					gUnit,
+					A2(
+						$elm$core$Maybe$withDefault,
+						$author$project$Main$Gram,
+						$author$project$Main$parseUnit(gUnit)));
+				var _default = $elm$core$Maybe$Just(
+					{amount: 1.0, id: '', label: '', unit: parsedUnit});
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					var maybeIngredientDraft = model.c;
+					return _Utils_Tuple2(
+						A3(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							draft,
+							function () {
+								if (maybeIngredientDraft.$ === 'Just') {
+									var i = maybeIngredientDraft.a;
+									return $elm$core$Maybe$Just(
+										_Utils_update(
+											i,
+											{unit: parsedUnit}));
+								} else {
+									return _default;
+								}
+							}()),
+						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
@@ -7221,39 +7269,116 @@ var $author$project$Main$UpdateIngredientId = function (a) {
 var $author$project$Main$UpdateIngredientLabel = function (a) {
 	return {$: 'UpdateIngredientLabel', a: a};
 };
+var $author$project$Main$UpdateIngredientUnit = function (a) {
+	return {$: 'UpdateIngredientUnit', a: a};
+};
+var $author$project$Main$allUnits = _List_fromArray(
+	[$author$project$Main$Gram, $author$project$Main$Mililiter, $author$project$Main$Teaspoon]);
+var $author$project$Main$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
+var $author$project$Main$empyStyleMapper = F2(
+	function (m, f) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyStyle,
+			A2($elm$core$Maybe$map, f, m));
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
+var $author$project$Main$unitToAbbr = function (unit) {
+	switch (unit.$) {
+		case 'Gram':
+			return 'g';
+		case 'Mililiter':
+			return 'ml';
+		default:
+			return 'tsp';
+	}
+};
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
-	var maybeMapper = F3(
-		function (m, f, d) {
-			return A2(
-				$elm$core$Maybe$withDefault,
-				d,
-				A2($elm$core$Maybe$map, f, m));
-		});
-	var emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
-	var idValue = A3(
-		maybeMapper,
-		maybeIngredient,
-		function (ing) {
-			return $elm$html$Html$Attributes$value(ing.id);
-		},
-		emptyStyle);
-	var labelValue = A3(
-		maybeMapper,
+	var labelValue = A2(
+		$author$project$Main$empyStyleMapper,
 		maybeIngredient,
 		function (ing) {
 			return $elm$html$Html$Attributes$value(ing.label);
-		},
-		emptyStyle);
-	var colDiv = F3(
+		});
+	var idValue = A2(
+		$author$project$Main$empyStyleMapper,
+		maybeIngredient,
+		function (ing) {
+			return $elm$html$Html$Attributes$value(ing.id);
+		});
+	var colSelect = F2(
+		function (l, message) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-md-3')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-floating')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$select,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('form-select'),
+										$elm$html$Html$Events$onInput(message)
+									]),
+								A2(
+									$elm$core$List$map,
+									function (unit) {
+										return A2(
+											$elm$html$Html$option,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$value(
+													$author$project$Main$unitToAbbr(unit)),
+													$elm$html$Html$Attributes$selected(
+													function () {
+														if (maybeIngredient.$ === 'Just') {
+															var i = maybeIngredient.a;
+															return _Utils_eq(i.unit, unit);
+														} else {
+															return false;
+														}
+													}())
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(
+													$author$project$Main$unitToAbbr(unit))
+												]));
+									},
+									$author$project$Main$allUnits)),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(l)
+									]))
+							]))
+					]));
+		});
+	var colInput = F3(
 		function (l, v, message) {
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('col-md-4')
+						$elm$html$Html$Attributes$class('col-md-3')
 					]),
 				_List_fromArray(
 					[
@@ -7284,19 +7409,18 @@ var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
 							]))
 					]));
 		});
-	var amountValue = A3(
-		maybeMapper,
+	var amountValue = A2(
+		$author$project$Main$empyStyleMapper,
 		maybeIngredient,
 		function (ing) {
 			return $elm$html$Html$Attributes$value(
 				$elm$core$String$fromFloat(ing.amount));
-		},
-		emptyStyle);
+		});
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('p-3 mb-3 position-relative border rounded')
+				$elm$html$Html$Attributes$class('mb-3 position-relative')
 			]),
 		_List_fromArray(
 			[
@@ -7308,9 +7432,10 @@ var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
 					]),
 				_List_fromArray(
 					[
-						A3(colDiv, 'Id', idValue, $author$project$Main$UpdateIngredientId),
-						A3(colDiv, 'Label', labelValue, $author$project$Main$UpdateIngredientLabel),
-						A3(colDiv, 'Amount', amountValue, $author$project$Main$UpdateIngredientAmount)
+						A3(colInput, 'Id', idValue, $author$project$Main$UpdateIngredientId),
+						A3(colInput, 'Label', labelValue, $author$project$Main$UpdateIngredientLabel),
+						A3(colInput, 'Amount', amountValue, $author$project$Main$UpdateIngredientAmount),
+						A2(colSelect, 'Unit', $author$project$Main$UpdateIngredientUnit)
 					]))
 			]));
 };
@@ -7600,16 +7725,6 @@ var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
 	return $elm$core$String$fromFloat(rounded);
-};
-var $author$project$Main$unitToAbbr = function (unit) {
-	switch (unit.$) {
-		case 'Gram':
-			return 'g';
-		case 'Mililiter':
-			return 'ml';
-		default:
-			return 'tsp';
-	}
 };
 var $author$project$Main$ingredientView = F4(
 	function (ratio, maybeSelectedIngredient, maybeNewAmount, ingredient) {

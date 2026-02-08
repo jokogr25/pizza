@@ -71,6 +71,7 @@ type Msg
     | UpdateIngredientId String
     | UpdateIngredientLabel String
     | UpdateIngredientAmount String
+    | UpdateIngredientUnit String
     | AddStep
     | UpdateStepTitle Int String
     | UpdateStepDescription Int String
@@ -592,6 +593,39 @@ update msg model =
 
                         Nothing ->
                             noChange
+
+                _ ->
+                    noChange
+
+        UpdateIngredientUnit gUnit ->
+            let
+                parsedUnit : Unit
+                parsedUnit =
+                    Debug.log gUnit
+                        (Maybe.withDefault Gram (parseUnit gUnit))
+
+                default =
+                    Just
+                        { id = ""
+                        , label = ""
+                        , amount = 1.0
+                        , unit = parsedUnit
+                        }
+            in
+            case model of
+                RecipeCreator recipes draft maybeIngredientDraft ->
+                    ( RecipeCreator
+                        recipes
+                        draft
+                        (case maybeIngredientDraft of
+                            Just i ->
+                                Just { i | unit = parsedUnit }
+
+                            Nothing ->
+                                default
+                        )
+                    , Cmd.none
+                    )
 
                 _ ->
                     noChange
@@ -1642,35 +1676,24 @@ recipeCreatorActions isRecipeValid =
 addOrEditIngredientView : Maybe Ingredient -> Html Msg
 addOrEditIngredientView maybeIngredient =
     let
-        maybeMapper m f d =
-            m
-                |> Maybe.map f
-                |> Maybe.withDefault d
-
-        emptyStyle =
-            Html.Attributes.style "" ""
-
         idValue =
-            maybeMapper
+            empyStyleMapper
                 maybeIngredient
                 (\ing -> Html.Attributes.value ing.id)
-                emptyStyle
 
         labelValue =
-            maybeMapper
+            empyStyleMapper
                 maybeIngredient
                 (\ing -> Html.Attributes.value ing.label)
-                emptyStyle
 
         amountValue =
-            maybeMapper
+            empyStyleMapper
                 maybeIngredient
                 (\ing -> Html.Attributes.value (String.fromFloat ing.amount))
-                emptyStyle
 
-        colDiv l v message =
+        colInput l v message =
             div
-                [ class "col-md-4" ]
+                [ class "col-md-3" ]
                 [ div
                     [ class "form-floating"
                     ]
@@ -1685,25 +1708,62 @@ addOrEditIngredientView maybeIngredient =
                         [ text l ]
                     ]
                 ]
+
+        colSelect l message =
+            div
+                [ class "col-md-3"
+                ]
+                [ div
+                    [ class "form-floating" ]
+                    [ Html.select
+                        [ class "form-select"
+                        , onInput message
+                        ]
+                        (List.map
+                            (\unit ->
+                                Html.option
+                                    [ Html.Attributes.value (unitToAbbr unit)
+                                    , Html.Attributes.selected
+                                        (case maybeIngredient of
+                                            Just i ->
+                                                i.unit == unit
+
+                                            Nothing ->
+                                                False
+                                        )
+                                    ]
+                                    [ text (unitToAbbr unit) ]
+                            )
+                            allUnits
+                        )
+                    , label
+                        []
+                        [ text l
+                        ]
+                    ]
+                ]
     in
     div
-        [ class "p-3 mb-3 position-relative border rounded"
+        [ class "mb-3 position-relative"
         ]
         [ div
             [ class "row g-2"
             ]
-            [ colDiv
+            [ colInput
                 "Id"
                 idValue
                 UpdateIngredientId
-            , colDiv
+            , colInput
                 "Label"
                 labelValue
                 UpdateIngredientLabel
-            , colDiv
+            , colInput
                 "Amount"
                 amountValue
                 UpdateIngredientAmount
+            , colSelect
+                "Unit"
+                UpdateIngredientUnit
             ]
         ]
 
@@ -1745,6 +1805,14 @@ type Unit
     | Teaspoon
 
 
+allUnits : List Unit
+allUnits =
+    [ Gram
+    , Mililiter
+    , Teaspoon
+    ]
+
+
 unitToAbbr : Unit -> String
 unitToAbbr unit =
     case unit of
@@ -1756,6 +1824,22 @@ unitToAbbr unit =
 
         Teaspoon ->
             "tsp"
+
+
+parseUnit : String -> Maybe Unit
+parseUnit s =
+    case s of
+        "g" ->
+            Just Gram
+
+        "ml" ->
+            Just Mililiter
+
+        "tsp" ->
+            Just Teaspoon
+
+        _ ->
+            Nothing
 
 
 type alias Recipe =
@@ -1992,6 +2076,18 @@ replaceIngredientAmountFraction ingredients string =
 
 
 -- helper
+
+
+empyStyleMapper : Maybe a -> (a -> Html.Attribute msg) -> Html.Attribute msg
+empyStyleMapper m f =
+    m
+        |> Maybe.map f
+        |> Maybe.withDefault emptyStyle
+
+
+emptyStyle : Html.Attribute msg
+emptyStyle =
+    Html.Attributes.style "" ""
 
 
 pencilIcon : Html msg
