@@ -1,3 +1,3 @@
 import { Elm } from "./src/Main.elm";
 
-Elm.Main.init({ node: document.getElementById("elm-app") });
+Elm.Main.init({ node: document.getElementById("parcel-elm-app") });

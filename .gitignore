@@ -10,3 +10,4 @@ node_modules
 
 .parcel-cache
 dist
+parcel.html

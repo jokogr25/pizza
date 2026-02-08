@@ -5274,6 +5274,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$CalculateRatio = {$: 'CalculateRatio'};
 var $author$project$Main$NoOp = {$: 'NoOp'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$Enter = {$: 'Enter'};
@@ -5699,8 +5700,9 @@ var $author$project$Main$subscriptions = function (model) {
 				$elm$core$Platform$Sub$map,
 				function (key) {
 					if (key.$ === 'Enter') {
-						if (model.$ === 'RecipeCalculator') {
-							return $author$project$Main$CalculateRatio;
+						if (((model.$ === 'RecipeCalculator') && (model.b.$ === 'Just')) && (model.d.$ === 'Just')) {
+							var newAmount = model.d.a;
+							return (newAmount >= 1) ? $author$project$Main$CalculateRatio : $author$project$Main$NoOp;
 						} else {
 							return $author$project$Main$NoOp;
 						}
@@ -5716,9 +5718,9 @@ var $author$project$Main$RecipeAlbum = F2(
 	function (a, b) {
 		return {$: 'RecipeAlbum', a: a, b: b};
 	});
-var $author$project$Main$RecipeCalculator = F4(
-	function (a, b, c, d) {
-		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d};
+var $author$project$Main$RecipeCalculator = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d, e: e};
 	});
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -5772,52 +5774,35 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $author$project$Pizza$Model$Types$ingredientApplyRatio = F2(
-	function (ratio, ingredient) {
-		return _Utils_update(
-			ingredient,
-			{amount: ingredient.amount * ratio});
-	});
-var $author$project$Pizza$Model$Types$recipeApplyRatio = F2(
-	function (ratio, recipe) {
-		return _Utils_update(
-			recipe,
-			{
-				ingredients: A2(
-					$elm$core$List$map,
-					$author$project$Pizza$Model$Types$ingredientApplyRatio(ratio),
-					recipe.ingredients)
-			});
-	});
-var $author$project$Pizza$Model$Types$Path = function (a) {
+var $author$project$Main$Path = function (a) {
 	return {$: 'Path', a: a};
 };
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
-	image: $author$project$Pizza$Model$Types$Path('public/img/lasanche.jpg'),
+	image: $author$project$Main$Path('public/img/lasanche.jpg'),
 	ingredients: _List_Nil,
 	label: 'Lasanche',
 	steps: _List_Nil
 };
-var $author$project$Pizza$Model$Types$Gram = {$: 'Gram'};
-var $author$project$Pizza$Model$Types$Mililiter = {$: 'Mililiter'};
-var $author$project$Pizza$Model$Types$Teaspoon = {$: 'Teaspoon'};
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Mililiter = {$: 'Mililiter'};
+var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
 var $author$project$Main$samplePizzaRecipe = {
 	description: '',
 	id: 'seven-hours-pizza-dough',
-	image: $author$project$Pizza$Model$Types$Path('public/img/7-hours-pizza-dough.jpg'),
+	image: $author$project$Main$Path('public/img/7-hours-pizza-dough.jpg'),
 	ingredients: _List_fromArray(
 		[
-			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Pizza$Model$Types$Gram},
-			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Pizza$Model$Types$Gram},
-			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Pizza$Model$Types$Gram},
-			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Pizza$Model$Types$Mililiter},
-			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Pizza$Model$Types$Gram},
-			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Pizza$Model$Types$Teaspoon}
+			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
+			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
+			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
+			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
+			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
+			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
 		]),
 	label: 'Pizza dough (7 hours)',
 	steps: _List_fromArray(
@@ -5856,7 +5841,7 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeCalculator':
 				var recipe = msg.a;
 				return _Utils_Tuple2(
-					A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing),
+					A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1),
 					$elm$core$Platform$Cmd$none);
 			case 'GoRecipeAlbum':
 				return _Utils_Tuple2(
@@ -5871,14 +5856,15 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
-					var maybeAmount = model.d;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4(
+						A5(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							$elm$core$Maybe$Just(ingredient),
 							prepStepIndex,
-							maybeAmount),
+							$elm$core$Maybe$Nothing,
+							ratio),
 						$author$project$Main$focus(ingredient.id));
 				} else {
 					return noChange;
@@ -5887,8 +5873,18 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing),
+						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'ResetCalculator':
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					return _Utils_Tuple2(
+						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5899,13 +5895,15 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4(
+						A5(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
 							prepStepIndex,
-							$elm$core$String$toFloat(amount)),
+							$elm$core$String$toFloat(amount),
+							ratio),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5932,19 +5930,14 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						A2(
 							$elm$core$Maybe$withDefault,
-							A4($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount),
+							A5($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount, 1),
 							A3(
 								$elm$core$Maybe$map2,
 								F2(
 									function (ingredient, newAmount) {
 										var oldAmount = ingredient.amount;
 										var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
-										return A4(
-											$author$project$Main$RecipeCalculator,
-											A2($author$project$Pizza$Model$Types$recipeApplyRatio, newRatio, recipe),
-											$elm$core$Maybe$Nothing,
-											prepStepIndex,
-											$elm$core$Maybe$Nothing);
+										return A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, newRatio);
 									}),
 								maybeIngredient,
 								maybeNewAmount)),
@@ -5956,8 +5949,9 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing),
+						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5968,8 +5962,9 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4(
+						A5(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
@@ -5977,7 +5972,8 @@ var $author$project$Main$update = F2(
 								$elm$core$Basics$min,
 								prepStepIndex + 1,
 								$elm$core$List$length(recipe.steps)),
-							maybeAmount),
+							maybeAmount,
+							ratio),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5988,13 +5984,15 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
+					var ratio = model.e;
 					return _Utils_Tuple2(
-						A4(
+						A5(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
 							A2($elm$core$Basics$max, prepStepIndex - 1, 0),
-							maybeAmount),
+							maybeAmount,
+							ratio),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6110,7 +6108,7 @@ var $author$project$Main$frontView = A2(
 					$elm$html$Html$text('🍕 🧮')
 				]))
 		]));
-var $author$project$Main$RecipeAlbumTab = {$: 'RecipeAlbumTab'};
+var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $author$project$Main$InputSearchTerm = function (a) {
 	return {$: 'InputSearchTerm', a: a};
 };
@@ -6218,7 +6216,7 @@ var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProp
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$navbarView = function (activeTab) {
+var $author$project$Main$navbarView = function (activePage) {
 	var navListItem = F3(
 		function (isActive, label, message) {
 			return A2(
@@ -6240,7 +6238,6 @@ var $author$project$Main$navbarView = function (activeTab) {
 										_Utils_Tuple2('active', isActive)
 									])),
 								isActive ? A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page') : A2($elm$html$Html$Attributes$style, '', ''),
-								$elm$html$Html$Attributes$href('#'),
 								$elm$html$Html$Events$onClick(message)
 							]),
 						_List_fromArray(
@@ -6249,15 +6246,8 @@ var $author$project$Main$navbarView = function (activeTab) {
 							]))
 					]));
 		});
-	var isRecipeCalculatorActive = function () {
-		if (activeTab.$ === 'RecipeCalculatorTab') {
-			return true;
-		} else {
-			return false;
-		}
-	}();
 	var isRecipeAlbumActive = function () {
-		if (activeTab.$ === 'RecipeAlbumTab') {
+		if (activePage.$ === 'RecipeAlbumPage') {
 			return true;
 		} else {
 			return false;
@@ -6268,7 +6258,7 @@ var $author$project$Main$navbarView = function (activeTab) {
 		$elm$html$Html$nav,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('navbar navbar-expand-lg bg-body-tertiary')
+				$elm$html$Html$Attributes$class('navbar navbar-expand-sm bg-body-tertiary')
 			]),
 		_List_fromArray(
 			[
@@ -6331,7 +6321,6 @@ var $author$project$Main$navbarView = function (activeTab) {
 								_List_fromArray(
 									[
 										A3(navListItem, isRecipeAlbumActive, 'Recipes', $author$project$Main$GoRecipeAlbum),
-										A3(navListItem, isRecipeCalculatorActive, 'Calculatore', $author$project$Main$NoOp),
 										A2(
 										$elm$html$Html$li,
 										_List_fromArray(
@@ -6590,7 +6579,7 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				$author$project$Main$navbarView($author$project$Main$RecipeAlbumTab),
+				$author$project$Main$navbarView($author$project$Main$RecipeAlbumPage),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -6619,8 +6608,9 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 					]))
 			]));
 };
-var $author$project$Main$RecipeCalculatorTab = {$: 'RecipeCalculatorTab'};
+var $author$project$Main$RecipeCalculatorPage = {$: 'RecipeCalculatorPage'};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$Main$ResetCalculator = {$: 'ResetCalculator'};
 var $author$project$Main$Abort = {$: 'Abort'};
 var $author$project$Main$InputNewAmount = function (a) {
 	return {$: 'InputNewAmount', a: a};
@@ -6631,7 +6621,6 @@ var $author$project$Main$SelectIngredient = function (a) {
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
 var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'public/img/icon/check.svg', 16);
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'public/img/icon/close.svg', 16);
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6649,7 +6638,7 @@ var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
 	return $elm$core$String$fromFloat(rounded);
 };
-var $author$project$Pizza$Model$Types$unitToAbbr = function (unit) {
+var $author$project$Main$unitToAbbr = function (unit) {
 	switch (unit.$) {
 		case 'Gram':
 			return 'g';
@@ -6660,9 +6649,9 @@ var $author$project$Pizza$Model$Types$unitToAbbr = function (unit) {
 	}
 };
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$ingredientView = F3(
-	function (maybeSelectedIngredient, maybeNewAmount, ingredient) {
-		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount) + (' ' + ($author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit) + ')'))));
+var $author$project$Main$ingredientView = F4(
+	function (ratio, maybeSelectedIngredient, maybeNewAmount, ingredient) {
+		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount * ratio) + (' ' + ($author$project$Main$unitToAbbr(ingredient.unit) + ')'))));
 		var isSelected = A2(
 			$elm$core$Maybe$withDefault,
 			false,
@@ -6751,15 +6740,43 @@ var $author$project$Main$ingredientView = F3(
 						])) : $elm$html$Html$text('')
 				]));
 	});
-var $author$project$Main$ingredientsView = F3(
-	function (ingredients, selectedIngredient, maybeNewAmount) {
+var $author$project$Main$resetIcon = A2($author$project$Main$genericIcon, 'public/img/icon/reset.svg', 32);
+var $author$project$Main$ingredientsView = F4(
+	function (ingredients, ratio, selectedIngredient, maybeNewAmount) {
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
-			A2(
-				$elm$core$List$map,
-				A2($author$project$Main$ingredientView, selectedIngredient, maybeNewAmount),
-				ingredients));
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						A3($author$project$Main$ingredientView, ratio, selectedIngredient, maybeNewAmount),
+						ingredients)),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('btn-group'),
+							A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('button'),
+									$elm$html$Html$Attributes$class('btn btn-primary'),
+									$elm$html$Html$Events$onClick($author$project$Main$ResetCalculator),
+									$elm$html$Html$Attributes$disabled(ratio === 1)
+								]),
+							_List_fromArray(
+								[$author$project$Main$resetIcon]))
+						]))
+				]));
 	});
 var $author$project$Main$Next = {$: 'Next'};
 var $author$project$Main$Prev = {$: 'Prev'};
@@ -6856,7 +6873,7 @@ var $author$project$Main$replaceIngredientAmountFraction = F2(
 					return A3(
 						$elm$core$String$replace,
 						fullMatch,
-						$author$project$Helper$round2ToString(newAmount) + ($author$project$Pizza$Model$Types$unitToAbbr(ing.unit) + (' ' + ing.id)),
+						$author$project$Helper$round2ToString(newAmount) + ($author$project$Main$unitToAbbr(ing.unit) + (' ' + ing.id)),
 						str);
 				} else {
 					return str;
@@ -6919,7 +6936,7 @@ var $author$project$Main$prepStepsView = F3(
 						[
 							$elm$html$Html$Events$onClick(message),
 							$elm$html$Html$Attributes$disabled(isDisabled),
-							$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+							$elm$html$Html$Attributes$class('btn btn-primary'),
 							A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
 							A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
 						]),
@@ -6950,8 +6967,9 @@ var $author$project$Main$prepStepsView = F3(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('mb-3'),
+							$elm$html$Html$Attributes$class('btn-group mb-3'),
 							A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+							A2($elm$html$Html$Attributes$attribute, 'role', 'group'),
 							A2($elm$html$Html$Attributes$style, 'grid-template-columns', '1fr 1fr'),
 							A2($elm$html$Html$Attributes$style, 'gap', '0.75rem')
 						]),
@@ -6968,8 +6986,8 @@ var $author$project$Main$prepStepsView = F3(
 						]))
 				]));
 	});
-var $author$project$Main$recipeView = F4(
-	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
+var $author$project$Main$recipeView = F5(
+	function (recipe, ratio, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
 		var tabListItem = F4(
 			function (buttonId, contentId, label, isActive) {
 				return A2(
@@ -7030,12 +7048,12 @@ var $author$project$Main$recipeView = F4(
 			_List_Nil,
 			_List_fromArray(
 				[
-					$author$project$Main$navbarView($author$project$Main$RecipeCalculatorTab),
+					$author$project$Main$navbarView($author$project$Main$RecipeCalculatorPage),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('mx-auto my-md-3 px-3 px-md-0'),
+							$elm$html$Html$Attributes$class('mx-auto my-3 my-md-4 px-3 px-md-0'),
 							A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 						]),
 					_List_fromArray(
@@ -7056,7 +7074,7 @@ var $author$project$Main$recipeView = F4(
 									$elm$html$Html$ul,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('nav nav-tabs'),
+											$elm$html$Html$Attributes$class('nav nav-underline'),
 											$elm$html$Html$Attributes$id('recipeTabs'),
 											A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
 										]),
@@ -7070,7 +7088,9 @@ var $author$project$Main$recipeView = F4(
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('tab-content'),
-											$elm$html$Html$Attributes$id('recipeTabsContent')
+											$elm$html$Html$Attributes$id('recipeTabsContent'),
+											A2($elm$html$Html$Attributes$style, 'height', '60vh'),
+											A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto')
 										]),
 									_List_fromArray(
 										[
@@ -7078,7 +7098,7 @@ var $author$project$Main$recipeView = F4(
 											tabContent,
 											'ingredients-content',
 											'ingredients-tab',
-											A3($author$project$Main$ingredientsView, recipe.ingredients, selectedIngredient, maybeNewAmount),
+											A4($author$project$Main$ingredientsView, recipe.ingredients, ratio, selectedIngredient, maybeNewAmount),
 											true,
 											true),
 											A5(
@@ -7215,7 +7235,8 @@ var $author$project$Main$view = function (model) {
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
 			var maybeNewAmount = model.d;
-			return A4($author$project$Main$recipeView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
+			var ratio = model.e;
+			return A5($author$project$Main$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

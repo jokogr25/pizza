@@ -9,7 +9,6 @@ import Html.Attributes exposing (alt, attribute, class, classList, disabled, id,
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
-import Pizza.Model.Types exposing (..)
 import Regex
 import String
 import Svg.Attributes exposing (visibility)
@@ -38,7 +37,7 @@ type Model
     = Front
     | Carousel
     | RecipeAlbum (List Recipe) (Maybe String)
-    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float)
+    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float) Float
 
 
 
@@ -49,6 +48,7 @@ type Msg
     = GoCarousel
     | GoRecipeAlbum
     | GoRecipeCalculator Recipe
+    | ResetCalculator
     | SelectIngredient Ingredient
     | UnselectIngredient
     | InputNewAmount String
@@ -72,8 +72,12 @@ subscriptions model =
                 case key of
                     Enter ->
                         case model of
-                            RecipeCalculator _ _ _ _ ->
-                                CalculateRatio
+                            RecipeCalculator _ (Just _) _ (Just newAmount) _ ->
+                                if newAmount >= 1 then
+                                    CalculateRatio
+
+                                else
+                                    NoOp
 
                             _ ->
                                 NoOp
@@ -125,6 +129,7 @@ update msg model =
                 Nothing
                 0
                 Nothing
+                1
             , Cmd.none
             )
 
@@ -139,12 +144,13 @@ update msg model =
 
         SelectIngredient ingredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex maybeAmount ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio ->
                     ( RecipeCalculator
                         recipe
                         (Just ingredient)
                         prepStepIndex
-                        maybeAmount
+                        Nothing
+                        ratio
                     , focus ingredient.id
                     )
 
@@ -153,12 +159,28 @@ update msg model =
 
         UnselectIngredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio ->
                     ( RecipeCalculator
                         recipe
                         Nothing
                         prepStepIndex
                         Nothing
+                        ratio
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
+        ResetCalculator ->
+            case model of
+                RecipeCalculator recipe _ _ _ _ ->
+                    ( RecipeCalculator
+                        recipe
+                        Nothing
+                        0
+                        Nothing
+                        1
                     , Cmd.none
                     )
 
@@ -167,12 +189,13 @@ update msg model =
 
         InputNewAmount amount ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex _ ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex _ ratio ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
                         prepStepIndex
                         (String.toFloat amount)
+                        ratio
                     , Cmd.none
                     )
 
@@ -193,7 +216,7 @@ update msg model =
 
         CalculateRatio ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount _ ->
                     ( Maybe.map2
                         (\ingredient newAmount ->
                             let
@@ -208,10 +231,11 @@ update msg model =
                                         newAmount / oldAmount
                             in
                             RecipeCalculator
-                                (recipeApplyRatio newRatio recipe)
+                                recipe
                                 Nothing
                                 prepStepIndex
                                 Nothing
+                                newRatio
                         )
                         maybeIngredient
                         maybeNewAmount
@@ -221,6 +245,7 @@ update msg model =
                                 maybeIngredient
                                 prepStepIndex
                                 maybeNewAmount
+                                1
                             )
                     , Cmd.none
                     )
@@ -230,12 +255,13 @@ update msg model =
 
         Abort ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio ->
                     ( RecipeCalculator
                         recipe
                         Nothing
                         prepStepIndex
                         Nothing
+                        ratio
                     , Cmd.none
                     )
 
@@ -244,7 +270,7 @@ update msg model =
 
         Next ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
@@ -253,6 +279,7 @@ update msg model =
                             (List.length recipe.steps)
                         )
                         maybeAmount
+                        ratio
                     , Cmd.none
                     )
 
@@ -261,7 +288,7 @@ update msg model =
 
         Prev ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
@@ -270,6 +297,7 @@ update msg model =
                             0
                         )
                         maybeAmount
+                        ratio
                     , Cmd.none
                     )
 
@@ -309,9 +337,10 @@ view model =
                         recipes
                 )
 
-        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
+        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ratio ->
             recipeView
                 recipe
+                ratio
                 selectedIngredient
                 maybeNewAmount
                 prepStepIndex
@@ -416,25 +445,17 @@ carouselButton direction label btnClass iconClass =
         ]
 
 
-type ActiveTab
-    = RecipeAlbumTab
-    | RecipeCalculatorTab
+type ActivePage
+    = RecipeAlbumPage
+    | RecipeCalculatorPage
 
 
-navbarView : ActiveTab -> Html Msg
-navbarView activeTab =
+navbarView : ActivePage -> Html Msg
+navbarView activePage =
     let
         isRecipeAlbumActive =
-            case activeTab of
-                RecipeAlbumTab ->
-                    True
-
-                _ ->
-                    False
-
-        isRecipeCalculatorActive =
-            case activeTab of
-                RecipeCalculatorTab ->
+            case activePage of
+                RecipeAlbumPage ->
                     True
 
                 _ ->
@@ -457,14 +478,13 @@ navbarView activeTab =
 
                       else
                         style "" ""
-                    , Html.Attributes.href "#"
                     , onClick message
                     ]
                     [ text label ]
                 ]
     in
     Html.nav
-        [ class "navbar navbar-expand-lg bg-body-tertiary"
+        [ class "navbar navbar-expand-sm bg-body-tertiary"
         ]
         [ div
             [ class "container-fluid" ]
@@ -498,10 +518,6 @@ navbarView activeTab =
                         isRecipeAlbumActive
                         "Recipes"
                         GoRecipeAlbum
-                    , navListItem
-                        isRecipeCalculatorActive
-                        "Calculatore"
-                        NoOp
                     , Html.li
                         [ class "nav-item dropdown"
                         ]
@@ -576,7 +592,7 @@ navbarView activeTab =
 recipeAlbumView : List Recipe -> Html Msg
 recipeAlbumView recipes =
     div []
-        [ navbarView RecipeAlbumTab
+        [ navbarView RecipeAlbumPage
         , div
             [ class "album py-5" ]
             [ div
@@ -640,8 +656,8 @@ recipeAlbumCardView recipe =
         ]
 
 
-recipeView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
-recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
+recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
+recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
         tabListItem : String -> String -> String -> Bool -> Html msg
         tabListItem buttonId contentId label isActive =
@@ -680,9 +696,9 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 ]
     in
     div []
-        [ navbarView RecipeCalculatorTab
+        [ navbarView RecipeCalculatorPage
         , div
-            [ class "mx-auto my-md-3 px-3 px-md-0"
+            [ class "mx-auto my-3 my-md-4 px-3 px-md-0"
             , style "max-width" "700px"
             ]
             [ div
@@ -691,7 +707,7 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                     []
                     [ text recipe.label ]
                 , Html.ul
-                    [ class "nav nav-tabs"
+                    [ class "nav nav-underline"
                     , id "recipeTabs"
                     , attribute "role" "tablist"
                     ]
@@ -709,12 +725,15 @@ recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepInde
                 , div
                     [ class "tab-content"
                     , id "recipeTabsContent"
+                    , style "height" "60vh"
+                    , style "overflow-y" "auto"
                     ]
                     [ tabContent
                         "ingredients-content"
                         "ingredients-tab"
                         (ingredientsView
                             recipe.ingredients
+                            ratio
                             selectedIngredient
                             maybeNewAmount
                         )
@@ -742,15 +761,33 @@ focus id =
         |> Task.attempt (\_ -> NoOp)
 
 
-ingredientsView : List Ingredient -> Maybe Ingredient -> Maybe Float -> Html Msg
-ingredientsView ingredients selectedIngredient maybeNewAmount =
-    div
-        []
-        (List.map (ingredientView selectedIngredient maybeNewAmount) ingredients)
+ingredientsView : List Ingredient -> Float -> Maybe Ingredient -> Maybe Float -> Html Msg
+ingredientsView ingredients ratio selectedIngredient maybeNewAmount =
+    div []
+        [ div
+            []
+            (List.map
+                (ingredientView ratio selectedIngredient maybeNewAmount)
+                ingredients
+            )
+        , div
+            [ class "btn-group"
+            , attribute "role" "group"
+            ]
+            [ button
+                [ type_ "button"
+                , class "btn btn-primary"
+                , onClick ResetCalculator
+                , disabled (ratio == 1)
+                ]
+                [ resetIcon
+                ]
+            ]
+        ]
 
 
-ingredientView : Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
-ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
+ingredientView : Float -> Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
+ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
     let
         isSelected =
             maybeSelectedIngredient
@@ -778,7 +815,7 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
         placeholder =
             ingredient.label
                 ++ " ("
-                ++ round2ToString ingredient.amount
+                ++ round2ToString (ingredient.amount * ratio)
                 ++ " "
                 ++ unitToAbbr ingredient.unit
                 ++ ")"
@@ -841,7 +878,7 @@ prepStepsView indexToDisplay ingredients prepSteps =
             button
                 [ onClick message
                 , disabled isDisabled
-                , class "btn btn-primary btn-lg"
+                , class "btn btn-primary"
                 , style "margin-top" "2rem"
                 , style "padding" "0.75rem 2rem"
                 ]
@@ -862,8 +899,9 @@ prepStepsView indexToDisplay ingredients prepSteps =
                     prepSteps
                 )
             , div
-                [ class "mb-3"
+                [ class "btn-group mb-3"
                 , style "display" "grid"
+                , Html.Attributes.attribute "role" "group"
                 , style "grid-template-columns" "1fr 1fr"
                 , style "gap" "0.75rem"
                 ]
@@ -938,6 +976,73 @@ prepStepView indexToDisplay ingredients index prepStep =
             [ text description
             ]
         ]
+
+
+
+-- TYPES
+
+
+type Unit
+    = Gram
+    | Mililiter
+    | Teaspoon
+
+
+unitToAbbr : Unit -> String
+unitToAbbr unit =
+    case unit of
+        Gram ->
+            "g"
+
+        Mililiter ->
+            "ml"
+
+        Teaspoon ->
+            "tsp"
+
+
+type alias Recipe =
+    { id : String
+    , label : String
+    , description : String
+    , ingredients : List Ingredient
+    , steps : List PrepStep
+    , image : RecipeImage
+    }
+
+
+type alias PrepStep =
+    { time : Int
+    , title : String
+    , description : String
+    }
+
+
+type RecipeImage
+    = Path String
+
+
+type alias Ingredient =
+    { id : String
+    , label : String
+    , amount : Float
+    , unit : Unit
+    }
+
+
+recipeApplyRatio : Float -> Recipe -> Recipe
+recipeApplyRatio ratio recipe =
+    { recipe
+        | ingredients =
+            List.map (ingredientApplyRatio ratio) recipe.ingredients
+    }
+
+
+ingredientApplyRatio : Float -> Ingredient -> Ingredient
+ingredientApplyRatio ratio ingredient =
+    { ingredient
+        | amount = ingredient.amount * ratio
+    }
 
 
 
@@ -1153,6 +1258,11 @@ checkIcon =
 closeIcon : Html msg
 closeIcon =
     genericIcon "public/img/icon/close.svg" 16
+
+
+resetIcon : Html msg
+resetIcon =
+    genericIcon "public/img/icon/reset.svg" 32
 
 
 genericIcon : String -> Int -> Html msg
