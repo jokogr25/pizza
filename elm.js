@@ -5718,10 +5718,11 @@ var $author$project$Main$RecipeAlbum = F2(
 	function (a, b) {
 		return {$: 'RecipeAlbum', a: a, b: b};
 	});
-var $author$project$Main$RecipeCalculator = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d, e: e};
+var $author$project$Main$RecipeCalculator = F6(
+	function (a, b, c, d, e, f) {
+		return {$: 'RecipeCalculator', a: a, b: b, c: c, d: d, e: e, f: f};
 	});
+var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -5841,7 +5842,7 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeCalculator':
 				var recipe = msg.a;
 				return _Utils_Tuple2(
-					A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1),
+					A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
 					$elm$core$Platform$Cmd$none);
 			case 'GoRecipeAlbum':
 				return _Utils_Tuple2(
@@ -5851,20 +5852,36 @@ var $author$project$Main$update = F2(
 							[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
 						$elm$core$Maybe$Nothing),
 					$elm$core$Platform$Cmd$none);
+			case 'SelectPage':
+				var page = msg.a;
+				if (model.$ === 'RecipeCalculator') {
+					var recipe = model.a;
+					var maybeIngredient = model.b;
+					var prepStepIndex = model.c;
+					var maybeAmount = model.d;
+					var ratio = model.e;
+					return _Utils_Tuple2(
+						A6($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeAmount, ratio, page),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
 			case 'SelectIngredient':
 				var ingredient = msg.a;
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5(
+						A6(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							$elm$core$Maybe$Just(ingredient),
 							prepStepIndex,
 							$elm$core$Maybe$Nothing,
-							ratio),
+							ratio,
+							page),
 						$author$project$Main$focus(ingredient.id));
 				} else {
 					return noChange;
@@ -5874,8 +5891,9 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio),
+						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5883,8 +5901,9 @@ var $author$project$Main$update = F2(
 			case 'ResetCalculator':
 				if (model.$ === 'RecipeCalculator') {
 					var recipe = model.a;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1),
+						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5896,14 +5915,16 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5(
+						A6(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
 							prepStepIndex,
 							$elm$core$String$toFloat(amount),
-							ratio),
+							ratio,
+							page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5927,17 +5948,18 @@ var $author$project$Main$update = F2(
 					var maybeIngredient = model.b;
 					var prepStepIndex = model.c;
 					var maybeNewAmount = model.d;
+					var page = model.f;
 					return _Utils_Tuple2(
 						A2(
 							$elm$core$Maybe$withDefault,
-							A5($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount, 1),
+							A6($author$project$Main$RecipeCalculator, recipe, maybeIngredient, prepStepIndex, maybeNewAmount, 1, page),
 							A3(
 								$elm$core$Maybe$map2,
 								F2(
 									function (ingredient, newAmount) {
 										var oldAmount = ingredient.amount;
 										var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
-										return A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, newRatio);
+										return A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, newRatio, page);
 									}),
 								maybeIngredient,
 								maybeNewAmount)),
@@ -5950,8 +5972,9 @@ var $author$project$Main$update = F2(
 					var recipe = model.a;
 					var prepStepIndex = model.c;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio),
+						A6($author$project$Main$RecipeCalculator, recipe, $elm$core$Maybe$Nothing, prepStepIndex, $elm$core$Maybe$Nothing, ratio, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5963,8 +5986,9 @@ var $author$project$Main$update = F2(
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5(
+						A6(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
@@ -5973,7 +5997,8 @@ var $author$project$Main$update = F2(
 								prepStepIndex + 1,
 								$elm$core$List$length(recipe.steps)),
 							maybeAmount,
-							ratio),
+							ratio,
+							page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -5985,14 +6010,16 @@ var $author$project$Main$update = F2(
 					var prepStepIndex = model.c;
 					var maybeAmount = model.d;
 					var ratio = model.e;
+					var page = model.f;
 					return _Utils_Tuple2(
-						A5(
+						A6(
 							$author$project$Main$RecipeCalculator,
 							recipe,
 							maybeIngredient,
 							A2($elm$core$Basics$max, prepStepIndex - 1, 0),
 							maybeAmount,
-							ratio),
+							ratio,
+							page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6001,6 +6028,7 @@ var $author$project$Main$update = F2(
 				return noChange;
 		}
 	});
+var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -6022,20 +6050,6 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
-var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6046,69 +6060,17 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
+var $author$project$Main$footerView = function (actions) {
 	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('p-3 border-top fixed-bottom d-flex justify-content-around')
+			]),
+		_List_fromArray(
+			[actions]));
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$frontView = A2(
-	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			A2($elm$html$Html$Attributes$style, 'height', '100vh'),
-			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-			A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
-			A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-			A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-			A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$button,
-			_List_fromArray(
-				[
-					$elm$html$Html$Events$onClick($author$project$Main$GoCarousel),
-					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
-					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza 🍕')
-				])),
-			A2(
-			$elm$html$Html$button,
-			_List_fromArray(
-				[
-					$elm$html$Html$Events$onClick($author$project$Main$GoRecipeAlbum),
-					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
-					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('🍕 🧮')
-				]))
-		]));
-var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
+var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
 var $author$project$Main$InputSearchTerm = function (a) {
 	return {$: 'InputSearchTerm', a: a};
 };
@@ -6121,6 +6083,18 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -6145,30 +6119,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$form = _VirtualDom_node('form');
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $elm$html$Html$Attributes$width = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'width',
-		$elm$core$String$fromInt(n));
-};
-var $author$project$Main$genericIcon = F2(
-	function (path, width) {
-		return A2(
-			$elm$html$Html$img,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$width(width),
-					$elm$html$Html$Attributes$src(path)
-				]),
-			_List_Nil);
-	});
 var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6181,6 +6131,23 @@ var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$core$Basics$not = _Basics_not;
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6212,8 +6179,37 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Main$genericIcon = F2(
+	function (path, width) {
+		return A2(
+			$elm$html$Html$img,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$width(width),
+					$elm$html$Html$Attributes$src('public/img/icon/' + path)
+				]),
+			_List_Nil);
+	});
+var $author$project$Main$pizzaIcon = A2($author$project$Main$genericIcon, 'pizza.svg', 32);
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$navbarView = function (activePage) {
@@ -6278,9 +6274,7 @@ var $author$project$Main$navbarView = function (activePage) {
 								$elm$html$Html$Attributes$href('#')
 							]),
 						_List_fromArray(
-							[
-								A2($author$project$Main$genericIcon, 'public/img/icon/pizza.svg', 32)
-							])),
+							[$author$project$Main$pizzaIcon])),
 						A2(
 						$elm$html$Html$button,
 						_List_fromArray(
@@ -6456,6 +6450,124 @@ var $author$project$Main$navbarView = function (activePage) {
 					]))
 			]));
 };
+var $author$project$Main$contentView = F3(
+	function (activePage, content, actions) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('d-flex flex-column vh-100')
+				]),
+			_List_fromArray(
+				[
+					$author$project$Main$navbarView(activePage),
+					content,
+					$author$project$Main$footerView(actions)
+				]));
+	});
+var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
+var $author$project$Main$frontView = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+			A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
+			A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+			A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+			A2($elm$html$Html$Attributes$style, 'padding', '1.5rem')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick($author$project$Main$GoCarousel),
+					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('dont we all need someone who looks at us the way joscha looks at pizza 🍕')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick($author$project$Main$GoRecipeAlbum),
+					$elm$html$Html$Attributes$class('btn btn-primary btn-lg'),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
+					A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('🍕 🧮')
+				]))
+		]));
+var $author$project$Main$ResetCalculator = {$: 'ResetCalculator'};
+var $author$project$Main$resetIcon = A2($author$project$Main$genericIcon, 'reset.svg', 32);
+var $author$project$Main$ingredientsViewActions = function (ratio) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('btn-group'),
+				A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('button'),
+						$elm$html$Html$Attributes$class('btn btn-primary'),
+						$elm$html$Html$Events$onClick($author$project$Main$ResetCalculator),
+						$elm$html$Html$Attributes$disabled(ratio === 1)
+					]),
+				_List_fromArray(
+					[$author$project$Main$resetIcon]))
+			]));
+};
+var $author$project$Main$Next = {$: 'Next'};
+var $author$project$Main$Prev = {$: 'Prev'};
+var $author$project$Main$arrowLeftIcon = A2($author$project$Main$genericIcon, 'arrow-left.svg', 32);
+var $author$project$Main$arrowRightIcon = A2($author$project$Main$genericIcon, 'arrow-right.svg', 32);
+var $author$project$Main$prepStepsViewActions = F2(
+	function (indexToDisplay, length) {
+		var prepStepButton = F3(
+			function (message, isDisabled, icon) {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick(message),
+							$elm$html$Html$Attributes$disabled(isDisabled),
+							$elm$html$Html$Attributes$class('btn btn-primary')
+						]),
+					_List_fromArray(
+						[icon]));
+			});
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('btn-group gap-2'),
+					A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+				]),
+			_List_fromArray(
+				[
+					A3(prepStepButton, $author$project$Main$Prev, indexToDisplay <= 0, $author$project$Main$arrowLeftIcon),
+					A3(
+					prepStepButton,
+					$author$project$Main$Next,
+					_Utils_cmp(indexToDisplay, length - 1) > -1,
+					$author$project$Main$arrowRightIcon)
+				]));
+	});
 var $author$project$Main$GoRecipeCalculator = function (a) {
 	return {$: 'GoRecipeCalculator', a: a};
 };
@@ -6482,7 +6594,8 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100')
+						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						A2($elm$html$Html$Attributes$style, 'min-width', '220px')
 					]),
 				_List_fromArray(
 					[
@@ -6579,7 +6692,6 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				$author$project$Main$navbarView($author$project$Main$RecipeAlbumPage),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -6608,9 +6720,11 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 					]))
 			]));
 };
-var $author$project$Main$RecipeCalculatorPage = {$: 'RecipeCalculatorPage'};
+var $author$project$Main$RecipeStepsPage = {$: 'RecipeStepsPage'};
+var $author$project$Main$SelectPage = function (a) {
+	return {$: 'SelectPage', a: a};
+};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $author$project$Main$ResetCalculator = {$: 'ResetCalculator'};
 var $author$project$Main$Abort = {$: 'Abort'};
 var $author$project$Main$InputNewAmount = function (a) {
 	return {$: 'InputNewAmount', a: a};
@@ -6619,8 +6733,8 @@ var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
-var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'public/img/icon/check.svg', 16);
-var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'public/img/icon/close.svg', 16);
+var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'check.svg', 16);
+var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6631,7 +6745,7 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'public/img/icon/pencil.svg', 16);
+var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
@@ -6740,7 +6854,6 @@ var $author$project$Main$ingredientView = F4(
 						])) : $elm$html$Html$text('')
 				]));
 	});
-var $author$project$Main$resetIcon = A2($author$project$Main$genericIcon, 'public/img/icon/reset.svg', 32);
 var $author$project$Main$ingredientsView = F4(
 	function (ingredients, ratio, selectedIngredient, maybeNewAmount) {
 		return A2(
@@ -6754,32 +6867,9 @@ var $author$project$Main$ingredientsView = F4(
 					A2(
 						$elm$core$List$map,
 						A3($author$project$Main$ingredientView, ratio, selectedIngredient, maybeNewAmount),
-						ingredients)),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('btn-group'),
-							A2($elm$html$Html$Attributes$attribute, 'role', 'group')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$type_('button'),
-									$elm$html$Html$Attributes$class('btn btn-primary'),
-									$elm$html$Html$Events$onClick($author$project$Main$ResetCalculator),
-									$elm$html$Html$Attributes$disabled(ratio === 1)
-								]),
-							_List_fromArray(
-								[$author$project$Main$resetIcon]))
-						]))
+						ingredients))
 				]));
 	});
-var $author$project$Main$Next = {$: 'Next'};
-var $author$project$Main$Prev = {$: 'Prev'};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
@@ -6928,23 +7018,6 @@ var $author$project$Main$prepStepView = F4(
 	});
 var $author$project$Main$prepStepsView = F3(
 	function (indexToDisplay, ingredients, prepSteps) {
-		var prepStepButton = F3(
-			function (message, isDisabled, label) {
-				return A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Events$onClick(message),
-							$elm$html$Html$Attributes$disabled(isDisabled),
-							$elm$html$Html$Attributes$class('btn btn-primary'),
-							A2($elm$html$Html$Attributes$style, 'margin-top', '2rem'),
-							A2($elm$html$Html$Attributes$style, 'padding', '0.75rem 2rem')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(label)
-						]));
-			});
 		return (!$elm$core$List$length(prepSteps)) ? $elm$html$Html$text('no steps :(') : A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6962,34 +7035,13 @@ var $author$project$Main$prepStepsView = F3(
 					A2(
 						$elm$core$List$indexedMap,
 						A2($author$project$Main$prepStepView, indexToDisplay, ingredients),
-						prepSteps)),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('btn-group mb-3'),
-							A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-							A2($elm$html$Html$Attributes$attribute, 'role', 'group'),
-							A2($elm$html$Html$Attributes$style, 'grid-template-columns', '1fr 1fr'),
-							A2($elm$html$Html$Attributes$style, 'gap', '0.75rem')
-						]),
-					_List_fromArray(
-						[
-							A3(prepStepButton, $author$project$Main$Prev, indexToDisplay <= 0, '←'),
-							A3(
-							prepStepButton,
-							$author$project$Main$Next,
-							_Utils_cmp(
-								indexToDisplay,
-								$elm$core$List$length(prepSteps) - 1) > -1,
-							'→')
-						]))
+						prepSteps))
 				]));
 	});
 var $author$project$Main$recipeView = F5(
 	function (recipe, ratio, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
-		var tabListItem = F4(
-			function (buttonId, contentId, label, isActive) {
+		var tabListItem = F5(
+			function (buttonId, contentId, label, isActive, pageToActivate) {
 				return A2(
 					$elm$html$Html$li,
 					_List_fromArray(
@@ -7010,6 +7062,8 @@ var $author$project$Main$recipeView = F5(
 											_Utils_Tuple2('active', isActive)
 										])),
 									$elm$html$Html$Attributes$id(buttonId),
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$SelectPage(pageToActivate)),
 									A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'tab'),
 									A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#' + contentId),
 									A2($elm$html$Html$Attributes$attribute, 'type', 'button'),
@@ -7048,7 +7102,6 @@ var $author$project$Main$recipeView = F5(
 			_List_Nil,
 			_List_fromArray(
 				[
-					$author$project$Main$navbarView($author$project$Main$RecipeCalculatorPage),
 					A2(
 					$elm$html$Html$div,
 					_List_fromArray(
@@ -7080,8 +7133,8 @@ var $author$project$Main$recipeView = F5(
 										]),
 									_List_fromArray(
 										[
-											A4(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true),
-											A4(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false)
+											A5(tabListItem, 'ingredients-tab', 'ingredients-content', 'Ingredients', true, $author$project$Main$RecipeIngredientsPage),
+											A5(tabListItem, 'prepSteps-tab', 'prepSteps-content', 'Steps', false, $author$project$Main$RecipeStepsPage)
 										])),
 									A2(
 									$elm$html$Html$div,
@@ -7212,31 +7265,52 @@ var $author$project$Main$view = function (model) {
 		case 'RecipeAlbum':
 			var recipes = model.a;
 			var maybeSearchTerm = model.b;
-			return $author$project$Main$recipeAlbumView(
-				function () {
-					if (maybeSearchTerm.$ === 'Just') {
-						var searchTerm = maybeSearchTerm.a;
-						return A2(
-							$elm$core$List$filter,
-							function (recipe) {
-								return A2(
-									$elm$core$List$any,
-									$elm$core$String$contains(searchTerm),
-									_List_fromArray(
-										[recipe.label, recipe.id]));
-							},
-							recipes);
-					} else {
-						return recipes;
-					}
-				}());
+			return A3(
+				$author$project$Main$contentView,
+				$author$project$Main$RecipeAlbumPage,
+				$author$project$Main$recipeAlbumView(
+					function () {
+						if (maybeSearchTerm.$ === 'Just') {
+							var searchTerm = maybeSearchTerm.a;
+							return A2(
+								$elm$core$List$filter,
+								function (recipe) {
+									return A2(
+										$elm$core$List$any,
+										$elm$core$String$contains(searchTerm),
+										_List_fromArray(
+											[recipe.label, recipe.id]));
+								},
+								recipes);
+						} else {
+							return recipes;
+						}
+					}()),
+				$elm$html$Html$text(''));
 		default:
 			var recipe = model.a;
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
 			var maybeNewAmount = model.d;
 			var ratio = model.e;
-			return A5($author$project$Main$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex);
+			var page = model.f;
+			return A3(
+				$author$project$Main$contentView,
+				page,
+				A5($author$project$Main$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex),
+				function () {
+					switch (page.$) {
+						case 'RecipeIngredientsPage':
+							return $author$project$Main$ingredientsViewActions(ratio);
+						case 'RecipeStepsPage':
+							return A2(
+								$author$project$Main$prepStepsViewActions,
+								prepStepIndex,
+								$elm$core$List$length(recipe.steps));
+						default:
+							return $elm$html$Html$text('');
+					}
+				}());
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

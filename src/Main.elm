@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom exposing (Error(..))
 import Browser.Events
 import Helper exposing (round2ToString, safeRegexOf)
-import Html exposing (Html, button, div, img, input, label, span, text)
+import Html exposing (Html, a, button, div, img, input, label, p, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
@@ -37,7 +37,7 @@ type Model
     = Front
     | Carousel
     | RecipeAlbum (List Recipe) (Maybe String)
-    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float) Float
+    | RecipeCalculator Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
 
 
 
@@ -50,6 +50,7 @@ type Msg
     | GoRecipeCalculator Recipe
     | ResetCalculator
     | SelectIngredient Ingredient
+    | SelectPage ActivePage
     | UnselectIngredient
     | InputNewAmount String
     | InputSearchTerm String
@@ -72,7 +73,7 @@ subscriptions model =
                 case key of
                     Enter ->
                         case model of
-                            RecipeCalculator _ (Just _) _ (Just newAmount) _ ->
+                            RecipeCalculator _ (Just _) _ (Just newAmount) _ _ ->
                                 if newAmount >= 1 then
                                     CalculateRatio
 
@@ -130,6 +131,7 @@ update msg model =
                 0
                 Nothing
                 1
+                RecipeIngredientsPage
             , Cmd.none
             )
 
@@ -142,15 +144,32 @@ update msg model =
             , Cmd.none
             )
 
+        SelectPage page ->
+            case model of
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio _ ->
+                    ( RecipeCalculator
+                        recipe
+                        maybeIngredient
+                        prepStepIndex
+                        maybeAmount
+                        ratio
+                        page
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
         SelectIngredient ingredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
                     ( RecipeCalculator
                         recipe
                         (Just ingredient)
                         prepStepIndex
                         Nothing
                         ratio
+                        page
                     , focus ingredient.id
                     )
 
@@ -159,13 +178,14 @@ update msg model =
 
         UnselectIngredient ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
                     ( RecipeCalculator
                         recipe
                         Nothing
                         prepStepIndex
                         Nothing
                         ratio
+                        page
                     , Cmd.none
                     )
 
@@ -174,13 +194,14 @@ update msg model =
 
         ResetCalculator ->
             case model of
-                RecipeCalculator recipe _ _ _ _ ->
+                RecipeCalculator recipe _ _ _ _ page ->
                     ( RecipeCalculator
                         recipe
                         Nothing
                         0
                         Nothing
                         1
+                        page
                     , Cmd.none
                     )
 
@@ -189,13 +210,14 @@ update msg model =
 
         InputNewAmount amount ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex _ ratio ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex _ ratio page ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
                         prepStepIndex
                         (String.toFloat amount)
                         ratio
+                        page
                     , Cmd.none
                     )
 
@@ -216,7 +238,7 @@ update msg model =
 
         CalculateRatio ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount _ ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeNewAmount _ page ->
                     ( Maybe.map2
                         (\ingredient newAmount ->
                             let
@@ -236,6 +258,7 @@ update msg model =
                                 prepStepIndex
                                 Nothing
                                 newRatio
+                                page
                         )
                         maybeIngredient
                         maybeNewAmount
@@ -246,6 +269,7 @@ update msg model =
                                 prepStepIndex
                                 maybeNewAmount
                                 1
+                                page
                             )
                     , Cmd.none
                     )
@@ -255,13 +279,14 @@ update msg model =
 
         Abort ->
             case model of
-                RecipeCalculator recipe _ prepStepIndex _ ratio ->
+                RecipeCalculator recipe _ prepStepIndex _ ratio page ->
                     ( RecipeCalculator
                         recipe
                         Nothing
                         prepStepIndex
                         Nothing
                         ratio
+                        page
                     , Cmd.none
                     )
 
@@ -270,7 +295,7 @@ update msg model =
 
         Next ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
@@ -280,6 +305,7 @@ update msg model =
                         )
                         maybeAmount
                         ratio
+                        page
                     , Cmd.none
                     )
 
@@ -288,7 +314,7 @@ update msg model =
 
         Prev ->
             case model of
-                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio ->
+                RecipeCalculator recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
                     ( RecipeCalculator
                         recipe
                         maybeIngredient
@@ -298,6 +324,7 @@ update msg model =
                         )
                         maybeAmount
                         ratio
+                        page
                     , Cmd.none
                     )
 
@@ -322,28 +349,47 @@ view model =
             viewCarousel1
 
         RecipeAlbum recipes maybeSearchTerm ->
-            recipeAlbumView
-                (case maybeSearchTerm of
-                    Just searchTerm ->
-                        List.filter
-                            (\recipe ->
-                                List.any
-                                    (String.contains searchTerm)
-                                    [ recipe.label, recipe.id ]
-                            )
+            contentView
+                RecipeAlbumPage
+                (recipeAlbumView
+                    (case maybeSearchTerm of
+                        Just searchTerm ->
+                            List.filter
+                                (\recipe ->
+                                    List.any
+                                        (String.contains searchTerm)
+                                        [ recipe.label, recipe.id ]
+                                )
+                                recipes
+
+                        Nothing ->
                             recipes
-
-                    Nothing ->
-                        recipes
+                    )
                 )
+                (text "")
 
-        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ratio ->
-            recipeView
-                recipe
-                ratio
-                selectedIngredient
-                maybeNewAmount
-                prepStepIndex
+        RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
+            contentView
+                page
+                (recipeView
+                    recipe
+                    ratio
+                    selectedIngredient
+                    maybeNewAmount
+                    prepStepIndex
+                )
+                (case page of
+                    RecipeIngredientsPage ->
+                        ingredientsViewActions ratio
+
+                    RecipeStepsPage ->
+                        prepStepsViewActions
+                            prepStepIndex
+                            (List.length recipe.steps)
+
+                    _ ->
+                        text ""
+                )
 
 
 frontView : Html Msg
@@ -447,7 +493,27 @@ carouselButton direction label btnClass iconClass =
 
 type ActivePage
     = RecipeAlbumPage
-    | RecipeCalculatorPage
+    | RecipeIngredientsPage
+    | RecipeStepsPage
+
+
+contentView : ActivePage -> Html Msg -> Html Msg -> Html Msg
+contentView activePage content actions =
+    div
+        [ class "d-flex flex-column vh-100"
+        ]
+        [ navbarView activePage
+        , content
+        , footerView actions
+        ]
+
+
+footerView : Html Msg -> Html Msg
+footerView actions =
+    div
+        [ class "p-3 border-top fixed-bottom d-flex justify-content-around" ]
+        [ actions
+        ]
 
 
 navbarView : ActivePage -> Html Msg
@@ -492,7 +558,7 @@ navbarView activePage =
                 [ class "navbar-brand"
                 , Html.Attributes.href "#"
                 ]
-                [ genericIcon "public/img/icon/pizza.svg" 32 ]
+                [ pizzaIcon ]
             , button
                 [ class "navbar-toggler"
                 , type_ "button"
@@ -592,8 +658,7 @@ navbarView activePage =
 recipeAlbumView : List Recipe -> Html Msg
 recipeAlbumView recipes =
     div []
-        [ navbarView RecipeAlbumPage
-        , div
+        [ div
             [ class "album py-5" ]
             [ div
                 [ class "container"
@@ -612,7 +677,9 @@ recipeAlbumCardView recipe =
     div
         [ class "col" ]
         [ div
-            [ class "card shadow-sm h-100" ]
+            [ class "card shadow-sm h-100"
+            , style "min-width" "220px"
+            ]
             [ Html.img
                 [ class "card-img-top"
                 , src
@@ -659,8 +726,8 @@ recipeAlbumCardView recipe =
 recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
 recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
-        tabListItem : String -> String -> String -> Bool -> Html msg
-        tabListItem buttonId contentId label isActive =
+        tabListItem : String -> String -> String -> Bool -> ActivePage -> Html Msg
+        tabListItem buttonId contentId label isActive pageToActivate =
             Html.li
                 [ class "nav-item"
                 , attribute "role" "presentation"
@@ -671,6 +738,7 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                         , ( "active", isActive )
                         ]
                     , id buttonId
+                    , onClick (SelectPage pageToActivate)
                     , attribute "data-bs-toggle" "tab"
                     , attribute "data-bs-target" ("#" ++ contentId)
                     , attribute "type" "button"
@@ -695,9 +763,9 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                 [ content
                 ]
     in
-    div []
-        [ navbarView RecipeCalculatorPage
-        , div
+    div
+        []
+        [ div
             [ class "mx-auto my-3 my-md-4 px-3 px-md-0"
             , style "max-width" "700px"
             ]
@@ -716,11 +784,13 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                         "ingredients-content"
                         "Ingredients"
                         True
+                        RecipeIngredientsPage
                     , tabListItem
                         "prepSteps-tab"
                         "prepSteps-content"
                         "Steps"
                         False
+                        RecipeStepsPage
                     ]
                 , div
                     [ class "tab-content"
@@ -770,18 +840,22 @@ ingredientsView ingredients ratio selectedIngredient maybeNewAmount =
                 (ingredientView ratio selectedIngredient maybeNewAmount)
                 ingredients
             )
-        , div
-            [ class "btn-group"
-            , attribute "role" "group"
+        ]
+
+
+ingredientsViewActions : Float -> Html Msg
+ingredientsViewActions ratio =
+    div
+        [ class "btn-group"
+        , attribute "role" "group"
+        ]
+        [ button
+            [ type_ "button"
+            , class "btn btn-primary"
+            , onClick ResetCalculator
+            , disabled (ratio == 1)
             ]
-            [ button
-                [ type_ "button"
-                , class "btn btn-primary"
-                , onClick ResetCalculator
-                , disabled (ratio == 1)
-                ]
-                [ resetIcon
-                ]
+            [ resetIcon
             ]
         ]
 
@@ -872,18 +946,6 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
 
 prepStepsView : Int -> List Ingredient -> List PrepStep -> Html Msg
 prepStepsView indexToDisplay ingredients prepSteps =
-    let
-        prepStepButton : Msg -> Bool -> String -> Html Msg
-        prepStepButton message isDisabled label =
-            button
-                [ onClick message
-                , disabled isDisabled
-                , class "btn btn-primary"
-                , style "margin-top" "2rem"
-                , style "padding" "0.75rem 2rem"
-                ]
-                [ text label ]
-    in
     if List.length prepSteps == 0 then
         text "no steps :("
 
@@ -898,23 +960,34 @@ prepStepsView indexToDisplay ingredients prepSteps =
                     (prepStepView indexToDisplay ingredients)
                     prepSteps
                 )
-            , div
-                [ class "btn-group mb-3"
-                , style "display" "grid"
-                , Html.Attributes.attribute "role" "group"
-                , style "grid-template-columns" "1fr 1fr"
-                , style "gap" "0.75rem"
-                ]
-                [ prepStepButton
-                    Prev
-                    (indexToDisplay <= 0)
-                    "←"
-                , prepStepButton
-                    Next
-                    (indexToDisplay >= List.length prepSteps - 1)
-                    "→"
-                ]
             ]
+
+
+prepStepsViewActions : Int -> Int -> Html Msg
+prepStepsViewActions indexToDisplay length =
+    let
+        prepStepButton : Msg -> Bool -> Html Msg -> Html Msg
+        prepStepButton message isDisabled icon =
+            button
+                [ onClick message
+                , disabled isDisabled
+                , class "btn btn-primary"
+                ]
+                [ icon ]
+    in
+    div
+        [ class "btn-group gap-2"
+        , Html.Attributes.attribute "role" "group"
+        ]
+        [ prepStepButton
+            Prev
+            (indexToDisplay <= 0)
+            arrowLeftIcon
+        , prepStepButton
+            Next
+            (indexToDisplay >= length - 1)
+            arrowRightIcon
+        ]
 
 
 
@@ -1247,28 +1320,43 @@ replaceIngredientAmountFraction ingredients string =
 
 pencilIcon : Html msg
 pencilIcon =
-    genericIcon "public/img/icon/pencil.svg" 16
+    genericIcon "pencil.svg" 16
 
 
 checkIcon : Html msg
 checkIcon =
-    genericIcon "public/img/icon/check.svg" 16
+    genericIcon "check.svg" 16
 
 
 closeIcon : Html msg
 closeIcon =
-    genericIcon "public/img/icon/close.svg" 16
+    genericIcon "close.svg" 16
 
 
 resetIcon : Html msg
 resetIcon =
-    genericIcon "public/img/icon/reset.svg" 32
+    genericIcon "reset.svg" 32
+
+
+arrowLeftIcon : Html msg
+arrowLeftIcon =
+    genericIcon "arrow-left.svg" 32
+
+
+arrowRightIcon : Html msg
+arrowRightIcon =
+    genericIcon "arrow-right.svg" 32
+
+
+pizzaIcon : Html msg
+pizzaIcon =
+    genericIcon "pizza.svg" 32
 
 
 genericIcon : String -> Int -> Html msg
 genericIcon path width =
     Html.img
         [ Html.Attributes.width width
-        , Html.Attributes.src path
+        , Html.Attributes.src ("public/img/icon/" ++ path)
         ]
         []
