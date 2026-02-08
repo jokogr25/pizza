@@ -5738,13 +5738,18 @@ var $author$project$Main$subscriptions = function (model) {
 			]));
 };
 var $author$project$Main$Carousel = {$: 'Carousel'};
+var $author$project$Main$Gram = {$: 'Gram'};
+var $author$project$Main$Path = function (a) {
+	return {$: 'Path', a: a};
+};
 var $author$project$Main$RecipeAlbum = F2(
 	function (a, b) {
 		return {$: 'RecipeAlbum', a: a, b: b};
 	});
-var $author$project$Main$RecipeCreator = function (a) {
-	return {$: 'RecipeCreator', a: a};
-};
+var $author$project$Main$RecipeCreator = F2(
+	function (a, b) {
+		return {$: 'RecipeCreator', a: a, b: b};
+	});
 var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $author$project$Main$RecipeViewer = F6(
 	function (a, b, c, d, e, f) {
@@ -5802,9 +5807,6 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $author$project$Main$Path = function (a) {
-	return {$: 'Path', a: a};
-};
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
@@ -5813,7 +5815,6 @@ var $author$project$Main$sampleLasagneRecipe = {
 	label: 'Lasanche',
 	steps: _List_Nil
 };
-var $author$project$Main$Gram = {$: 'Gram'};
 var $author$project$Main$Mililiter = {$: 'Mililiter'};
 var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
@@ -5885,7 +5886,17 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeAlbum') {
 					var recipes = model.a;
 					return _Utils_Tuple2(
-						$author$project$Main$RecipeCreator(recipes),
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							{
+								description: 'Draft description',
+								id: 'draft-id',
+								image: $author$project$Main$Path(''),
+								ingredients: _List_Nil,
+								label: 'Draft label',
+								steps: _List_Nil
+							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6058,6 +6069,231 @@ var $author$project$Main$update = F2(
 							maybeAmount,
 							ratio,
 							page),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateLabel':
+				var label = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{label: label})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateDescription':
+				var description = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{description: description})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateImagePath':
+				var imagePath = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									image: $author$project$Main$Path(imagePath)
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'AddIngredient':
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									ingredients: _Utils_ap(
+										draft.ingredients,
+										_List_fromArray(
+											[
+												{
+												amount: 0,
+												id: 'new-ingredient-id' + $elm$core$String$fromInt(
+													$elm$core$List$length(draft.ingredients)),
+												label: 'New Ingredientlabel',
+												unit: $author$project$Main$Gram
+											}
+											]))
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientLabel':
+				var id = msg.a;
+				var newLabel = msg.b;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									ingredients: A2(
+										$elm$core$List$map,
+										function (ingredient) {
+											return _Utils_eq(ingredient.id, id) ? _Utils_update(
+												ingredient,
+												{label: newLabel}) : ingredient;
+										},
+										draft.ingredients)
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientAmount':
+				var id = msg.a;
+				var newAmount = msg.b;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					var _v18 = $elm$core$String$toFloat(newAmount);
+					if (_v18.$ === 'Just') {
+						var f = _v18.a;
+						return _Utils_Tuple2(
+							A2(
+								$author$project$Main$RecipeCreator,
+								recipes,
+								_Utils_update(
+									draft,
+									{
+										ingredients: A2(
+											$elm$core$List$map,
+											function (ingredient) {
+												return _Utils_eq(ingredient.id, id) ? _Utils_update(
+													ingredient,
+													{amount: f}) : ingredient;
+											},
+											draft.ingredients)
+									})),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
+				} else {
+					return noChange;
+				}
+			case 'AddStep':
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									steps: _Utils_ap(
+										draft.steps,
+										_List_fromArray(
+											[
+												{description: 'New Step Description', time: 42, title: 'New Step Title'}
+											]))
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateStepTitle':
+				var index = msg.a;
+				var newTitle = msg.b;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									steps: A2(
+										$elm$core$List$indexedMap,
+										F2(
+											function (i, step) {
+												return _Utils_eq(i, index) ? _Utils_update(
+													step,
+													{title: newTitle}) : step;
+											}),
+										draft.steps)
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateStepDescription':
+				var index = msg.a;
+				var newDescription = msg.b;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									steps: A2(
+										$elm$core$List$indexedMap,
+										F2(
+											function (i, step) {
+												return _Utils_eq(i, index) ? _Utils_update(
+													step,
+													{description: newDescription}) : step;
+											}),
+										draft.steps)
+								})),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'SaveRecipe':
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Main$RecipeAlbum,
+							A2($elm$core$List$cons, draft, recipes),
+							$elm$core$Maybe$Nothing),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6802,7 +7038,325 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 					]))
 			]));
 };
-var $author$project$Main$recipeCreatorView = $elm$html$Html$text('recipeCreatorView construction :(');
+var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
+var $author$project$Main$saveIcon = A2($author$project$Main$genericIcon, 'save.svg', 32);
+var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('btn-group'),
+				A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('button'),
+						$elm$html$Html$Attributes$class('btn btn-primary'),
+						$elm$html$Html$Attributes$disabled(!isRecipeValid),
+						$elm$html$Html$Events$onClick($author$project$Main$SaveRecipe)
+					]),
+				_List_fromArray(
+					[$author$project$Main$saveIcon]))
+			]));
+};
+var $author$project$Main$AddIngredient = {$: 'AddIngredient'};
+var $author$project$Main$AddStep = {$: 'AddStep'};
+var $author$project$Main$UpdateDescription = function (a) {
+	return {$: 'UpdateDescription', a: a};
+};
+var $author$project$Main$UpdateImagePath = function (a) {
+	return {$: 'UpdateImagePath', a: a};
+};
+var $author$project$Main$UpdateLabel = function (a) {
+	return {$: 'UpdateLabel', a: a};
+};
+var $author$project$Main$getPathStr = function (p) {
+	var str = p.a;
+	return str;
+};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $author$project$Main$UpdateIngredientAmount = F2(
+	function (a, b) {
+		return {$: 'UpdateIngredientAmount', a: a, b: b};
+	});
+var $author$project$Main$UpdateIngredientLabel = F2(
+	function (a, b) {
+		return {$: 'UpdateIngredientLabel', a: a, b: b};
+	});
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$ingredientRow = function (ingredient) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('row g-2 mb-2')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-6')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-control'),
+								$elm$html$Html$Attributes$placeholder('Ingredient'),
+								$elm$html$Html$Attributes$value(ingredient.label),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$UpdateIngredientLabel(ingredient.id))
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-3')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-control'),
+								$elm$html$Html$Attributes$placeholder('Amount'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromFloat(ingredient.amount)),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$UpdateIngredientAmount(ingredient.id))
+							]),
+						_List_Nil)
+					]))
+			]));
+};
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Main$UpdateStepDescription = F2(
+	function (a, b) {
+		return {$: 'UpdateStepDescription', a: a, b: b};
+	});
+var $author$project$Main$UpdateStepTitle = F2(
+	function (a, b) {
+		return {$: 'UpdateStepTitle', a: a, b: b};
+	});
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $author$project$Main$stepRow = F2(
+	function (index, step) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('card mb-2')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('card-body')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-control mb-2'),
+									$elm$html$Html$Attributes$placeholder('Step title'),
+									$elm$html$Html$Attributes$value(step.title),
+									$elm$html$Html$Events$onInput(
+									$author$project$Main$UpdateStepTitle(index))
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$textarea,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$rows(2),
+									$elm$html$Html$Attributes$placeholder('Step description'),
+									$elm$html$Html$Attributes$value(step.description),
+									$elm$html$Html$Events$onInput(
+									$author$project$Main$UpdateStepDescription(index))
+								]),
+							_List_Nil)
+						]))
+				]));
+	});
+var $author$project$Main$recipeCreatorView = function (draft) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('container my-4'),
+				A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Create recipe')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-3')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Name')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-control'),
+								$elm$html$Html$Attributes$value(draft.label),
+								$elm$html$Html$Events$onInput($author$project$Main$UpdateLabel)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-3')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Description')
+							])),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-control'),
+								$elm$html$Html$Attributes$rows(3),
+								$elm$html$Html$Attributes$value(draft.description),
+								$elm$html$Html$Events$onInput($author$project$Main$UpdateDescription)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-4')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Image path')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-control'),
+								$elm$html$Html$Attributes$value(
+								$author$project$Main$getPathStr(draft.image)),
+								$elm$html$Html$Events$onInput($author$project$Main$UpdateImagePath)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$h4,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mt-4')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Ingredients')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				A2($elm$core$List$map, $author$project$Main$ingredientRow, draft.ingredients)),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm mt-2'),
+						$elm$html$Html$Events$onClick($author$project$Main$AddIngredient)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('+ Add ingredient')
+					])),
+				A2(
+				$elm$html$Html$h4,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mt-4')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Steps')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				A2($elm$core$List$indexedMap, $author$project$Main$stepRow, draft.steps)),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm mt-2'),
+						$elm$html$Html$Events$onClick($author$project$Main$AddStep)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('+ Add step')
+					]))
+			]));
+};
 var $author$project$Main$RecipeStepsPage = {$: 'RecipeStepsPage'};
 var $author$project$Main$SelectPage = function (a) {
 	return {$: 'SelectPage', a: a};
@@ -6819,7 +7373,6 @@ var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty
 var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'check.svg', 16);
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
 var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
@@ -6835,7 +7388,6 @@ var $author$project$Main$unitToAbbr = function (unit) {
 			return 'tsp';
 	}
 };
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$ingredientView = F4(
 	function (ratio, maybeSelectedIngredient, maybeNewAmount, ingredient) {
 		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount * ratio) + (' ' + ($author$project$Main$unitToAbbr(ingredient.unit) + ')'))));
@@ -7267,6 +7819,46 @@ var $author$project$Main$recipeView = F6(
 						]))
 				]));
 	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$uniqueStrings = function (list) {
+	return _Utils_eq(
+		$elm$core$List$length(list),
+		$elm$core$List$length(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (id, unique) {
+						return A2($elm$core$List$member, id, unique) ? unique : _Utils_ap(
+							unique,
+							_List_fromArray(
+								[id]));
+					}),
+				_List_Nil,
+				list)));
+};
+var $author$project$Main$validateIngredients = function (ingredients) {
+	return (!$elm$core$List$isEmpty(ingredients)) && $author$project$Main$uniqueStrings(
+		A2(
+			$elm$core$List$map,
+			function (ingredient) {
+				return ingredient.id;
+			},
+			ingredients));
+};
+var $author$project$Main$validateSteps = function (steps) {
+	return !$elm$core$List$isEmpty(steps);
+};
+var $author$project$Main$validateRecipe = function (recipe) {
+	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
+};
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(
@@ -7415,15 +8007,14 @@ var $author$project$Main$view = function (model) {
 					}
 				}());
 		default:
-			var recipes = model.a;
+			var recipeDraft = model.b;
 			return A3(
 				$author$project$Main$contentView,
 				$author$project$Main$RecipeCreatorPage,
-				$author$project$Main$recipeCreatorView,
+				$author$project$Main$recipeCreatorView(recipeDraft),
 				$elm$core$Maybe$Just(
-					$elm$html$Html$text(
-						'Existing recipes: ' + $elm$core$String$fromInt(
-							$elm$core$List$length(recipes)))));
+					$author$project$Main$recipeCreatorActions(
+						$author$project$Main$validateRecipe(recipeDraft))));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
