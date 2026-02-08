@@ -9,6 +9,7 @@ import Html.Attributes exposing (alt, attribute, class, classList, disabled, id,
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
+import Pizza.Model.Types exposing (..)
 import Regex
 import String
 import Task
@@ -913,25 +914,6 @@ prepStepView indexToDisplay ingredients index prepStep =
         ]
 
 
-type Unit
-    = Gram
-    | Mililiter
-    | Teaspoon
-
-
-unitToAbbr : Unit -> String
-unitToAbbr unit =
-    case unit of
-        Gram ->
-            "g"
-
-        Mililiter ->
-            "ml"
-
-        Teaspoon ->
-            "tsp"
-
-
 
 -- SAMPLE DATA
 
@@ -1126,54 +1108,6 @@ replaceIngredientAmountFraction ingredients string =
                     str
     in
     List.foldl replaceMatch string matches
-
-
-
--- DOMAIN MODELS
-
-
-type alias Recipe =
-    { id : String
-    , label : String
-    , description : String
-    , ingredients : List Ingredient
-    , steps : List PrepStep
-    , image : RecipeImage
-    }
-
-
-type RecipeImage
-    = Path String
-
-
-type alias Ingredient =
-    { id : String
-    , label : String
-    , amount : Float
-    , unit : Unit
-    }
-
-
-recipeApplyRatio : Float -> Recipe -> Recipe
-recipeApplyRatio ratio recipe =
-    { recipe
-        | ingredients =
-            List.map (ingredientApplyRatio ratio) recipe.ingredients
-    }
-
-
-ingredientApplyRatio : Float -> Ingredient -> Ingredient
-ingredientApplyRatio ratio ingredient =
-    { ingredient
-        | amount = ingredient.amount * ratio
-    }
-
-
-type alias PrepStep =
-    { time : Int
-    , title : String
-    , description : String
-    }
 
 
 

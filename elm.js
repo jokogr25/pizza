@@ -5772,52 +5772,52 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $author$project$Main$ingredientApplyRatio = F2(
+var $author$project$Pizza$Model$Types$ingredientApplyRatio = F2(
 	function (ratio, ingredient) {
 		return _Utils_update(
 			ingredient,
 			{amount: ingredient.amount * ratio});
 	});
-var $author$project$Main$recipeApplyRatio = F2(
+var $author$project$Pizza$Model$Types$recipeApplyRatio = F2(
 	function (ratio, recipe) {
 		return _Utils_update(
 			recipe,
 			{
 				ingredients: A2(
 					$elm$core$List$map,
-					$author$project$Main$ingredientApplyRatio(ratio),
+					$author$project$Pizza$Model$Types$ingredientApplyRatio(ratio),
 					recipe.ingredients)
 			});
 	});
-var $author$project$Main$Path = function (a) {
+var $author$project$Pizza$Model$Types$Path = function (a) {
 	return {$: 'Path', a: a};
 };
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
-	image: $author$project$Main$Path('public/img/lasanche.jpg'),
+	image: $author$project$Pizza$Model$Types$Path('public/img/lasanche.jpg'),
 	ingredients: _List_Nil,
 	label: 'Lasanche',
 	steps: _List_Nil
 };
-var $author$project$Main$Gram = {$: 'Gram'};
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
+var $author$project$Pizza$Model$Types$Gram = {$: 'Gram'};
+var $author$project$Pizza$Model$Types$Mililiter = {$: 'Mililiter'};
+var $author$project$Pizza$Model$Types$Teaspoon = {$: 'Teaspoon'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
 var $author$project$Main$samplePizzaRecipe = {
 	description: '',
 	id: 'seven-hours-pizza-dough',
-	image: $author$project$Main$Path('public/img/7-hours-pizza-dough.jpg'),
+	image: $author$project$Pizza$Model$Types$Path('public/img/7-hours-pizza-dough.jpg'),
 	ingredients: _List_fromArray(
 		[
-			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
-			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
-			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
-			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
-			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
-			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
+			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Pizza$Model$Types$Gram},
+			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Pizza$Model$Types$Gram},
+			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Pizza$Model$Types$Gram},
+			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Pizza$Model$Types$Mililiter},
+			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Pizza$Model$Types$Gram},
+			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Pizza$Model$Types$Teaspoon}
 		]),
 	label: 'Pizza dough (7 hours)',
 	steps: _List_fromArray(
@@ -5941,7 +5941,7 @@ var $author$project$Main$update = F2(
 										var newRatio = (oldAmount <= 0) ? 1 : (newAmount / oldAmount);
 										return A4(
 											$author$project$Main$RecipeCalculator,
-											A2($author$project$Main$recipeApplyRatio, newRatio, recipe),
+											A2($author$project$Pizza$Model$Types$recipeApplyRatio, newRatio, recipe),
 											$elm$core$Maybe$Nothing,
 											prepStepIndex,
 											$elm$core$Maybe$Nothing);
@@ -6650,7 +6650,7 @@ var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
 	return $elm$core$String$fromFloat(rounded);
 };
-var $author$project$Main$unitToAbbr = function (unit) {
+var $author$project$Pizza$Model$Types$unitToAbbr = function (unit) {
 	switch (unit.$) {
 		case 'Gram':
 			return 'g';
@@ -6734,7 +6734,7 @@ var $author$project$Main$ingredientView = F3(
 											_Utils_Tuple2('is-invalid', isSelected && (!isNewAmountValid))
 										])),
 									$elm$html$Html$Attributes$placeholder(
-									$author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Main$unitToAbbr(ingredient.unit))),
+									$author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit))),
 									$elm$html$Html$Attributes$disabled(!isSelected),
 									isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value(''),
 									$elm$html$Html$Events$onInput($author$project$Main$InputNewAmount)
@@ -6862,7 +6862,7 @@ var $author$project$Main$replaceIngredientAmountFraction = F2(
 					return A3(
 						$elm$core$String$replace,
 						fullMatch,
-						$author$project$Helper$round2ToString(newAmount) + ($author$project$Main$unitToAbbr(ing.unit) + (' ' + ing.id)),
+						$author$project$Helper$round2ToString(newAmount) + ($author$project$Pizza$Model$Types$unitToAbbr(ing.unit) + (' ' + ing.id)),
 						str);
 				} else {
 					return str;
