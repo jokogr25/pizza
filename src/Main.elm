@@ -9,6 +9,7 @@ import Html.Attributes exposing (alt, attribute, class, classList, disabled, id,
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
+import Platform.Cmd as Cmd
 import Regex
 import String
 import Svg.Attributes exposing (visibility)
@@ -37,8 +38,8 @@ type Model
     = Front
     | Carousel
     | RecipeAlbum (List Recipe) (Maybe String)
-    | RecipeViewer Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
-    | RecipeCreator (List Recipe) Recipe (Maybe Ingredient)
+    | RecipeViewer (List Recipe) Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
+    | RecipeCreator (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep)
 
 
 
@@ -73,8 +74,11 @@ type Msg
     | UpdateIngredientAmount String
     | UpdateIngredientUnit String
     | AddStep
-    | UpdateStepTitle Int String
-    | UpdateStepDescription Int String
+    | RemoveStep PrepStep
+    | EditStep PrepStep
+    | UpdateStepTitle String
+    | UpdateStepTime String
+    | UpdateStepDescription String
     | SaveRecipe
 
 
@@ -90,7 +94,7 @@ subscriptions model =
                 case key of
                     Enter ->
                         case model of
-                            RecipeViewer _ (Just _) _ (Just newAmount) _ _ ->
+                            RecipeViewer _ _ (Just _) _ (Just newAmount) _ _ ->
                                 if newAmount >= 1 then
                                     CalculateRatio
 
@@ -102,7 +106,7 @@ subscriptions model =
 
                     Left ->
                         case model of
-                            RecipeViewer _ _ _ _ _ RecipeStepsPage ->
+                            RecipeViewer _ _ _ _ _ _ RecipeStepsPage ->
                                 Prev
 
                             _ ->
@@ -110,7 +114,7 @@ subscriptions model =
 
                     Right ->
                         case model of
-                            RecipeViewer _ _ _ _ _ RecipeStepsPage ->
+                            RecipeViewer _ _ _ _ _ _ RecipeStepsPage ->
                                 Next
 
                             _ ->
@@ -169,37 +173,55 @@ update msg model =
             ( Carousel, Cmd.none )
 
         GoRecipeViewer recipe ->
-            ( RecipeViewer
-                recipe
-                Nothing
-                0
-                Nothing
-                1
-                RecipeIngredientsPage
-            , Cmd.none
-            )
+            case model of
+                RecipeAlbum recipes _ ->
+                    ( RecipeViewer
+                        recipes
+                        recipe
+                        Nothing
+                        0
+                        Nothing
+                        1
+                        RecipeIngredientsPage
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
 
         GoRecipeAlbum ->
-            ( RecipeAlbum
-                [ samplePizzaRecipe
-                , sampleLasagneRecipe
-                ]
-                Nothing
-            , Cmd.none
-            )
+            case model of
+                Front ->
+                    ( RecipeAlbum
+                        [ samplePizzaRecipe
+                        , sampleLasagneRecipe
+                        ]
+                        Nothing
+                    , Cmd.none
+                    )
+
+                RecipeCreator recipes _ _ _ ->
+                    ( RecipeAlbum recipes Nothing, Cmd.none )
+
+                RecipeViewer recipes _ _ _ _ _ _ ->
+                    ( RecipeAlbum recipes Nothing, Cmd.none )
+
+                _ ->
+                    noChange
 
         GoRecipeCreator ->
             case model of
                 RecipeAlbum recipes _ ->
                     ( RecipeCreator
                         recipes
-                        { id = "draft-id"
-                        , label = "Draft label"
-                        , description = "Draft description"
+                        { id = ""
+                        , label = ""
+                        , description = ""
                         , ingredients = []
                         , steps = []
                         , image = Path ""
                         }
+                        Nothing
                         Nothing
                     , Cmd.none
                     )
@@ -209,8 +231,9 @@ update msg model =
 
         SelectPage page ->
             case model of
-                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio _ ->
+                RecipeViewer recipes recipe maybeIngredient prepStepIndex maybeAmount ratio _ ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         maybeIngredient
                         prepStepIndex
@@ -225,8 +248,9 @@ update msg model =
 
         SelectIngredient ingredient ->
             case model of
-                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                RecipeViewer recipes recipe _ prepStepIndex _ ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         (Just ingredient)
                         prepStepIndex
@@ -241,8 +265,9 @@ update msg model =
 
         UnselectIngredient ->
             case model of
-                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                RecipeViewer recipes recipe _ prepStepIndex _ ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         Nothing
                         prepStepIndex
@@ -257,8 +282,9 @@ update msg model =
 
         ResetRecipeViewer ->
             case model of
-                RecipeViewer recipe _ _ _ _ page ->
+                RecipeViewer recipes recipe _ _ _ _ page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         Nothing
                         0
@@ -273,8 +299,9 @@ update msg model =
 
         InputNewAmount amount ->
             case model of
-                RecipeViewer recipe maybeIngredient prepStepIndex _ ratio page ->
+                RecipeViewer recipes recipe maybeIngredient prepStepIndex _ ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         maybeIngredient
                         prepStepIndex
@@ -301,7 +328,7 @@ update msg model =
 
         CalculateRatio ->
             case model of
-                RecipeViewer recipe maybeIngredient prepStepIndex maybeNewAmount _ page ->
+                RecipeViewer recipes recipe maybeIngredient prepStepIndex maybeNewAmount _ page ->
                     ( Maybe.map2
                         (\ingredient newAmount ->
                             let
@@ -316,6 +343,7 @@ update msg model =
                                         newAmount / oldAmount
                             in
                             RecipeViewer
+                                recipes
                                 recipe
                                 Nothing
                                 prepStepIndex
@@ -327,6 +355,7 @@ update msg model =
                         maybeNewAmount
                         |> Maybe.withDefault
                             (RecipeViewer
+                                recipes
                                 recipe
                                 maybeIngredient
                                 prepStepIndex
@@ -342,8 +371,9 @@ update msg model =
 
         Abort ->
             case model of
-                RecipeViewer recipe _ prepStepIndex _ ratio page ->
+                RecipeViewer recipes recipe _ prepStepIndex _ ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         Nothing
                         prepStepIndex
@@ -358,8 +388,9 @@ update msg model =
 
         Next ->
             case model of
-                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
+                RecipeViewer recipes recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         maybeIngredient
                         (min
@@ -377,8 +408,9 @@ update msg model =
 
         Prev ->
             case model of
-                RecipeViewer recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
+                RecipeViewer recipes recipe maybeIngredient prepStepIndex maybeAmount ratio page ->
                     ( RecipeViewer
+                        recipes
                         recipe
                         maybeIngredient
                         (max
@@ -396,13 +428,14 @@ update msg model =
 
         UpdateLabel label ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft ingredientDraft stepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
                             | label = label
                         }
                         ingredientDraft
+                        stepDraft
                     , Cmd.none
                     )
 
@@ -411,13 +444,14 @@ update msg model =
 
         UpdateDescription description ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft ingredientDraft stepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
                             | description = description
                         }
                         ingredientDraft
+                        stepDraft
                     , Cmd.none
                     )
 
@@ -426,13 +460,14 @@ update msg model =
 
         UpdateImagePath imagePath ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft ingredientDraft stepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
                             | image = Path imagePath
                         }
                         ingredientDraft
+                        stepDraft
                     , Cmd.none
                     )
 
@@ -441,7 +476,7 @@ update msg model =
 
         AddIngredient ->
             case model of
-                RecipeCreator recipes draft maybeIngredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
@@ -469,6 +504,7 @@ update msg model =
                                         Nothing
                                 )
                         )
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -477,7 +513,7 @@ update msg model =
 
         EditIngredient ing ->
             case model of
-                RecipeCreator recipes draft _ ->
+                RecipeCreator recipes draft _ maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
@@ -485,6 +521,7 @@ update msg model =
                                 List.filter (\i -> i.id /= ing.id) draft.ingredients
                         }
                         (Just ing)
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -493,7 +530,7 @@ update msg model =
 
         RemoveIngredient id ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft ingredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
@@ -505,6 +542,7 @@ update msg model =
                                     draft.ingredients
                         }
                         ingredientDraft
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -513,7 +551,7 @@ update msg model =
 
         UpdateIngredientId newId ->
             case model of
-                RecipeCreator recipes draft maybeIngredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         draft
@@ -532,6 +570,7 @@ update msg model =
                                     , unit = Gram
                                     }
                         )
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -540,7 +579,7 @@ update msg model =
 
         UpdateIngredientLabel newLabel ->
             case model of
-                RecipeCreator recipes draft maybeIngredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         draft
@@ -559,6 +598,7 @@ update msg model =
                                     , unit = Gram
                                     }
                         )
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -567,7 +607,7 @@ update msg model =
 
         UpdateIngredientAmount newStrAmount ->
             case model of
-                RecipeCreator recipes draft maybeIngredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     case String.toFloat newStrAmount of
                         Just f ->
                             ( RecipeCreator
@@ -588,6 +628,7 @@ update msg model =
                                             , unit = Gram
                                             }
                                 )
+                                maybeStepDraft
                             , Cmd.none
                             )
 
@@ -603,17 +644,9 @@ update msg model =
                 parsedUnit =
                     Debug.log gUnit
                         (Maybe.withDefault Gram (parseUnit gUnit))
-
-                default =
-                    Just
-                        { id = ""
-                        , label = ""
-                        , amount = 1.0
-                        , unit = parsedUnit
-                        }
             in
             case model of
-                RecipeCreator recipes draft maybeIngredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         draft
@@ -622,8 +655,14 @@ update msg model =
                                 Just { i | unit = parsedUnit }
 
                             Nothing ->
-                                default
+                                Just
+                                    { id = ""
+                                    , label = ""
+                                    , amount = 0
+                                    , unit = parsedUnit
+                                    }
                         )
+                        maybeStepDraft
                     , Cmd.none
                     )
 
@@ -632,71 +671,146 @@ update msg model =
 
         AddStep ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
                         { draft
                             | steps =
                                 draft.steps
-                                    ++ [ { time = 42
-                                         , title = "New Step Title"
-                                         , description = "New Step Description"
-                                         }
-                                       ]
+                                    ++ (case maybeStepDraft of
+                                            Just step ->
+                                                [ step ]
+
+                                            Nothing ->
+                                                []
+                                       )
                         }
-                        ingredientDraft
+                        maybeIngredientDraft
+                        maybeStepDraft
                     , Cmd.none
                     )
 
                 _ ->
                     noChange
 
-        UpdateStepTitle index newTitle ->
+        UpdateStepTitle newTitle ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
                     ( RecipeCreator
                         recipes
-                        { draft
-                            | steps =
-                                List.indexedMap
-                                    (\i step ->
-                                        if i == index then
-                                            { step
-                                                | title = newTitle
-                                            }
+                        draft
+                        maybeIngredientDraft
+                        (case maybeStepDraft of
+                            Just step ->
+                                Just
+                                    { step
+                                        | title = newTitle
+                                    }
 
-                                        else
-                                            step
-                                    )
-                                    draft.steps
-                        }
-                        ingredientDraft
+                            Nothing ->
+                                Just
+                                    { title = newTitle
+                                    , time = -1
+                                    , description = ""
+                                    }
+                        )
                     , Cmd.none
                     )
 
                 _ ->
                     noChange
 
-        UpdateStepDescription index newDescription ->
+        UpdateStepDescription newDescription ->
             case model of
-                RecipeCreator recipes draft ingredientDraft ->
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
+                    ( RecipeCreator
+                        recipes
+                        draft
+                        maybeIngredientDraft
+                        (case maybeStepDraft of
+                            Just step ->
+                                Just
+                                    { step
+                                        | description = newDescription
+                                    }
+
+                            Nothing ->
+                                Just
+                                    { description = newDescription
+                                    , time = -1
+                                    , title = ""
+                                    }
+                        )
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
+        UpdateStepTime newTime ->
+            let
+                parsedTime : Int
+                parsedTime =
+                    String.toInt newTime |> Maybe.withDefault -1
+            in
+            case model of
+                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
+                    ( RecipeCreator
+                        recipes
+                        draft
+                        maybeIngredientDraft
+                        (case maybeStepDraft of
+                            Just step ->
+                                Just
+                                    { step
+                                        | time = parsedTime
+                                    }
+
+                            Nothing ->
+                                Just
+                                    { time = parsedTime
+                                    , description = "newDescription"
+                                    , title = ""
+                                    }
+                        )
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
+        EditStep step ->
+            case model of
+                RecipeCreator recipes draft maybeIngredient _ ->
                     ( RecipeCreator
                         recipes
                         { draft
                             | steps =
-                                List.indexedMap
-                                    (\i step ->
-                                        if i == index then
-                                            { step
-                                                | description = newDescription
-                                            }
-
-                                        else
-                                            step
-                                    )
+                                List.filter
+                                    (\s -> s /= step)
                                     draft.steps
                         }
-                        ingredientDraft
+                        maybeIngredient
+                        (Just step)
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
+        RemoveStep step ->
+            case model of
+                RecipeCreator recipes draft maybeIngredient _ ->
+                    ( RecipeCreator
+                        recipes
+                        { draft
+                            | steps =
+                                List.filter
+                                    (\s -> s /= step)
+                                    draft.steps
+                        }
+                        maybeIngredient
+                        Nothing
                     , Cmd.none
                     )
 
@@ -705,9 +819,14 @@ update msg model =
 
         SaveRecipe ->
             case model of
-                RecipeCreator recipes draft _ ->
+                RecipeCreator recipes draft _ _ ->
                     ( RecipeAlbum
-                        (draft :: recipes)
+                        (if validateRecipe draft then
+                            draft :: recipes
+
+                         else
+                            recipes
+                        )
                         Nothing
                     , Cmd.none
                     )
@@ -752,7 +871,7 @@ view model =
                 )
                 Nothing
 
-        RecipeViewer recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
+        RecipeViewer _ recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
             contentView
                 page
                 (recipeView
@@ -778,10 +897,10 @@ view model =
                         Nothing
                 )
 
-        RecipeCreator _ recipeDraft maybeIngredientDraft ->
+        RecipeCreator _ recipeDraft maybeIngredientDraft maybeStepDraft ->
             contentView
                 RecipeCreatorPage
-                (recipeCreatorView recipeDraft maybeIngredientDraft)
+                (recipeCreatorView recipeDraft maybeIngredientDraft maybeStepDraft)
                 (Just
                     (recipeCreatorActions
                         (validateRecipe recipeDraft)
@@ -793,6 +912,14 @@ validateRecipe : Recipe -> Bool
 validateRecipe recipe =
     validateIngredients recipe.ingredients
         && validateSteps recipe.steps
+
+
+validateStep : PrepStep -> Bool
+validateStep step =
+    step.time
+        >= -1
+        && not (String.isEmpty step.title)
+        && not (String.isEmpty step.description)
 
 
 validateIngredient : Ingredient -> List Ingredient -> Bool
@@ -1541,15 +1668,26 @@ prepStepView indexToDisplay ingredients index prepStep =
         ]
 
 
-recipeCreatorView : Recipe -> Maybe Ingredient -> Html Msg
-recipeCreatorView draft maybeIngredientToEdit =
+recipeCreatorView : Recipe -> Maybe Ingredient -> Maybe PrepStep -> Html Msg
+recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
     let
-        addButton msg =
+        isIngredientValid =
+            maybeIngredientToEdit
+                |> Maybe.map (\i -> validateIngredient i draft.ingredients)
+                |> Maybe.withDefault False
+
+        isStepValid =
+            maybePrepStepToEdit
+                |> Maybe.map (\i -> validateStep i)
+                |> Maybe.withDefault False
+
+        addButton msg isDisabled =
             button
                 [ class "btn btn-outline-secondary btn-sm w-100 d-flex justify-content-center align-items-center mt-3"
+                , disabled isDisabled
                 , onClick msg
                 ]
-                [ plusIcon 16 ]
+                [ plusIcon 32 ]
     in
     div
         [ class "container my-4 flex-grow-1"
@@ -1558,47 +1696,74 @@ recipeCreatorView draft maybeIngredientToEdit =
         [ Html.h2
             []
             [ text "Create recipe" ]
-
-        -- Recipe label
-        , div
-            [ class "mb-3"
+        , let
+            id =
+                "createRecipeLabel"
+          in
+          div
+            [ class "col-md-12 mb-3"
             ]
-            [ label
-                [ class "form-label" ]
-                [ text "Name" ]
-            , input
-                [ class "form-control"
-                , Html.Attributes.value draft.label
-                , onInput UpdateLabel
+            [ div
+                [ class "form-floating"
                 ]
-                []
+                [ input
+                    [ class "form-control"
+                    , Html.Attributes.value id
+                    , Html.Attributes.value draft.label
+                    , onInput UpdateLabel
+                    ]
+                    []
+                , label
+                    [ Html.Attributes.for id
+                    ]
+                    [ text "Name"
+                    ]
+                ]
             ]
-
-        -- Description
-        , div
-            [ class "mb-3" ]
-            [ label
-                [ class "form-label" ]
-                [ text "Description" ]
-            , Html.textarea
-                [ class "form-control"
-                , Html.Attributes.rows 3
-                , Html.Attributes.value draft.description
-                , onInput UpdateDescription
+        , let
+            id =
+                "createRecipeDescription"
+          in
+          div
+            [ class "col-md-12 mb-3" ]
+            [ div
+                [ class "form-floating"
                 ]
-                []
+                [ Html.textarea
+                    [ class "form-control"
+                    , Html.Attributes.id id
+                    , Html.Attributes.rows 3
+                    , Html.Attributes.value draft.description
+                    , onInput UpdateDescription
+                    ]
+                    []
+                , label
+                    [ Html.Attributes.for id
+                    ]
+                    [ text "Description"
+                    ]
+                ]
             ]
-
-        -- Image
-        , div
-            [ class "mb-4" ]
-            [ label [ class "form-label" ] [ text "Image path" ]
-            , input
-                [ class "form-control"
-                , Html.Attributes.value (getPathStr draft.image)
-                , onInput UpdateImagePath
+        , let
+            id =
+                "createRecipeImagePath"
+          in
+          div
+            [ class "col-md-12 mb-4" ]
+            [ div
+                [ class "form-floating"
                 ]
-                []
+                [ input
+                    [ class "form-control"
+                    , Html.Attributes.id id
+                    , Html.Attributes.value (getPathStr draft.image)
+                    , onInput UpdateImagePath
+                    ]
+                    []
+                , label
+                    [ Html.Attributes.for id ]
+                    [ text "Image path" ]
+                ]
             ]
 
         -- Ingredients
@@ -1637,7 +1802,7 @@ recipeCreatorView draft maybeIngredientToEdit =
                 )
                 draft.ingredients
                 ++ [ addOrEditIngredientView maybeIngredientToEdit
-                   , addButton AddIngredient
+                   , addButton AddIngredient (not isIngredientValid)
                    ]
             )
 
@@ -1649,8 +1814,34 @@ recipeCreatorView draft maybeIngredientToEdit =
             ]
         , div
             []
-            (List.indexedMap addStepRow draft.steps
-                ++ [ addButton AddStep
+            (List.map
+                (\step ->
+                    div
+                        [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
+                        ]
+                        [ div
+                            []
+                            [ text step.title
+                            ]
+                        , button
+                            [ class "btn btn-sm btn-warn"
+                            , Html.Attributes.title "Edit step"
+                            , onClick (EditStep step)
+                            ]
+                            [ pencilIcon
+                            ]
+                        , button
+                            [ class "btn btn-sm btn-danger"
+                            , onClick (RemoveStep step)
+                            , Html.Attributes.title "Remove step"
+                            ]
+                            [ closeIcon
+                            ]
+                        ]
+                )
+                draft.steps
+                ++ [ addOrEditStepView maybePrepStepToEdit
+                   , addButton AddStep (not isStepValid)
                    ]
             )
         ]
@@ -1689,7 +1880,13 @@ addOrEditIngredientView maybeIngredient =
         amountValue =
             empyStyleMapper
                 maybeIngredient
-                (\ing -> Html.Attributes.value (String.fromFloat ing.amount))
+                (\ing ->
+                    if ing.amount > 0 then
+                        Html.Attributes.value (String.fromFloat ing.amount)
+
+                    else
+                        emptyStyle
+                )
 
         colInput l v message =
             div
@@ -1768,29 +1965,90 @@ addOrEditIngredientView maybeIngredient =
         ]
 
 
-addStepRow : Int -> PrepStep -> Html Msg
-addStepRow index step =
+addOrEditStepView : Maybe PrepStep -> Html Msg
+addOrEditStepView maybeStep =
+    let
+        stepTitleValue =
+            empyStyleMapper
+                maybeStep
+                (\step -> Html.Attributes.value step.title)
+
+        stepTimeValue =
+            empyStyleMapper
+                maybeStep
+                (\step ->
+                    if step.time > -1 then
+                        Html.Attributes.value (String.fromInt step.time)
+
+                    else
+                        emptyStyle
+                )
+
+        stepDescriptionValue =
+            empyStyleMapper
+                maybeStep
+                (\step ->
+                    Html.Attributes.value step.description
+                )
+
+        colInput l v message =
+            div
+                [ class "col-md-12"
+                ]
+                [ div
+                    [ class "form-floating"
+                    ]
+                    [ input
+                        [ class "form-control"
+                        , onInput message
+                        , v
+                        ]
+                        []
+                    , label
+                        []
+                        [ text l ]
+                    ]
+                ]
+
+        colTextArea l v message =
+            div
+                [ class "col-md-12"
+                ]
+                [ div
+                    [ class "form-floating"
+                    ]
+                    [ Html.textarea
+                        [ class "form-control"
+                        , Html.Attributes.rows 2
+                        , v
+                        , onInput message
+                        ]
+                        []
+                    , label
+                        []
+                        [ text l
+                        ]
+                    ]
+                ]
+    in
     div
-        [ class "card mb-2"
+        [ class "mb-3 position-relative"
         ]
         [ div
-            [ class "card-body"
+            [ class "row g-2"
             ]
-            [ input
-                [ class "form-control mb-2"
-                , Html.Attributes.placeholder "Step title"
-                , Html.Attributes.value step.title
-                , onInput (UpdateStepTitle index)
-                ]
-                []
-            , Html.textarea
-                [ class "form-control"
-                , Html.Attributes.rows 2
-                , Html.Attributes.placeholder "Step description"
-                , Html.Attributes.value step.description
-                , onInput (UpdateStepDescription index)
-                ]
-                []
+            [ colInput
+                "Title"
+                stepTitleValue
+                UpdateStepTitle
+            , colTextArea
+                "Description"
+                stepDescriptionValue
+                UpdateStepDescription
+            , colInput
+                "Time"
+                stepTimeValue
+                UpdateStepTime
             ]
         ]
 
