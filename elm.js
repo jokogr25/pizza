@@ -5746,14 +5746,34 @@ var $author$project$Main$RecipeAlbum = F2(
 	function (a, b) {
 		return {$: 'RecipeAlbum', a: a, b: b};
 	});
-var $author$project$Main$RecipeCreator = F2(
-	function (a, b) {
-		return {$: 'RecipeCreator', a: a, b: b};
+var $author$project$Main$RecipeCreator = F3(
+	function (a, b, c) {
+		return {$: 'RecipeCreator', a: a, b: b, c: c};
 	});
 var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $author$project$Main$RecipeViewer = F6(
 	function (a, b, c, d, e, f) {
 		return {$: 'RecipeViewer', a: a, b: b, c: c, d: d, e: e, f: f};
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -5807,6 +5827,8 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
@@ -5852,6 +5874,46 @@ var $author$project$Main$samplePizzaRecipe = {
 		])
 };
 var $elm$core$String$toFloat = _String_toFloat;
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$validateIngredient = F2(
+	function (ing, ings) {
+		var listOfIds = A2(
+			$elm$core$List$map,
+			function (i) {
+				return i.id;
+			},
+			ings);
+		return (!$elm$core$String$isEmpty(ing.id)) && ((!A2($elm$core$List$member, ing.id, listOfIds)) && ((ing.amount > 0) && (!$elm$core$String$isEmpty(ing.label))));
+	});
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5886,7 +5948,7 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeAlbum') {
 					var recipes = model.a;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							{
@@ -5896,7 +5958,8 @@ var $author$project$Main$update = F2(
 								ingredients: _List_Nil,
 								label: 'Draft label',
 								steps: _List_Nil
-							}),
+							},
+							$elm$core$Maybe$Nothing),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6078,13 +6141,15 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
 								draft,
-								{label: label})),
+								{label: label}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6094,13 +6159,15 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
 								draft,
-								{description: description})),
+								{description: description}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6110,15 +6177,17 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
 								draft,
 								{
 									image: $author$project$Main$Path(imagePath)
-								})),
+								}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6127,8 +6196,9 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var maybeIngredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
@@ -6136,72 +6206,155 @@ var $author$project$Main$update = F2(
 								{
 									ingredients: _Utils_ap(
 										draft.ingredients,
-										_List_fromArray(
-											[
-												{
-												amount: 0,
-												id: 'new-ingredient-id' + $elm$core$String$fromInt(
-													$elm$core$List$length(draft.ingredients)),
-												label: 'New Ingredientlabel',
-												unit: $author$project$Main$Gram
+										function () {
+											if (maybeIngredientDraft.$ === 'Just') {
+												var ingredient = maybeIngredientDraft.a;
+												return A2($author$project$Main$validateIngredient, ingredient, draft.ingredients) ? _List_fromArray(
+													[ingredient]) : _List_Nil;
+											} else {
+												return _List_Nil;
 											}
-											]))
-								})),
+										}())
+								}),
+							A2(
+								$elm$core$Maybe$andThen,
+								function (i) {
+									return (!A2($author$project$Main$validateIngredient, i, draft.ingredients)) ? $elm$core$Maybe$Just(i) : $elm$core$Maybe$Nothing;
+								},
+								maybeIngredientDraft)),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
-			case 'UpdateIngredientLabel':
-				var id = msg.a;
-				var newLabel = msg.b;
+			case 'EditIngredient':
+				var ing = msg.a;
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
 								draft,
 								{
 									ingredients: A2(
-										$elm$core$List$map,
-										function (ingredient) {
-											return _Utils_eq(ingredient.id, id) ? _Utils_update(
-												ingredient,
-												{label: newLabel}) : ingredient;
+										$elm$core$List$filter,
+										function (i) {
+											return !_Utils_eq(i.id, ing.id);
 										},
 										draft.ingredients)
-								})),
+								}),
+							$elm$core$Maybe$Just(ing)),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'RemoveIngredient':
+				var id = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					var ingredientDraft = model.c;
+					return _Utils_Tuple2(
+						A3(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							_Utils_update(
+								draft,
+								{
+									ingredients: A2(
+										$elm$core$List$filter,
+										function (ingredient) {
+											return !_Utils_eq(ingredient.id, id);
+										},
+										draft.ingredients)
+								}),
+							ingredientDraft),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientId':
+				var newId = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					var maybeIngredientDraft = model.c;
+					return _Utils_Tuple2(
+						A3(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							draft,
+							function () {
+								if (maybeIngredientDraft.$ === 'Just') {
+									var ing = maybeIngredientDraft.a;
+									return $elm$core$Maybe$Just(
+										_Utils_update(
+											ing,
+											{id: newId}));
+								} else {
+									return $elm$core$Maybe$Just(
+										{amount: 0, id: newId, label: '', unit: $author$project$Main$Gram});
+								}
+							}()),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientLabel':
+				var newLabel = msg.a;
+				if (model.$ === 'RecipeCreator') {
+					var recipes = model.a;
+					var draft = model.b;
+					var maybeIngredientDraft = model.c;
+					return _Utils_Tuple2(
+						A3(
+							$author$project$Main$RecipeCreator,
+							recipes,
+							draft,
+							function () {
+								if (maybeIngredientDraft.$ === 'Just') {
+									var ing = maybeIngredientDraft.a;
+									return $elm$core$Maybe$Just(
+										_Utils_update(
+											ing,
+											{label: newLabel}));
+								} else {
+									return $elm$core$Maybe$Just(
+										{amount: 0, id: '', label: newLabel, unit: $author$project$Main$Gram});
+								}
+							}()),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
 				}
 			case 'UpdateIngredientAmount':
-				var id = msg.a;
-				var newAmount = msg.b;
+				var newStrAmount = msg.a;
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
-					var _v18 = $elm$core$String$toFloat(newAmount);
-					if (_v18.$ === 'Just') {
-						var f = _v18.a;
+					var maybeIngredientDraft = model.c;
+					var _v24 = $elm$core$String$toFloat(newStrAmount);
+					if (_v24.$ === 'Just') {
+						var f = _v24.a;
 						return _Utils_Tuple2(
-							A2(
+							A3(
 								$author$project$Main$RecipeCreator,
 								recipes,
-								_Utils_update(
-									draft,
-									{
-										ingredients: A2(
-											$elm$core$List$map,
-											function (ingredient) {
-												return _Utils_eq(ingredient.id, id) ? _Utils_update(
-													ingredient,
-													{amount: f}) : ingredient;
-											},
-											draft.ingredients)
-									})),
+								draft,
+								function () {
+									if (maybeIngredientDraft.$ === 'Just') {
+										var ing = maybeIngredientDraft.a;
+										return $elm$core$Maybe$Just(
+											_Utils_update(
+												ing,
+												{amount: f}));
+									} else {
+										return $elm$core$Maybe$Just(
+											{amount: f, id: '', label: '', unit: $author$project$Main$Gram});
+									}
+								}()),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return noChange;
@@ -6213,8 +6366,9 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
@@ -6226,7 +6380,8 @@ var $author$project$Main$update = F2(
 											[
 												{description: 'New Step Description', time: 42, title: 'New Step Title'}
 											]))
-								})),
+								}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6237,8 +6392,9 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
@@ -6253,7 +6409,8 @@ var $author$project$Main$update = F2(
 													{title: newTitle}) : step;
 											}),
 										draft.steps)
-								})),
+								}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6264,8 +6421,9 @@ var $author$project$Main$update = F2(
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
+					var ingredientDraft = model.c;
 					return _Utils_Tuple2(
-						A2(
+						A3(
 							$author$project$Main$RecipeCreator,
 							recipes,
 							_Utils_update(
@@ -6280,7 +6438,8 @@ var $author$project$Main$update = F2(
 													{description: newDescription}) : step;
 											}),
 										draft.steps)
-								})),
+								}),
+							ingredientDraft),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6304,27 +6463,6 @@ var $author$project$Main$update = F2(
 	});
 var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $author$project$Main$RecipeCreatorPage = {$: 'RecipeCreatorPage'};
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6370,17 +6508,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -6416,7 +6543,6 @@ var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id'
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $elm$core$Basics$not = _Basics_not;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6863,7 +6989,9 @@ var $author$project$Main$prepStepsViewActions = F2(
 				]));
 	});
 var $author$project$Main$GoRecipeCreator = {$: 'GoRecipeCreator'};
-var $author$project$Main$plusIcon = A2($author$project$Main$genericIcon, 'plus.svg', 64);
+var $author$project$Main$plusIcon = function (width) {
+	return A2($author$project$Main$genericIcon, 'plus.svg', width);
+};
 var $author$project$Main$GoRecipeViewer = function (a) {
 	return {$: 'GoRecipeViewer', a: a};
 };
@@ -7033,7 +7161,9 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 															$elm$html$Html$Events$onClick($author$project$Main$GoRecipeCreator)
 														]),
 													_List_fromArray(
-														[$author$project$Main$plusIcon]))
+														[
+															$author$project$Main$plusIcon(64)
+														]))
 												]))
 										])))
 							]))
@@ -7067,6 +7197,12 @@ var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 };
 var $author$project$Main$AddIngredient = {$: 'AddIngredient'};
 var $author$project$Main$AddStep = {$: 'AddStep'};
+var $author$project$Main$EditIngredient = function (a) {
+	return {$: 'EditIngredient', a: a};
+};
+var $author$project$Main$RemoveIngredient = function (a) {
+	return {$: 'RemoveIngredient', a: a};
+};
 var $author$project$Main$UpdateDescription = function (a) {
 	return {$: 'UpdateDescription', a: a};
 };
@@ -7076,22 +7212,91 @@ var $author$project$Main$UpdateImagePath = function (a) {
 var $author$project$Main$UpdateLabel = function (a) {
 	return {$: 'UpdateLabel', a: a};
 };
-var $author$project$Main$UpdateIngredientAmount = F2(
-	function (a, b) {
-		return {$: 'UpdateIngredientAmount', a: a, b: b};
-	});
-var $author$project$Main$UpdateIngredientLabel = F2(
-	function (a, b) {
-		return {$: 'UpdateIngredientLabel', a: a, b: b};
-	});
+var $author$project$Main$UpdateIngredientAmount = function (a) {
+	return {$: 'UpdateIngredientAmount', a: a};
+};
+var $author$project$Main$UpdateIngredientId = function (a) {
+	return {$: 'UpdateIngredientId', a: a};
+};
+var $author$project$Main$UpdateIngredientLabel = function (a) {
+	return {$: 'UpdateIngredientLabel', a: a};
+};
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$addIngredientView = function (ingredient) {
+var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
+	var maybeMapper = F3(
+		function (m, f, d) {
+			return A2(
+				$elm$core$Maybe$withDefault,
+				d,
+				A2($elm$core$Maybe$map, f, m));
+		});
+	var emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
+	var idValue = A3(
+		maybeMapper,
+		maybeIngredient,
+		function (ing) {
+			return $elm$html$Html$Attributes$value(ing.id);
+		},
+		emptyStyle);
+	var labelValue = A3(
+		maybeMapper,
+		maybeIngredient,
+		function (ing) {
+			return $elm$html$Html$Attributes$value(ing.label);
+		},
+		emptyStyle);
+	var colDiv = F3(
+		function (l, v, message) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-md-4')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('form-floating')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('form-control'),
+										$elm$html$Html$Events$onInput(message),
+										v
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(l)
+									]))
+							]))
+					]));
+		});
+	var amountValue = A3(
+		maybeMapper,
+		maybeIngredient,
+		function (ing) {
+			return $elm$html$Html$Attributes$value(
+				$elm$core$String$fromFloat(ing.amount));
+		},
+		emptyStyle);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('row g-2 mb-2')
+				$elm$html$Html$Attributes$class('p-3 mb-3 position-relative border rounded')
 			]),
 		_List_fromArray(
 			[
@@ -7099,42 +7304,13 @@ var $author$project$Main$addIngredientView = function (ingredient) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('col-6')
+						$elm$html$Html$Attributes$class('row g-2')
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-control'),
-								$elm$html$Html$Attributes$placeholder('Ingredient'),
-								$elm$html$Html$Attributes$value(ingredient.label),
-								$elm$html$Html$Events$onInput(
-								$author$project$Main$UpdateIngredientLabel(ingredient.id))
-							]),
-						_List_Nil)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('col-3')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-control'),
-								$elm$html$Html$Attributes$placeholder('Amount'),
-								$elm$html$Html$Attributes$value(
-								$elm$core$String$fromFloat(ingredient.amount)),
-								$elm$html$Html$Events$onInput(
-								$author$project$Main$UpdateIngredientAmount(ingredient.id))
-							]),
-						_List_Nil)
+						A3(colDiv, 'Id', idValue, $author$project$Main$UpdateIngredientId),
+						A3(colDiv, 'Label', labelValue, $author$project$Main$UpdateIngredientLabel),
+						A3(colDiv, 'Amount', amountValue, $author$project$Main$UpdateIngredientAmount)
 					]))
 			]));
 };
@@ -7197,168 +7373,215 @@ var $author$project$Main$addStepRow = F2(
 						]))
 				]));
 	});
+var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
 var $author$project$Main$getPathStr = function (p) {
 	var str = p.a;
 	return str;
 };
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
-var $elm$html$Html$label = _VirtualDom_node('label');
-var $author$project$Main$recipeCreatorView = function (draft) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('container my-4 flex-grow-1'),
-				A2($elm$html$Html$Attributes$style, 'max-width', '700px')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Create recipe')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-3')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Name')
-							])),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-control'),
-								$elm$html$Html$Attributes$value(draft.label),
-								$elm$html$Html$Events$onInput($author$project$Main$UpdateLabel)
-							]),
-						_List_Nil)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-3')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Description')
-							])),
-						A2(
-						$elm$html$Html$textarea,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-control'),
-								$elm$html$Html$Attributes$rows(3),
-								$elm$html$Html$Attributes$value(draft.description),
-								$elm$html$Html$Events$onInput($author$project$Main$UpdateDescription)
-							]),
-						_List_Nil)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-4')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$label,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Image path')
-							])),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('form-control'),
-								$elm$html$Html$Attributes$value(
-								$author$project$Main$getPathStr(draft.image)),
-								$elm$html$Html$Events$onInput($author$project$Main$UpdateImagePath)
-							]),
-						_List_Nil)
-					])),
-				A2(
-				$elm$html$Html$h4,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Ingredients')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				A2($elm$core$List$map, $author$project$Main$addIngredientView, draft.ingredients)),
-				A2(
+var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $author$project$Main$recipeCreatorView = F2(
+	function (draft, maybeIngredientToEdit) {
+		var addButton = function (msg) {
+			return A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm mt-2'),
-						$elm$html$Html$Events$onClick($author$project$Main$AddIngredient)
+						$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm w-100 d-flex justify-content-center align-items-center mt-3'),
+						$elm$html$Html$Events$onClick(msg)
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('+ Add ingredient')
-					])),
-				A2(
-				$elm$html$Html$h4,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mt-4')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Steps')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				A2($elm$core$List$indexedMap, $author$project$Main$addStepRow, draft.steps)),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm mt-2'),
-						$elm$html$Html$Events$onClick($author$project$Main$AddStep)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('+ Add step')
-					]))
-			]));
-};
+						$author$project$Main$plusIcon(16)
+					]));
+		};
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('container my-4 flex-grow-1'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h2,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Create recipe')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mb-3')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-label')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Name')
+								])),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$value(draft.label),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateLabel)
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mb-3')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-label')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Description')
+								])),
+							A2(
+							$elm$html$Html$textarea,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$rows(3),
+									$elm$html$Html$Attributes$value(draft.description),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateDescription)
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mb-4')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-label')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Image path')
+								])),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('form-control'),
+									$elm$html$Html$Attributes$value(
+									$author$project$Main$getPathStr(draft.image)),
+									$elm$html$Html$Events$onInput($author$project$Main$UpdateImagePath)
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$h4,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mt-4')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Ingredients')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_Utils_ap(
+						A2(
+							$elm$core$List$map,
+							function (ing) {
+								return A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$div,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(ing.id)
+												])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn btn-sm btn-warn'),
+													$elm$html$Html$Attributes$title('Edit ingredient'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$EditIngredient(ing))
+												]),
+											_List_fromArray(
+												[$author$project$Main$pencilIcon])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn btn-sm btn-danger'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$RemoveIngredient(ing.id)),
+													$elm$html$Html$Attributes$title('Remove ingredient')
+												]),
+											_List_fromArray(
+												[$author$project$Main$closeIcon]))
+										]));
+							},
+							draft.ingredients),
+						_List_fromArray(
+							[
+								$author$project$Main$addOrEditIngredientView(maybeIngredientToEdit),
+								addButton($author$project$Main$AddIngredient)
+							]))),
+					A2(
+					$elm$html$Html$h4,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mt-4')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Steps')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_Utils_ap(
+						A2($elm$core$List$indexedMap, $author$project$Main$addStepRow, draft.steps),
+						_List_fromArray(
+							[
+								addButton($author$project$Main$AddStep)
+							])))
+				]));
+	});
 var $author$project$Main$RecipeStepsPage = {$: 'RecipeStepsPage'};
 var $author$project$Main$SelectPage = function (a) {
 	return {$: 'SelectPage', a: a};
@@ -7373,8 +7596,6 @@ var $author$project$Main$SelectIngredient = function (a) {
 };
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
 var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'check.svg', 16);
-var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
-var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
@@ -7828,15 +8049,6 @@ var $elm$core$List$all = F2(
 			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
 			list);
 	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
 var $author$project$Main$uniqueStrings = function (list) {
 	return _Utils_eq(
 		$elm$core$List$length(list),
@@ -8022,10 +8234,11 @@ var $author$project$Main$view = function (model) {
 				}());
 		default:
 			var recipeDraft = model.b;
+			var maybeIngredientDraft = model.c;
 			return A3(
 				$author$project$Main$contentView,
 				$author$project$Main$RecipeCreatorPage,
-				$author$project$Main$recipeCreatorView(recipeDraft),
+				A2($author$project$Main$recipeCreatorView, recipeDraft, maybeIngredientDraft),
 				$elm$core$Maybe$Just(
 					$author$project$Main$recipeCreatorActions(
 						$author$project$Main$validateRecipe(recipeDraft))));
