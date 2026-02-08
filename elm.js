@@ -6663,6 +6663,7 @@ var $author$project$Pizza$Model$Types$unitToAbbr = function (unit) {
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$ingredientView = F3(
 	function (maybeSelectedIngredient, maybeNewAmount, ingredient) {
+		var placeholder = $author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit));
 		var isSelected = A2(
 			$elm$core$Maybe$withDefault,
 			false,
@@ -6733,8 +6734,7 @@ var $author$project$Main$ingredientView = F3(
 											_Utils_Tuple2('form-control', true),
 											_Utils_Tuple2('is-invalid', isSelected && (!isNewAmountValid))
 										])),
-									$elm$html$Html$Attributes$placeholder(
-									$author$project$Helper$round2ToString(ingredient.amount) + (' ' + $author$project$Pizza$Model$Types$unitToAbbr(ingredient.unit))),
+									$elm$html$Html$Attributes$placeholder(placeholder),
 									$elm$html$Html$Attributes$disabled(!isSelected),
 									isSelected ? A2($elm$html$Html$Attributes$style, '', '') : $elm$html$Html$Attributes$value(''),
 									$elm$html$Html$Events$onInput($author$project$Main$InputNewAmount)
@@ -6874,6 +6874,11 @@ var $author$project$Main$replaceIngredientAmountFraction = F2(
 	});
 var $author$project$Main$prepStepView = F4(
 	function (indexToDisplay, ingredients, index, prepStep) {
+		var visibility = _Utils_eq(indexToDisplay, index) ? 'visible' : 'hidden';
+		var title = $elm$core$String$fromInt(index + 1) + ('. ' + prepStep.title);
+		var time = _Utils_eq(prepStep.time, -1) ? '∞' : ((!prepStep.time) ? '' : ($elm$core$String$fromInt(prepStep.time) + ' mins'));
+		var opacity = _Utils_eq(indexToDisplay, index) ? '1' : '0';
+		var description = A2($author$project$Main$replaceIngredientAmountFraction, ingredients, prepStep.description);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6881,12 +6886,9 @@ var $author$project$Main$prepStepView = F4(
 					A2($elm$html$Html$Attributes$style, 'grid-row', '1'),
 					A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'visibility',
-					_Utils_eq(indexToDisplay, index) ? 'visible' : 'hidden'),
 					A2($elm$html$Html$Attributes$style, 'transition', 'opacity 1000ms ease'),
-					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'opacity', '1') : A2($elm$html$Html$Attributes$style, 'opacity', '0')
+					A2($elm$html$Html$Attributes$style, 'visibility', visibility),
+					A2($elm$html$Html$Attributes$style, 'opacity', opacity)
 				]),
 			_List_fromArray(
 				[
@@ -6895,24 +6897,21 @@ var $author$project$Main$prepStepView = F4(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(
-							$elm$core$String$fromInt(index + 1) + ('. ' + prepStep.title))
+							$elm$html$Html$text(title)
 						])),
 					A2(
 					$elm$html$Html$div,
 					_List_Nil,
 					_List_fromArray(
 						[
-							_Utils_eq(prepStep.time, -1) ? $elm$html$Html$text('∞') : ((!prepStep.time) ? $elm$html$Html$text('') : $elm$html$Html$text(
-							$elm$core$String$fromInt(prepStep.time) + ' mins'))
+							$elm$html$Html$text(time)
 						])),
 					A2(
 					$elm$html$Html$div,
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(
-							A2($author$project$Main$replaceIngredientAmountFraction, ingredients, prepStep.description))
+							$elm$html$Html$text(description)
 						]))
 				]));
 	});

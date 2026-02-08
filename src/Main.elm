@@ -5,13 +5,14 @@ import Browser.Dom exposing (Error(..))
 import Browser.Events
 import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, img, input, label, span, text)
-import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, placeholder, src, style, type_)
+import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
 import Pizza.Model.Types exposing (..)
 import Regex
 import String
+import Svg.Attributes exposing (visibility)
 import Task
 
 
@@ -560,7 +561,7 @@ navbarView activeTab =
                             , ( "disabled", not isRecipeAlbumActive )
                             ]
                         , type_ "search"
-                        , placeholder "Search"
+                        , Html.Attributes.placeholder "Search"
                         , attribute "aria-label" "Search"
                         , disabled (not isRecipeAlbumActive)
                         , onInput InputSearchTerm
@@ -771,16 +772,24 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                 , style "padding" "0 0.75rem"
                 , onClick onClickMessage
                 ]
-                [ icon ]
+                [ icon
+                ]
+
+        placeholder =
+            round2ToString ingredient.amount
+                ++ " "
+                ++ unitToAbbr ingredient.unit
     in
     div
         [ class "mb-3"
         ]
         [ label
             []
-            [ text ingredient.label ]
+            [ text ingredient.label
+            ]
         , div
-            [ class "input-group" ]
+            [ class "input-group"
+            ]
             [ input
                 [ Html.Attributes.id ingredient.id
                 , type_ "number"
@@ -789,11 +798,7 @@ ingredientView maybeSelectedIngredient maybeNewAmount ingredient =
                     [ ( "form-control", True )
                     , ( "is-invalid", isSelected && not isNewAmountValid )
                     ]
-                , placeholder
-                    (round2ToString ingredient.amount
-                        ++ " "
-                        ++ unitToAbbr ingredient.unit
-                    )
+                , Html.Attributes.placeholder placeholder
                 , disabled (not isSelected)
                 , if isSelected then
                     style "" ""
@@ -842,7 +847,8 @@ prepStepsView indexToDisplay ingredients prepSteps =
 
     else
         div
-            [ style "display" "grid" ]
+            [ style "display" "grid"
+            ]
             [ div
                 [ style "display" "grid"
                 ]
@@ -874,45 +880,57 @@ prepStepsView indexToDisplay ingredients prepSteps =
 
 prepStepView : Int -> List Ingredient -> Int -> PrepStep -> Html Msg
 prepStepView indexToDisplay ingredients index prepStep =
+    let
+        visibility =
+            if indexToDisplay == index then
+                "visible"
+
+            else
+                "hidden"
+
+        opacity =
+            if indexToDisplay == index then
+                "1"
+
+            else
+                "0"
+
+        title =
+            String.fromInt (index + 1) ++ ". " ++ prepStep.title
+
+        time =
+            if prepStep.time == -1 then
+                "∞"
+
+            else if prepStep.time == 0 then
+                ""
+
+            else
+                String.fromInt prepStep.time ++ " mins"
+
+        description =
+            replaceIngredientAmountFraction
+                ingredients
+                prepStep.description
+    in
     div
         [ style "grid-row" "1"
         , style "grid-column" "1"
         , style "margin-top" "1rem"
-        , style
-            "visibility"
-            (if indexToDisplay == index then
-                "visible"
-
-             else
-                "hidden"
-            )
         , style "transition" "opacity 1000ms ease"
-        , if indexToDisplay == index then
-            style "opacity" "1"
-
-          else
-            style "opacity" "0"
+        , style "visibility" visibility
+        , style "opacity" opacity
         ]
         [ Html.h3
             []
-            [ text (String.fromInt (index + 1) ++ ". " ++ prepStep.title) ]
-        , div []
-            [ if prepStep.time == -1 then
-                text "∞"
-
-              else if prepStep.time == 0 then
-                text ""
-
-              else
-                text (String.fromInt prepStep.time ++ " mins")
+            [ text title ]
+        , div
+            []
+            [ text time
             ]
         , div
             []
-            [ text
-                (replaceIngredientAmountFraction
-                    ingredients
-                    prepStep.description
-                )
+            [ text description
             ]
         ]
 
