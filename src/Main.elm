@@ -310,7 +310,7 @@ view model =
                 )
 
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ->
-            recipeCalculatorView
+            recipeView
                 recipe
                 selectedIngredient
                 maybeNewAmount
@@ -640,8 +640,8 @@ recipeAlbumCardView recipe =
         ]
 
 
-recipeCalculatorView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
-recipeCalculatorView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
+recipeView : Recipe -> Maybe Ingredient -> Maybe Float -> Int -> Html Msg
+recipeView recipe selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex =
     let
         tabListItem : String -> String -> String -> Bool -> Html msg
         tabListItem buttonId contentId label isActive =

@@ -6968,7 +6968,7 @@ var $author$project$Main$prepStepsView = F3(
 						]))
 				]));
 	});
-var $author$project$Main$recipeCalculatorView = F4(
+var $author$project$Main$recipeView = F4(
 	function (recipe, selectedIngredient, maybeNewAmount, currentDisplayedPrepStepIndex) {
 		var tabListItem = F4(
 			function (buttonId, contentId, label, isActive) {
@@ -7215,7 +7215,7 @@ var $author$project$Main$view = function (model) {
 			var selectedIngredient = model.b;
 			var prepStepIndex = model.c;
 			var maybeNewAmount = model.d;
-			return A4($author$project$Main$recipeCalculatorView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
+			return A4($author$project$Main$recipeView, recipe, selectedIngredient, maybeNewAmount, prepStepIndex);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
