@@ -7076,12 +7076,6 @@ var $author$project$Main$UpdateImagePath = function (a) {
 var $author$project$Main$UpdateLabel = function (a) {
 	return {$: 'UpdateLabel', a: a};
 };
-var $author$project$Main$getPathStr = function (p) {
-	var str = p.a;
-	return str;
-};
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $author$project$Main$UpdateIngredientAmount = F2(
 	function (a, b) {
 		return {$: 'UpdateIngredientAmount', a: a, b: b};
@@ -7092,7 +7086,7 @@ var $author$project$Main$UpdateIngredientLabel = F2(
 	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$ingredientRow = function (ingredient) {
+var $author$project$Main$addIngredientView = function (ingredient) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7144,13 +7138,6 @@ var $author$project$Main$ingredientRow = function (ingredient) {
 					]))
 			]));
 };
-var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$html$Html$Attributes$rows = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'rows',
-		$elm$core$String$fromInt(n));
-};
 var $author$project$Main$UpdateStepDescription = F2(
 	function (a, b) {
 		return {$: 'UpdateStepDescription', a: a, b: b};
@@ -7159,8 +7146,14 @@ var $author$project$Main$UpdateStepTitle = F2(
 	function (a, b) {
 		return {$: 'UpdateStepTitle', a: a, b: b};
 	});
+var $elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $author$project$Main$stepRow = F2(
+var $author$project$Main$addStepRow = F2(
 	function (index, step) {
 		return A2(
 			$elm$html$Html$div,
@@ -7204,6 +7197,13 @@ var $author$project$Main$stepRow = F2(
 						]))
 				]));
 	});
+var $author$project$Main$getPathStr = function (p) {
+	var str = p.a;
+	return str;
+};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $author$project$Main$recipeCreatorView = function (draft) {
 	return A2(
 		$elm$html$Html$div,
@@ -7320,7 +7320,7 @@ var $author$project$Main$recipeCreatorView = function (draft) {
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,
-				A2($elm$core$List$map, $author$project$Main$ingredientRow, draft.ingredients)),
+				A2($elm$core$List$map, $author$project$Main$addIngredientView, draft.ingredients)),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
@@ -7345,7 +7345,7 @@ var $author$project$Main$recipeCreatorView = function (draft) {
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,
-				A2($elm$core$List$indexedMap, $author$project$Main$stepRow, draft.steps)),
+				A2($elm$core$List$indexedMap, $author$project$Main$addStepRow, draft.steps)),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(

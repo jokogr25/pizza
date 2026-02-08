@@ -1458,7 +1458,7 @@ recipeCreatorView draft =
             ]
         , div
             []
-            (List.map ingredientRow draft.ingredients)
+            (List.map addIngredientView draft.ingredients)
         , button
             [ class "btn btn-outline-secondary btn-sm mt-2"
             , onClick AddIngredient
@@ -1471,7 +1471,7 @@ recipeCreatorView draft =
             [ text "Steps" ]
         , div
             []
-            (List.indexedMap stepRow draft.steps)
+            (List.indexedMap addStepRow draft.steps)
         , button
             [ class "btn btn-outline-secondary btn-sm mt-2"
             , onClick AddStep
@@ -1497,8 +1497,8 @@ recipeCreatorActions isRecipeValid =
         ]
 
 
-ingredientRow : Ingredient -> Html Msg
-ingredientRow ingredient =
+addIngredientView : Ingredient -> Html Msg
+addIngredientView ingredient =
     div
         [ class "row g-2 mb-2"
         ]
@@ -1527,8 +1527,8 @@ ingredientRow ingredient =
         ]
 
 
-stepRow : Int -> PrepStep -> Html Msg
-stepRow index step =
+addStepRow : Int -> PrepStep -> Html Msg
+addStepRow index step =
     div
         [ class "card mb-2"
         ]
