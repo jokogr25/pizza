@@ -878,11 +878,14 @@ prepStepView indexToDisplay ingredients index prepStep =
         [ style "grid-row" "1"
         , style "grid-column" "1"
         , style "margin-top" "1rem"
-        , if indexToDisplay == index then
-            style "visibility" "visible"
+        , style
+            "visibility"
+            (if indexToDisplay == index then
+                "visible"
 
-          else
-            style "visibility" "hidden"
+             else
+                "hidden"
+            )
         , style "transition" "opacity 1000ms ease"
         , if indexToDisplay == index then
             style "opacity" "1"

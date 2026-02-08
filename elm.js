@@ -6881,7 +6881,10 @@ var $author$project$Main$prepStepView = F4(
 					A2($elm$html$Html$Attributes$style, 'grid-row', '1'),
 					A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
 					A2($elm$html$Html$Attributes$style, 'margin-top', '1rem'),
-					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'visibility', 'visible') : A2($elm$html$Html$Attributes$style, 'visibility', 'hidden'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'visibility',
+					_Utils_eq(indexToDisplay, index) ? 'visible' : 'hidden'),
 					A2($elm$html$Html$Attributes$style, 'transition', 'opacity 1000ms ease'),
 					_Utils_eq(indexToDisplay, index) ? A2($elm$html$Html$Attributes$style, 'opacity', '1') : A2($elm$html$Html$Attributes$style, 'opacity', '0')
 				]),
