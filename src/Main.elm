@@ -406,7 +406,7 @@ view model =
                             recipes
                     )
                 )
-                (text "")
+                Nothing
 
         RecipeCalculator recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
             contentView
@@ -421,24 +421,28 @@ view model =
                 )
                 (case page of
                     RecipeIngredientsPage ->
-                        ingredientsViewActions ratio
+                        Just (ingredientsViewActions ratio)
 
                     RecipeStepsPage ->
-                        prepStepsViewActions
-                            prepStepIndex
-                            (List.length recipe.steps)
+                        Just
+                            (prepStepsViewActions
+                                prepStepIndex
+                                (List.length recipe.steps)
+                            )
 
                     _ ->
-                        text ""
+                        Nothing
                 )
 
         RecipeCreator recipes ->
             contentView
                 RecipeCreatorPage
                 recipeCreatorView
-                (text
-                    ("Existing recipes: "
-                        ++ String.fromInt (List.length recipes)
+                (Just
+                    (text
+                        ("Existing recipes: "
+                            ++ String.fromInt (List.length recipes)
+                        )
                     )
                 )
 
@@ -549,33 +553,16 @@ type ActivePage
     | RecipeCreatorPage
 
 
-contentView : ActivePage -> Html Msg -> Html Msg -> Html Msg
-contentView activePage content actions =
-    let
-        hasActions =
-            case activePage of
-                RecipeAlbumPage ->
-                    False
-
-                RecipeIngredientsPage ->
-                    True
-
-                RecipeStepsPage ->
-                    True
-
-                RecipeCreatorPage ->
-                    True
-    in
+contentView : ActivePage -> Html Msg -> Maybe (Html Msg) -> Html Msg
+contentView activePage content maybeActions =
     div
         [ class "d-flex flex-column vh-100"
         ]
         [ navbarView activePage
         , content
-        , if hasActions then
-            footerView actions
-
-          else
-            text ""
+        , maybeActions
+            |> Maybe.map (\m -> footerView m)
+            |> Maybe.withDefault (text "")
         ]
 
 

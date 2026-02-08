@@ -6109,6 +6109,16 @@ var $author$project$Main$footerView = function (actions) {
 		_List_fromArray(
 			[actions]));
 };
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $author$project$Main$GoFront = {$: 'GoFront'};
 var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
 var $author$project$Main$InputSearchTerm = function (a) {
@@ -6491,19 +6501,7 @@ var $author$project$Main$navbarView = function (activePage) {
 			]));
 };
 var $author$project$Main$contentView = F3(
-	function (activePage, content, actions) {
-		var hasActions = function () {
-			switch (activePage.$) {
-				case 'RecipeAlbumPage':
-					return false;
-				case 'RecipeIngredientsPage':
-					return true;
-				case 'RecipeStepsPage':
-					return true;
-				default:
-					return true;
-			}
-		}();
+	function (activePage, content, maybeActions) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6514,7 +6512,15 @@ var $author$project$Main$contentView = F3(
 				[
 					$author$project$Main$navbarView(activePage),
 					content,
-					hasActions ? $author$project$Main$footerView(actions) : $elm$html$Html$text('')
+					A2(
+					$elm$core$Maybe$withDefault,
+					$elm$html$Html$text(''),
+					A2(
+						$elm$core$Maybe$map,
+						function (m) {
+							return $author$project$Main$footerView(m);
+						},
+						maybeActions))
 				]));
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
@@ -6812,16 +6818,6 @@ var $author$project$Main$SelectIngredient = function (a) {
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
 var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'check.svg', 16);
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
@@ -7391,7 +7387,7 @@ var $author$project$Main$view = function (model) {
 							return recipes;
 						}
 					}()),
-				$elm$html$Html$text(''));
+				$elm$core$Maybe$Nothing);
 		case 'RecipeCalculator':
 			var recipe = model.a;
 			var selectedIngredient = model.b;
@@ -7406,14 +7402,16 @@ var $author$project$Main$view = function (model) {
 				function () {
 					switch (page.$) {
 						case 'RecipeIngredientsPage':
-							return $author$project$Main$ingredientsViewActions(ratio);
+							return $elm$core$Maybe$Just(
+								$author$project$Main$ingredientsViewActions(ratio));
 						case 'RecipeStepsPage':
-							return A2(
-								$author$project$Main$prepStepsViewActions,
-								prepStepIndex,
-								$elm$core$List$length(recipe.steps));
+							return $elm$core$Maybe$Just(
+								A2(
+									$author$project$Main$prepStepsViewActions,
+									prepStepIndex,
+									$elm$core$List$length(recipe.steps)));
 						default:
-							return $elm$html$Html$text('');
+							return $elm$core$Maybe$Nothing;
 					}
 				}());
 		default:
@@ -7422,9 +7420,10 @@ var $author$project$Main$view = function (model) {
 				$author$project$Main$contentView,
 				$author$project$Main$RecipeCreatorPage,
 				$author$project$Main$recipeCreatorView,
-				$elm$html$Html$text(
-					'Existing recipes: ' + $elm$core$String$fromInt(
-						$elm$core$List$length(recipes))));
+				$elm$core$Maybe$Just(
+					$elm$html$Html$text(
+						'Existing recipes: ' + $elm$core$String$fromInt(
+							$elm$core$List$length(recipes)))));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
