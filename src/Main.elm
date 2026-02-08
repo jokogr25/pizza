@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom exposing (Error(..))
 import Browser.Events
 import Helper exposing (round2ToString, safeRegexOf)
-import Html exposing (Html, a, button, div, img, input, label, p, span, text)
+import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
@@ -1120,21 +1120,6 @@ type alias Ingredient =
     , label : String
     , amount : Float
     , unit : Unit
-    }
-
-
-recipeApplyRatio : Float -> Recipe -> Recipe
-recipeApplyRatio ratio recipe =
-    { recipe
-        | ingredients =
-            List.map (ingredientApplyRatio ratio) recipe.ingredients
-    }
-
-
-ingredientApplyRatio : Float -> Ingredient -> Ingredient
-ingredientApplyRatio ratio ingredient =
-    { ingredient
-        | amount = ingredient.amount * ratio
     }
 
 
