@@ -441,7 +441,7 @@ navbarView activeTab =
         hasHistory =
             False
 
-        navListItem : Bool -> String -> Maybe Msg -> Html Msg
+        navListItem : Bool -> String -> msg -> Html msg
         navListItem isActive label message =
             Html.li
                 [ class "nav-item" ]
@@ -456,9 +456,7 @@ navbarView activeTab =
                       else
                         style "" ""
                     , Html.Attributes.href "#"
-                    , message
-                        |> Maybe.map (\msg -> onClick msg)
-                        |> Maybe.withDefault (Html.Attributes.style "" "")
+                    , onClick message
                     ]
                     [ text label ]
                 ]
@@ -497,11 +495,11 @@ navbarView activeTab =
                     [ navListItem
                         isRecipeAlbumActive
                         "Recipes"
-                        (Just GoRecipeAlbum)
+                        GoRecipeAlbum
                     , navListItem
                         isRecipeCalculatorActive
                         "Calculatore"
-                        Nothing
+                        NoOp
                     , Html.li
                         [ class "nav-item dropdown"
                         ]

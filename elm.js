@@ -6181,16 +6181,6 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -6251,15 +6241,7 @@ var $author$project$Main$navbarView = function (activeTab) {
 									])),
 								isActive ? A2($elm$html$Html$Attributes$attribute, 'aria-current', 'page') : A2($elm$html$Html$Attributes$style, '', ''),
 								$elm$html$Html$Attributes$href('#'),
-								A2(
-								$elm$core$Maybe$withDefault,
-								A2($elm$html$Html$Attributes$style, '', ''),
-								A2(
-									$elm$core$Maybe$map,
-									function (msg) {
-										return $elm$html$Html$Events$onClick(msg);
-									},
-									message))
+								$elm$html$Html$Events$onClick(message)
 							]),
 						_List_fromArray(
 							[
@@ -6348,12 +6330,8 @@ var $author$project$Main$navbarView = function (activeTab) {
 									]),
 								_List_fromArray(
 									[
-										A3(
-										navListItem,
-										isRecipeAlbumActive,
-										'Recipes',
-										$elm$core$Maybe$Just($author$project$Main$GoRecipeAlbum)),
-										A3(navListItem, isRecipeCalculatorActive, 'Calculatore', $elm$core$Maybe$Nothing),
+										A3(navListItem, isRecipeAlbumActive, 'Recipes', $author$project$Main$GoRecipeAlbum),
+										A3(navListItem, isRecipeCalculatorActive, 'Calculatore', $author$project$Main$NoOp),
 										A2(
 										$elm$html$Html$li,
 										_List_fromArray(
@@ -6655,6 +6633,16 @@ var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'publi
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'public/img/icon/close.svg', 16);
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'public/img/icon/pencil.svg', 16);
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
