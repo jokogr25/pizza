@@ -138,6 +138,7 @@ type Unit
     | Teaspoon
 
 
+allUnits : List Unit
 allUnits =
     [ Gram
     , Mililiter
