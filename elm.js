@@ -5737,9 +5737,6 @@ var $author$project$Main$subscriptions = function (model) {
 				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder))
 			]));
 };
-var $author$project$Main$Album = function (a) {
-	return {$: 'Album', a: a};
-};
 var $author$project$Page$Recipe$Album$Album = F2(
 	function (a, b) {
 		return {$: 'Album', a: a, b: b};
@@ -5749,6 +5746,9 @@ var $author$project$Domain$Recipe$Gram = {$: 'Gram'};
 var $author$project$Page$Recipe$Album$NoOp = {$: 'NoOp'};
 var $author$project$Domain$Recipe$Path = function (a) {
 	return {$: 'Path', a: a};
+};
+var $author$project$Main$RecipeAlbum = function (a) {
+	return {$: 'RecipeAlbum', a: a};
 };
 var $author$project$Main$RecipeCreator = F4(
 	function (a, b, c, d) {
@@ -5964,7 +5964,7 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeViewer':
 				var recipe = msg.a;
 				var page = msg.b;
-				if (model.$ === 'Album') {
+				if (model.$ === 'RecipeAlbum') {
 					var _v2 = model.a;
 					var recipes = _v2.a;
 					return _Utils_Tuple2(
@@ -5977,7 +5977,7 @@ var $author$project$Main$update = F2(
 				switch (model.$) {
 					case 'Front':
 						return _Utils_Tuple2(
-							$author$project$Main$Album(
+							$author$project$Main$RecipeAlbum(
 								A2(
 									$author$project$Page$Recipe$Album$Album,
 									_List_fromArray(
@@ -5987,7 +5987,7 @@ var $author$project$Main$update = F2(
 					case 'RecipeCreator':
 						var recipes = model.a;
 						return _Utils_Tuple2(
-							$author$project$Main$Album(
+							$author$project$Main$RecipeAlbum(
 								A2(
 									$author$project$Page$Recipe$Album$update,
 									$author$project$Page$Recipe$Album$NoOp,
@@ -5996,7 +5996,7 @@ var $author$project$Main$update = F2(
 					case 'RecipeViewer':
 						var recipes = model.a;
 						return _Utils_Tuple2(
-							$author$project$Main$Album(
+							$author$project$Main$RecipeAlbum(
 								A2(
 									$author$project$Page$Recipe$Album$update,
 									$author$project$Page$Recipe$Album$NoOp,
@@ -6006,7 +6006,7 @@ var $author$project$Main$update = F2(
 						return noChange;
 				}
 			case 'GoRecipeCreator':
-				if ((model.$ === 'Album') && (model.a.b.$ === 'Nothing')) {
+				if ((model.$ === 'RecipeAlbum') && (model.a.b.$ === 'Nothing')) {
 					var _v5 = model.a;
 					var recipes = _v5.a;
 					var _v6 = _v5.b;
@@ -6114,11 +6114,11 @@ var $author$project$Main$update = F2(
 				}
 			case 'InputSearchTerm':
 				var searchTerm = msg.a;
-				if (model.$ === 'Album') {
+				if (model.$ === 'RecipeAlbum') {
 					var _v13 = model.a;
 					var recipes = _v13.a;
 					return _Utils_Tuple2(
-						$author$project$Main$Album(
+						$author$project$Main$RecipeAlbum(
 							A2(
 								$author$project$Page$Recipe$Album$Album,
 								recipes,
@@ -6674,7 +6674,7 @@ var $author$project$Main$update = F2(
 					var recipes = model.a;
 					var draft = model.b;
 					return _Utils_Tuple2(
-						$author$project$Main$Album(
+						$author$project$Main$RecipeAlbum(
 							A2(
 								$author$project$Page$Recipe$Album$update,
 								$author$project$Page$Recipe$Album$NoOp,
@@ -6711,10 +6711,10 @@ var $author$project$Main$update = F2(
 							A7($author$project$Main$RecipeViewer, _List_Nil, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
 							$elm$core$Platform$Cmd$none);
 					default:
-						if (model.$ === 'Album') {
+						if (model.$ === 'RecipeAlbum') {
 							var m = model.a;
 							return _Utils_Tuple2(
-								$author$project$Main$Album(
+								$author$project$Main$RecipeAlbum(
 									A2($author$project$Page$Recipe$Album$update, albumMsg, m)),
 								$elm$core$Platform$Cmd$none);
 						} else {
