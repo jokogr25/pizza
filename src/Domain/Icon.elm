@@ -1,19 +1,24 @@
 module Domain.Icon exposing (..)
 
-import Html exposing (Html, i, s)
+import Html exposing (Html, s)
 import Html.Attributes
 import Svg exposing (..)
-import Svg.Attributes exposing (d, fill, height, stroke, strokeLinecap, strokeLinejoin, viewBox, width)
+import Svg.Attributes exposing (width)
 
 
 editIcon : Int -> Html msg
 editIcon size =
-    genericIcon "edit.svg" size
+    genericIcon "pen.svg" size
 
 
 checkIcon : Int -> Html msg
 checkIcon s =
     genericIcon "check.svg" s
+
+
+menuIcon : Int -> Html msg
+menuIcon s =
+    genericIcon "menu.svg" s
 
 
 

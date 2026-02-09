@@ -1199,14 +1199,13 @@ navbarView activePage =
                 [ class "navbar-brand"
                 , onClick GoFront
                 ]
-                [ pizzaIcon 64 ]
+                [ pizzaIcon 32 ]
             , button
-                [ class "navbar-toggler"
+                [ class "navbar-toggler collapsed"
                 , type_ "button"
                 , attribute "data-bs-toggle" "collapse"
                 , attribute "data-bs-target" "#navbarSupportedContent"
                 , attribute "aria-controls" "navbarSupportedContent"
-                , attribute "aria-expanded" "false"
                 , attribute "aria-label" "Toggle navigation"
                 ]
                 [ span
@@ -1341,74 +1340,74 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                 ]
     in
     div
-        []
+        [ style "max-width" "700px"
+        , class "mx-auto my-3 my-md-4"
+        ]
         [ div
-            [ class "mx-auto my-3 my-md-4 px-3 px-md-0"
-            , style "max-width" "700px"
-            ]
-            [ div
+            []
+            [ Html.h1
                 []
-                [ Html.h1
-                    []
-                    [ text recipe.label ]
-                , Html.ul
-                    [ class "nav nav-underline"
-                    , id "recipeTabs"
-                    , attribute "role" "tablist"
-                    ]
-                    [ tabListItem
-                        "ingredients-tab"
-                        "ingredients-content"
-                        "Ingredients"
-                        (case activePage of
-                            RecipeIngredientsPage ->
-                                True
+                [ text recipe.label ]
+            ]
+        , div
+            [ class "border rounded" ]
+            [ Html.ul
+                [ class "nav nav-underline border-bottom"
+                , id "recipeTabs"
+                , attribute "role" "tablist"
+                ]
+                [ tabListItem
+                    "ingredients-tab"
+                    "ingredients-content"
+                    "Ingredients"
+                    (case activePage of
+                        RecipeIngredientsPage ->
+                            True
 
-                            _ ->
-                                False
-                        )
-                        RecipeIngredientsPage
-                    , tabListItem
-                        "prepSteps-tab"
-                        "prepSteps-content"
-                        "Steps"
-                        (case activePage of
-                            RecipeStepsPage ->
-                                True
+                        _ ->
+                            False
+                    )
+                    RecipeIngredientsPage
+                , tabListItem
+                    "prepSteps-tab"
+                    "prepSteps-content"
+                    "Steps"
+                    (case activePage of
+                        RecipeStepsPage ->
+                            True
 
-                            _ ->
-                                False
-                        )
-                        RecipeStepsPage
-                    ]
-                , div
-                    [ class "tab-content"
-                    , id "recipeTabsContent"
-                    , style "height" "60vh"
-                    , style "overflow-y" "auto"
-                    ]
-                    [ tabContent
-                        "ingredients-content"
-                        "ingredients-tab"
-                        (ingredientsView
-                            recipe.ingredients
-                            ratio
-                            selectedIngredient
-                            maybeNewAmount
-                        )
-                        True
-                        True
-                    , tabContent
-                        "prepSteps-content"
-                        "prepSteps-tab"
-                        (prepStepsView
-                            currentDisplayedPrepStepIndex
-                            recipe.ingredients
-                            recipe.steps
-                        )
-                        False
-                        False
-                    ]
+                        _ ->
+                            False
+                    )
+                    RecipeStepsPage
+                ]
+            , div
+                [ class "tab-content p-3"
+                , style "overflow-y" "auto"
+                , style "height" "60vh"
+                , id "recipeTabsContent"
+                ]
+                [ tabContent
+                    "ingredients-content"
+                    "ingredients-tab"
+                    (ingredientsView
+                        recipe.ingredients
+                        ratio
+                        selectedIngredient
+                        maybeNewAmount
+                    )
+                    True
+                    True
+                , tabContent
+                    "prepSteps-content"
+                    "prepSteps-tab"
+                    (prepStepsView
+                        currentDisplayedPrepStepIndex
+                        recipe.ingredients
+                        recipe.steps
+                    )
+                    False
+                    False
                 ]
             ]
         ]
@@ -1439,11 +1438,11 @@ ingredientsViewActions ratio =
         ]
         [ button
             [ type_ "button"
-            , class "btn btn-primary"
+            , class "btn btn-light"
             , onClick ResetRecipeViewer
             , disabled (ratio == 1)
             ]
-            [ refreshIcon 16
+            [ refreshIcon 32
             ]
         ]
 
@@ -1568,10 +1567,14 @@ prepStepsViewActions indexToDisplay length =
                 [ button
                     [ onClick message
                     , disabled isDisabled
-                    , class "btn btn-primary"
+                    , class "btn btn-light"
                     ]
                     [ icon ]
                 ]
+    in
+    let
+        btnSize =
+            32
     in
     div
         [ class "d-flex w-100 m-auto gap-2"
@@ -1580,11 +1583,11 @@ prepStepsViewActions indexToDisplay length =
         [ prepStepButton
             Prev
             (indexToDisplay <= 0)
-            (arrowLeftIcon 64)
+            (arrowLeftIcon btnSize)
         , prepStepButton
             Next
             (indexToDisplay >= length - 1)
-            (arrowRightIcon 64)
+            (arrowRightIcon btnSize)
         ]
 
 
@@ -1836,11 +1839,11 @@ recipeCreatorActions isRecipeValid =
         ]
         [ button
             [ type_ "button"
-            , class "btn btn-primary"
+            , class "btn btn-light"
             , disabled (not isRecipeValid)
             , onClick SaveRecipe
             ]
-            [ pizzaIcon 64
+            [ pizzaIcon 32
             ]
         ]
 

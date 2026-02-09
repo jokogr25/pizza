@@ -6965,18 +6965,17 @@ var $author$project$Main$navbarView = function (activePage) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Domain$Icon$pizzaIcon(64)
+								$author$project$Domain$Icon$pizzaIcon(32)
 							])),
 						A2(
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('navbar-toggler'),
+								$elm$html$Html$Attributes$class('navbar-toggler collapsed'),
 								$elm$html$Html$Attributes$type_('button'),
 								A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
 								A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarSupportedContent'),
 								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarSupportedContent'),
-								A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
 								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
 							]),
 						_List_fromArray(
@@ -7227,13 +7226,13 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('button'),
-						$elm$html$Html$Attributes$class('btn btn-primary'),
+						$elm$html$Html$Attributes$class('btn btn-light'),
 						$elm$html$Html$Events$onClick($author$project$Main$ResetRecipeViewer),
 						$elm$html$Html$Attributes$disabled(ratio === 1)
 					]),
 				_List_fromArray(
 					[
-						$author$project$Domain$Icon$refreshIcon(16)
+						$author$project$Domain$Icon$refreshIcon(32)
 					]))
 			]));
 };
@@ -7263,12 +7262,13 @@ var $author$project$Main$prepStepsViewActions = F2(
 								[
 									$elm$html$Html$Events$onClick(message),
 									$elm$html$Html$Attributes$disabled(isDisabled),
-									$elm$html$Html$Attributes$class('btn btn-primary')
+									$elm$html$Html$Attributes$class('btn btn-light')
 								]),
 							_List_fromArray(
 								[icon]))
 						]));
 			});
+		var btnSize = 32;
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -7282,12 +7282,12 @@ var $author$project$Main$prepStepsViewActions = F2(
 					prepStepButton,
 					$author$project$Main$Prev,
 					indexToDisplay <= 0,
-					$author$project$Domain$Icon$arrowLeftIcon(64)),
+					$author$project$Domain$Icon$arrowLeftIcon(btnSize)),
 					A3(
 					prepStepButton,
 					$author$project$Main$Next,
 					_Utils_cmp(indexToDisplay, length - 1) > -1,
-					$author$project$Domain$Icon$arrowRightIcon(64))
+					$author$project$Domain$Icon$arrowRightIcon(btnSize))
 				]));
 	});
 var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
@@ -7306,13 +7306,13 @@ var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('button'),
-						$elm$html$Html$Attributes$class('btn btn-primary'),
+						$elm$html$Html$Attributes$class('btn btn-light'),
 						$elm$html$Html$Attributes$disabled(!isRecipeValid),
 						$elm$html$Html$Events$onClick($author$project$Main$SaveRecipe)
 					]),
 				_List_fromArray(
 					[
-						$author$project$Domain$Icon$pizzaIcon(64)
+						$author$project$Domain$Icon$pizzaIcon(32)
 					]))
 			]));
 };
@@ -7658,7 +7658,7 @@ var $author$project$Domain$Icon$closeIcon = function (size) {
 	return A2($author$project$Domain$Icon$genericIcon, 'close.svg', size);
 };
 var $author$project$Domain$Icon$editIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'edit.svg', size);
+	return A2($author$project$Domain$Icon$genericIcon, 'pen.svg', size);
 };
 var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $author$project$Domain$Recipe$getPathStr = function (p) {
@@ -8354,93 +8354,96 @@ var $author$project$Main$recipeView = F6(
 			});
 		return A2(
 			$elm$html$Html$div,
-			_List_Nil,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px'),
+					$elm$html$Html$Attributes$class('mx-auto my-3 my-md-4')
+				]),
 			_List_fromArray(
 				[
 					A2(
 					$elm$html$Html$div,
+					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('mx-auto my-3 my-md-4 px-3 px-md-0'),
-							A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+							A2(
+							$elm$html$Html$h1,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(recipe.label)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('border rounded')
 						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$div,
-							_List_Nil,
+							$elm$html$Html$ul,
 							_List_fromArray(
 								[
-									A2(
-									$elm$html$Html$h1,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(recipe.label)
-										])),
-									A2(
-									$elm$html$Html$ul,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('nav nav-underline'),
-											$elm$html$Html$Attributes$id('recipeTabs'),
-											A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
-										]),
-									_List_fromArray(
-										[
-											A5(
-											tabListItem,
-											'ingredients-tab',
-											'ingredients-content',
-											'Ingredients',
-											function () {
-												if (activePage.$ === 'RecipeIngredientsPage') {
-													return true;
-												} else {
-													return false;
-												}
-											}(),
-											$author$project$Main$RecipeIngredientsPage),
-											A5(
-											tabListItem,
-											'prepSteps-tab',
-											'prepSteps-content',
-											'Steps',
-											function () {
-												if (activePage.$ === 'RecipeStepsPage') {
-													return true;
-												} else {
-													return false;
-												}
-											}(),
-											$author$project$Main$RecipeStepsPage)
-										])),
-									A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('tab-content'),
-											$elm$html$Html$Attributes$id('recipeTabsContent'),
-											A2($elm$html$Html$Attributes$style, 'height', '60vh'),
-											A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto')
-										]),
-									_List_fromArray(
-										[
-											A5(
-											tabContent,
-											'ingredients-content',
-											'ingredients-tab',
-											A4($author$project$Main$ingredientsView, recipe.ingredients, ratio, selectedIngredient, maybeNewAmount),
-											true,
-											true),
-											A5(
-											tabContent,
-											'prepSteps-content',
-											'prepSteps-tab',
-											A3($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.ingredients, recipe.steps),
-											false,
-											false)
-										]))
+									$elm$html$Html$Attributes$class('nav nav-underline border-bottom'),
+									$elm$html$Html$Attributes$id('recipeTabs'),
+									A2($elm$html$Html$Attributes$attribute, 'role', 'tablist')
+								]),
+							_List_fromArray(
+								[
+									A5(
+									tabListItem,
+									'ingredients-tab',
+									'ingredients-content',
+									'Ingredients',
+									function () {
+										if (activePage.$ === 'RecipeIngredientsPage') {
+											return true;
+										} else {
+											return false;
+										}
+									}(),
+									$author$project$Main$RecipeIngredientsPage),
+									A5(
+									tabListItem,
+									'prepSteps-tab',
+									'prepSteps-content',
+									'Steps',
+									function () {
+										if (activePage.$ === 'RecipeStepsPage') {
+											return true;
+										} else {
+											return false;
+										}
+									}(),
+									$author$project$Main$RecipeStepsPage)
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('tab-content p-3'),
+									A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto'),
+									A2($elm$html$Html$Attributes$style, 'height', '60vh'),
+									$elm$html$Html$Attributes$id('recipeTabsContent')
+								]),
+							_List_fromArray(
+								[
+									A5(
+									tabContent,
+									'ingredients-content',
+									'ingredients-tab',
+									A4($author$project$Main$ingredientsView, recipe.ingredients, ratio, selectedIngredient, maybeNewAmount),
+									true,
+									true),
+									A5(
+									tabContent,
+									'prepSteps-content',
+									'prepSteps-tab',
+									A3($author$project$Main$prepStepsView, currentDisplayedPrepStepIndex, recipe.ingredients, recipe.steps),
+									false,
+									false)
 								]))
 						]))
 				]));

@@ -9,3 +9,12 @@ input[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
 }
+
+.nav-underline .nav-link.active,
+.nav-underline .nav-link:hover {
+    border-bottom-color: #ff7c4c;
+    /* Sunset red */
+    border-bottom-width: 2px;
+    /* Thicker underline for drama */
+    transition: border-color 0.3s ease, border-width 0.3s ease;
+}
