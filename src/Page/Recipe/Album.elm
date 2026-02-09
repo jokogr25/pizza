@@ -2,19 +2,19 @@ module Page.Recipe.Album exposing (..)
 
 import Domain.Helper exposing (emptyStyle)
 import Domain.Icon exposing (plusIcon)
-import Domain.Recipe
+import Domain.Recipe exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
 
 type Model
-    = Album (List Domain.Recipe.Recipe) (Maybe String)
+    = Album (List Recipe) (Maybe String)
 
 
 type Msg
     = InputAlbumSearch String
-    | GoRecipeViewer Domain.Recipe.Recipe
+    | GoRecipeViewer Recipe
     | GoRecipeCreator
     | NoOp
 
@@ -53,7 +53,7 @@ view model =
             recipeAlbumView maybeFilteredRecipes
 
 
-recipeAlbumView : List Domain.Recipe.Recipe -> Html Msg
+recipeAlbumView : List Recipe -> Html Msg
 recipeAlbumView recipes =
     let
         addButtonCard =
@@ -92,7 +92,7 @@ recipeAlbumView recipes =
         ]
 
 
-recipeAlbumCardView : Domain.Recipe.Recipe -> Html Msg
+recipeAlbumCardView : Recipe -> Html Msg
 recipeAlbumCardView recipe =
     let
         isRecipeValid =
@@ -113,7 +113,7 @@ recipeAlbumCardView recipe =
                 [ class "card-img-top"
                 , src
                     (case recipe.image of
-                        Domain.Recipe.Path path ->
+                        Path path ->
                             path
                     )
                 , alt recipe.label
