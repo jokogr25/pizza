@@ -6745,10 +6745,19 @@ var $author$project$Main$footerView = function (actions) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('p-3 border-top d-flex justify-content-around')
+				$elm$html$Html$Attributes$class('p-3 border-top')
 			]),
 		_List_fromArray(
-			[actions]));
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('w-100')
+					]),
+				_List_fromArray(
+					[actions]))
+			]));
 };
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -6871,7 +6880,7 @@ var $elm$html$Html$Attributes$width = function (n) {
 		'width',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$genericIcon = F2(
+var $author$project$Domain$Icon$genericIcon = F2(
 	function (path, width) {
 		return A2(
 			$elm$html$Html$img,
@@ -6882,7 +6891,9 @@ var $author$project$Main$genericIcon = F2(
 				]),
 			_List_Nil);
 	});
-var $author$project$Main$pizzaIcon = A2($author$project$Main$genericIcon, 'pizza.svg', 32);
+var $author$project$Domain$Icon$pizzaIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'pizza.svg', size);
+};
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
@@ -6953,7 +6964,9 @@ var $author$project$Main$navbarView = function (activePage) {
 								$elm$html$Html$Events$onClick($author$project$Main$GoFront)
 							]),
 						_List_fromArray(
-							[$author$project$Main$pizzaIcon])),
+							[
+								$author$project$Domain$Icon$pizzaIcon(64)
+							])),
 						A2(
 						$elm$html$Html$button,
 						_List_fromArray(
@@ -7197,14 +7210,15 @@ var $author$project$Main$frontView = A2(
 				]))
 		]));
 var $author$project$Main$ResetRecipeViewer = {$: 'ResetRecipeViewer'};
-var $author$project$Main$resetIcon = A2($author$project$Main$genericIcon, 'reset.svg', 32);
+var $author$project$Domain$Icon$refreshIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'refresh.svg', size);
+};
 var $author$project$Main$ingredientsViewActions = function (ratio) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('btn-group'),
-				A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+				$elm$html$Html$Attributes$class('w-100 d-flex justify-content-center')
 			]),
 		_List_fromArray(
 			[
@@ -7218,47 +7232,65 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 						$elm$html$Html$Attributes$disabled(ratio === 1)
 					]),
 				_List_fromArray(
-					[$author$project$Main$resetIcon]))
+					[
+						$author$project$Domain$Icon$refreshIcon(16)
+					]))
 			]));
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
-var $author$project$Main$arrowLeftIcon = A2($author$project$Main$genericIcon, 'arrow-left.svg', 32);
-var $author$project$Main$arrowRightIcon = A2($author$project$Main$genericIcon, 'arrow-right.svg', 32);
+var $author$project$Domain$Icon$arrowLeftIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'left.svg', size);
+};
+var $author$project$Domain$Icon$arrowRightIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'right.svg', size);
+};
 var $author$project$Main$prepStepsViewActions = F2(
 	function (indexToDisplay, length) {
 		var prepStepButton = F3(
 			function (message, isDisabled, icon) {
 				return A2(
-					$elm$html$Html$button,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Events$onClick(message),
-							$elm$html$Html$Attributes$disabled(isDisabled),
-							$elm$html$Html$Attributes$class('btn btn-primary')
+							$elm$html$Html$Attributes$class('d-flex justify-content-center w-50')
 						]),
 					_List_fromArray(
-						[icon]));
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(message),
+									$elm$html$Html$Attributes$disabled(isDisabled),
+									$elm$html$Html$Attributes$class('btn btn-primary')
+								]),
+							_List_fromArray(
+								[icon]))
+						]));
 			});
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('btn-group gap-2'),
-					A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+					$elm$html$Html$Attributes$class('d-flex w-100 m-auto gap-2'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
 				]),
 			_List_fromArray(
 				[
-					A3(prepStepButton, $author$project$Main$Prev, indexToDisplay <= 0, $author$project$Main$arrowLeftIcon),
+					A3(
+					prepStepButton,
+					$author$project$Main$Prev,
+					indexToDisplay <= 0,
+					$author$project$Domain$Icon$arrowLeftIcon(64)),
 					A3(
 					prepStepButton,
 					$author$project$Main$Next,
 					_Utils_cmp(indexToDisplay, length - 1) > -1,
-					$author$project$Main$arrowRightIcon)
+					$author$project$Domain$Icon$arrowRightIcon(64))
 				]));
 	});
 var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
-var $author$project$Main$saveIcon = A2($author$project$Main$genericIcon, 'save.svg', 32);
 var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 	return A2(
 		$elm$html$Html$div,
@@ -7279,7 +7311,9 @@ var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 						$elm$html$Html$Events$onClick($author$project$Main$SaveRecipe)
 					]),
 				_List_fromArray(
-					[$author$project$Main$saveIcon]))
+					[
+						$author$project$Domain$Icon$pizzaIcon(64)
+					]))
 			]));
 };
 var $author$project$Main$AddIngredient = {$: 'AddIngredient'};
@@ -7304,6 +7338,9 @@ var $author$project$Main$UpdateImagePath = function (a) {
 };
 var $author$project$Main$UpdateLabel = function (a) {
 	return {$: 'UpdateLabel', a: a};
+};
+var $author$project$Domain$Icon$addIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'add.svg', size);
 };
 var $author$project$Main$UpdateIngredientAmount = function (a) {
 	return {$: 'UpdateIngredientAmount', a: a};
@@ -7617,7 +7654,12 @@ var $author$project$Main$addOrEditStepView = function (maybeStep) {
 					]))
 			]));
 };
-var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
+var $author$project$Domain$Icon$closeIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'close.svg', size);
+};
+var $author$project$Domain$Icon$editIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'edit.svg', size);
+};
 var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $author$project$Domain$Recipe$getPathStr = function (p) {
 	var str = p.a;
@@ -7625,10 +7667,6 @@ var $author$project$Domain$Recipe$getPathStr = function (p) {
 };
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
-var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
-var $author$project$Main$plusIcon = function (width) {
-	return A2($author$project$Main$genericIcon, 'plus.svg', width);
-};
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$validateStep = function (step) {
 	return (_Utils_cmp(step.time, -1) > -1) && ((!$elm$core$String$isEmpty(step.title)) && (!$elm$core$String$isEmpty(step.description)));
@@ -7665,7 +7703,7 @@ var $author$project$Main$recipeCreatorView = F3(
 						]),
 					_List_fromArray(
 						[
-							$author$project$Main$plusIcon(32)
+							$author$project$Domain$Icon$addIcon(32)
 						]));
 			});
 		return A2(
@@ -7851,7 +7889,9 @@ var $author$project$Main$recipeCreatorView = F3(
 													$author$project$Main$EditIngredient(ing))
 												]),
 											_List_fromArray(
-												[$author$project$Main$pencilIcon])),
+												[
+													$author$project$Domain$Icon$editIcon(32)
+												])),
 											A2(
 											$elm$html$Html$button,
 											_List_fromArray(
@@ -7862,7 +7902,9 @@ var $author$project$Main$recipeCreatorView = F3(
 													$elm$html$Html$Attributes$title('Remove ingredient')
 												]),
 											_List_fromArray(
-												[$author$project$Main$closeIcon]))
+												[
+													$author$project$Domain$Icon$closeIcon(32)
+												]))
 										]));
 							},
 							draft.ingredients),
@@ -7913,7 +7955,9 @@ var $author$project$Main$recipeCreatorView = F3(
 													$author$project$Main$EditStep(step))
 												]),
 											_List_fromArray(
-												[$author$project$Main$pencilIcon])),
+												[
+													$author$project$Domain$Icon$editIcon(32)
+												])),
 											A2(
 											$elm$html$Html$button,
 											_List_fromArray(
@@ -7924,7 +7968,9 @@ var $author$project$Main$recipeCreatorView = F3(
 													$elm$html$Html$Attributes$title('Remove step')
 												]),
 											_List_fromArray(
-												[$author$project$Main$closeIcon]))
+												[
+													$author$project$Domain$Icon$closeIcon(32)
+												]))
 										]));
 							},
 							draft.steps),
@@ -7948,7 +7994,9 @@ var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
-var $author$project$Main$checkIcon = A2($author$project$Main$genericIcon, 'check.svg', 16);
+var $author$project$Domain$Icon$checkIcon = function (s) {
+	return A2($author$project$Domain$Icon$genericIcon, 'check.svg', s);
+};
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
@@ -7992,10 +8040,16 @@ var $author$project$Main$ingredientView = F4(
 					_List_fromArray(
 						[icon]));
 			});
-		var btn = isSelected ? (isNewAmountValid ? A2(inputButton, $author$project$Main$CalculateRatio, $author$project$Main$checkIcon) : A2(inputButton, $author$project$Main$Abort, $author$project$Main$closeIcon)) : A2(
+		var btn = isSelected ? (isNewAmountValid ? A2(
+			inputButton,
+			$author$project$Main$CalculateRatio,
+			$author$project$Domain$Icon$checkIcon(24)) : A2(
+			inputButton,
+			$author$project$Main$Abort,
+			$author$project$Domain$Icon$closeIcon(24))) : A2(
 			inputButton,
 			$author$project$Main$SelectIngredient(ingredient),
-			$author$project$Main$pencilIcon);
+			$author$project$Domain$Icon$editIcon(24));
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -8019,6 +8073,9 @@ var $author$project$Main$ingredientView = F4(
 									$elm$html$Html$Attributes$id(ingredient.id),
 									$elm$html$Html$Attributes$autofocus(isSelected),
 									$elm$html$Html$Attributes$placeholder(placeholder),
+									A2($elm$html$Html$Attributes$style, 'font-size', '1.1rem'),
+									A2($elm$html$Html$Attributes$style, 'padding', '0.5rem 0.75rem'),
+									A2($elm$html$Html$Attributes$style, 'height', 'calc(2.5rem + 2px)'),
 									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$classList(
 									_List_fromArray(
@@ -8436,20 +8493,6 @@ var $author$project$Main$validateRecipe = function (recipe) {
 	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
 };
 var $author$project$Page$Recipe$Album$GoRecipeCreator = {$: 'GoRecipeCreator'};
-var $author$project$Domain$Icon$genericIcon = F2(
-	function (path, width) {
-		return A2(
-			$elm$html$Html$img,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$width(width),
-					$elm$html$Html$Attributes$src('public/img/icon/' + path)
-				]),
-			_List_Nil);
-	});
-var $author$project$Domain$Icon$plusIcon = function (width) {
-	return A2($author$project$Domain$Icon$genericIcon, 'plus.svg', width);
-};
 var $author$project$Page$Recipe$Album$GoRecipeViewer = function (a) {
 	return {$: 'GoRecipeViewer', a: a};
 };
@@ -8546,7 +8589,7 @@ var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						$elm$html$Html$Attributes$class('card shadow-sm h-100 rounded-4'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
 						$elm$html$Html$Events$onClick($author$project$Page$Recipe$Album$GoRecipeCreator)
 					]),
@@ -8568,7 +8611,7 @@ var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Domain$Icon$plusIcon(64)
+								$author$project$Domain$Icon$addIcon(64)
 							]))
 					]))
 			]));

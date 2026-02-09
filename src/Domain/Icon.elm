@@ -1,52 +1,80 @@
 module Domain.Icon exposing (..)
 
-import Html exposing (Html)
+import Html exposing (Html, i, s)
 import Html.Attributes
+import Svg exposing (..)
+import Svg.Attributes exposing (d, fill, height, stroke, strokeLinecap, strokeLinejoin, viewBox, width)
 
 
-pencilIcon : Html msg
-pencilIcon =
-    genericIcon "pencil.svg" 16
+editIcon : Int -> Html msg
+editIcon size =
+    genericIcon "edit.svg" size
 
 
-checkIcon : Html msg
-checkIcon =
-    genericIcon "check.svg" 16
+checkIcon : Int -> Html msg
+checkIcon s =
+    genericIcon "check.svg" s
 
 
-closeIcon : Html msg
-closeIcon =
-    genericIcon "close.svg" 16
+
+-- checkIcon : Int -> String -> Html msg
+-- checkIcon i color =
+--     baseIcon
+--         i
+--         [ path
+--             [ d "M5 13.3636L8.03559 16.3204C8.42388 16.6986 9.04279 16.6986 9.43108 16.3204L19 7"
+--             , stroke color
+--             , strokeLinecap "round"
+--             , strokeLinejoin "round"
+--             ]
+--             []
+--         ]
+-- baseIcon : Int -> List (Svg msg) -> Html msg
+-- baseIcon i =
+--     let
+--         size =
+--             String.fromInt i
+--     in
+--     svg
+--         [ width size
+--         , height size
+--         , viewBox (String.join " " [ "0", "0", size, size ])
+--         ]
 
 
-resetIcon : Html msg
-resetIcon =
-    genericIcon "reset.svg" 32
+closeIcon : Int -> Html msg
+closeIcon size =
+    genericIcon "close.svg" size
 
 
-arrowLeftIcon : Html msg
-arrowLeftIcon =
-    genericIcon "arrow-left.svg" 32
+refreshIcon : Int -> Html msg
+refreshIcon size =
+    genericIcon "refresh.svg" size
 
 
-arrowRightIcon : Html msg
-arrowRightIcon =
-    genericIcon "arrow-right.svg" 32
+arrowLeftIcon : Int -> Html msg
+arrowLeftIcon size =
+    genericIcon "left.svg" size
 
 
-pizzaIcon : Html msg
-pizzaIcon =
-    genericIcon "pizza.svg" 32
+arrowRightIcon : Int -> Html msg
+arrowRightIcon size =
+    genericIcon "right.svg" size
 
 
-plusIcon : Int -> Html msg
-plusIcon width =
-    genericIcon "plus.svg" width
+pizzaIcon : Int -> Html msg
+pizzaIcon size =
+    genericIcon "pizza.svg" size
 
 
-saveIcon : Html msg
-saveIcon =
-    genericIcon "save.svg" 32
+addIcon : Int -> Html msg
+addIcon size =
+    genericIcon "add.svg" size
+
+
+saveIcon : Int -> Html msg
+saveIcon size =
+    genericIcon "save.svg" size
 
 
 genericIcon : String -> Int -> Html msg

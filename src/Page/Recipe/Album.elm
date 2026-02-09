@@ -1,7 +1,7 @@
 module Page.Recipe.Album exposing (..)
 
 import Domain.Helper exposing (emptyStyle)
-import Domain.Icon exposing (plusIcon)
+import Domain.Icon exposing (addIcon)
 import Domain.Recipe exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -59,7 +59,7 @@ recipeAlbumView recipes =
         addButtonCard =
             div [ class "col" ]
                 [ div
-                    [ class "card shadow-sm h-100"
+                    [ class "card shadow-sm h-100 rounded-4"
                     , style "min-width" "220px"
                     , onClick GoRecipeCreator
                     ]
@@ -70,7 +70,7 @@ recipeAlbumView recipes =
                         []
                     , div
                         [ class "card-body d-flex justify-content-center align-items-center" ]
-                        [ plusIcon 64 ]
+                        [ addIcon 64 ]
                     ]
                 ]
     in

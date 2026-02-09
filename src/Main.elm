@@ -3,6 +3,7 @@ module Main exposing (Msg(..), main, update, view)
 import Browser
 import Browser.Dom exposing (Error(..))
 import Browser.Events
+import Domain.Icon exposing (..)
 import Domain.Recipe exposing (..)
 import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, i, img, input, label, span, text)
@@ -1148,9 +1149,12 @@ contentView activePage content maybeActions =
 footerView : Html Msg -> Html Msg
 footerView actions =
     div
-        [ class "p-3 border-top d-flex justify-content-around"
+        [ class "p-3 border-top"
         ]
-        [ actions ]
+        [ div
+            [ class "w-100" ]
+            [ actions ]
+        ]
 
 
 navbarView : ActivePage -> Html Msg
@@ -1195,7 +1199,7 @@ navbarView activePage =
                 [ class "navbar-brand"
                 , onClick GoFront
                 ]
-                [ pizzaIcon ]
+                [ pizzaIcon 64 ]
             , button
                 [ class "navbar-toggler"
                 , type_ "button"
@@ -1431,8 +1435,7 @@ ingredientsView ingredients ratio selectedIngredient maybeNewAmount =
 ingredientsViewActions : Float -> Html Msg
 ingredientsViewActions ratio =
     div
-        [ class "btn-group"
-        , attribute "role" "group"
+        [ class "w-100 d-flex justify-content-center"
         ]
         [ button
             [ type_ "button"
@@ -1440,7 +1443,7 @@ ingredientsViewActions ratio =
             , onClick ResetRecipeViewer
             , disabled (ratio == 1)
             ]
-            [ resetIcon
+            [ refreshIcon 16
             ]
         ]
 
@@ -1489,13 +1492,13 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
         btn =
             if isSelected then
                 if isNewAmountValid then
-                    inputButton CalculateRatio checkIcon
+                    inputButton CalculateRatio (checkIcon 24)
 
                 else
-                    inputButton Abort closeIcon
+                    inputButton Abort (closeIcon 24)
 
             else
-                inputButton (SelectIngredient ingredient) pencilIcon
+                inputButton (SelectIngredient ingredient) (editIcon 24)
     in
     div
         [ class "mt-3"
@@ -1507,6 +1510,9 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
                 [ Html.Attributes.id ingredient.id
                 , Html.Attributes.autofocus isSelected
                 , Html.Attributes.placeholder placeholder
+                , style "font-size" "1.1rem"
+                , style "padding" "0.5rem 0.75rem"
+                , style "height" "calc(2.5rem + 2px)"
                 , type_ "number"
                 , classList
                     [ ( "form-control", True )
@@ -1553,25 +1559,28 @@ prepStepsViewActions indexToDisplay length =
     let
         prepStepButton : Msg -> Bool -> Html Msg -> Html Msg
         prepStepButton message isDisabled icon =
-            button
-                [ onClick message
-                , disabled isDisabled
-                , class "btn btn-primary"
+            div
+                [ class "d-flex justify-content-center w-50" ]
+                [ button
+                    [ onClick message
+                    , disabled isDisabled
+                    , class "btn btn-primary"
+                    ]
+                    [ icon ]
                 ]
-                [ icon ]
     in
     div
-        [ class "btn-group gap-2"
-        , Html.Attributes.attribute "role" "group"
+        [ class "d-flex w-100 m-auto gap-2"
+        , style "max-width" "700px"
         ]
         [ prepStepButton
             Prev
             (indexToDisplay <= 0)
-            arrowLeftIcon
+            (arrowLeftIcon 64)
         , prepStepButton
             Next
             (indexToDisplay >= length - 1)
-            arrowRightIcon
+            (arrowRightIcon 64)
         ]
 
 
@@ -1655,7 +1664,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                 , disabled isDisabled
                 , onClick msg
                 ]
-                [ plusIcon 32 ]
+                [ addIcon 32 ]
     in
     div
         [ class "container my-4 flex-grow-1"
@@ -1756,7 +1765,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , Html.Attributes.title "Edit ingredient"
                             , onClick (EditIngredient ing)
                             ]
-                            [ pencilIcon
+                            [ editIcon 32
                             ]
                         , button
                             [ class
@@ -1764,7 +1773,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , onClick (RemoveIngredient ing.id)
                             , Html.Attributes.title "Remove ingredient"
                             ]
-                            [ closeIcon
+                            [ closeIcon 32
                             ]
                         ]
                 )
@@ -1796,14 +1805,14 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , Html.Attributes.title "Edit step"
                             , onClick (EditStep step)
                             ]
-                            [ pencilIcon
+                            [ editIcon 32
                             ]
                         , button
                             [ class "btn btn-sm btn-danger"
                             , onClick (RemoveStep step)
                             , Html.Attributes.title "Remove step"
                             ]
-                            [ closeIcon
+                            [ closeIcon 32
                             ]
                         ]
                 )
@@ -1827,7 +1836,7 @@ recipeCreatorActions isRecipeValid =
             , disabled (not isRecipeValid)
             , onClick SaveRecipe
             ]
-            [ saveIcon
+            [ pizzaIcon 64
             ]
         ]
 
@@ -2231,57 +2240,3 @@ empyStyleMapper m f =
 emptyStyle : Html.Attribute msg
 emptyStyle =
     Html.Attributes.style "" ""
-
-
-pencilIcon : Html msg
-pencilIcon =
-    genericIcon "pencil.svg" 16
-
-
-checkIcon : Html msg
-checkIcon =
-    genericIcon "check.svg" 16
-
-
-closeIcon : Html msg
-closeIcon =
-    genericIcon "close.svg" 16
-
-
-resetIcon : Html msg
-resetIcon =
-    genericIcon "reset.svg" 32
-
-
-arrowLeftIcon : Html msg
-arrowLeftIcon =
-    genericIcon "arrow-left.svg" 32
-
-
-arrowRightIcon : Html msg
-arrowRightIcon =
-    genericIcon "arrow-right.svg" 32
-
-
-pizzaIcon : Html msg
-pizzaIcon =
-    genericIcon "pizza.svg" 32
-
-
-plusIcon : Int -> Html msg
-plusIcon width =
-    genericIcon "plus.svg" width
-
-
-saveIcon : Html msg
-saveIcon =
-    genericIcon "save.svg" 32
-
-
-genericIcon : String -> Int -> Html msg
-genericIcon path width =
-    Html.img
-        [ Html.Attributes.width width
-        , Html.Attributes.src ("public/img/icon/" ++ path)
-        ]
-        []
