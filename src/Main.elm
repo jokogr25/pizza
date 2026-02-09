@@ -6,7 +6,7 @@ import Browser.Events
 import Domain.Icon exposing (..)
 import Domain.Recipe exposing (..)
 import Helper exposing (round2ToString, safeRegexOf)
-import Html exposing (Html, button, div, i, img, input, label, span, text)
+import Html exposing (Html, button, div, i, img, input, label, s, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
@@ -1490,15 +1490,19 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
                 Html.Attributes.value ""
 
         btn =
+            let
+                size =
+                    24
+            in
             if isSelected then
                 if isNewAmountValid then
-                    inputButton CalculateRatio (checkIcon 24)
+                    inputButton CalculateRatio (checkIcon size)
 
                 else
-                    inputButton Abort (closeIcon 24)
+                    inputButton Abort (closeIcon size)
 
             else
-                inputButton (SelectIngredient ingredient) (editIcon 24)
+                inputButton (SelectIngredient ingredient) (editIcon size)
     in
     div
         [ class "mt-3"

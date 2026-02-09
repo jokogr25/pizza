@@ -8040,16 +8040,19 @@ var $author$project$Main$ingredientView = F4(
 					_List_fromArray(
 						[icon]));
 			});
-		var btn = isSelected ? (isNewAmountValid ? A2(
-			inputButton,
-			$author$project$Main$CalculateRatio,
-			$author$project$Domain$Icon$checkIcon(24)) : A2(
-			inputButton,
-			$author$project$Main$Abort,
-			$author$project$Domain$Icon$closeIcon(24))) : A2(
-			inputButton,
-			$author$project$Main$SelectIngredient(ingredient),
-			$author$project$Domain$Icon$editIcon(24));
+		var btn = function () {
+			var size = 24;
+			return isSelected ? (isNewAmountValid ? A2(
+				inputButton,
+				$author$project$Main$CalculateRatio,
+				$author$project$Domain$Icon$checkIcon(size)) : A2(
+				inputButton,
+				$author$project$Main$Abort,
+				$author$project$Domain$Icon$closeIcon(size))) : A2(
+				inputButton,
+				$author$project$Main$SelectIngredient(ingredient),
+				$author$project$Domain$Icon$editIcon(size));
+		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
