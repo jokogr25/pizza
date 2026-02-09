@@ -3,6 +3,7 @@ module Main exposing (Msg(..), main, update, view)
 import Browser
 import Browser.Dom exposing (Error(..))
 import Browser.Events
+import Domain.Recipe
 import Helper exposing (round2ToString, safeRegexOf)
 import Html exposing (Html, button, div, i, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
@@ -10,6 +11,7 @@ import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
 import Platform.Cmd as Cmd
+import Recipe.Album
 import Regex
 import String
 import Svg.Attributes exposing (visibility)
@@ -37,9 +39,9 @@ main =
 type Model
     = Front
     | Carousel
-    | RecipeAlbum (List Recipe) (Maybe String)
-    | RecipeViewer (List Recipe) Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
-    | RecipeCreator (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep)
+    | Album Recipe.Album.Model
+    | RecipeViewer (List Domain.Recipe.Recipe) Domain.Recipe.Recipe (Maybe Domain.Recipe.Ingredient) Int (Maybe Float) Float ActivePage
+    | RecipeCreator (List Domain.Recipe.Recipe) Domain.Recipe.Recipe (Maybe Domain.Recipe.Ingredient) (Maybe Domain.Recipe.PrepStep)
 
 
 
@@ -50,10 +52,10 @@ type Msg
     = GoFront
     | GoCarousel
     | GoRecipeAlbum
-    | GoRecipeViewer Recipe ActivePage
+    | GoRecipeViewer Domain.Recipe.Recipe ActivePage
     | GoRecipeCreator
     | ResetRecipeViewer
-    | SelectIngredient Ingredient
+    | SelectIngredient Domain.Recipe.Ingredient
     | SelectPage ActivePage
     | UnselectIngredient
     | InputNewAmount String
@@ -68,18 +70,19 @@ type Msg
     | UpdateImagePath String
     | AddIngredient
     | RemoveIngredient String
-    | EditIngredient Ingredient
+    | EditIngredient Domain.Recipe.Ingredient
     | UpdateIngredientId String
     | UpdateIngredientLabel String
     | UpdateIngredientAmount String
     | UpdateIngredientUnit String
     | AddStep
-    | RemoveStep PrepStep
-    | EditStep PrepStep
+    | RemoveStep Domain.Recipe.PrepStep
+    | EditStep Domain.Recipe.PrepStep
     | UpdateStepTitle String
     | UpdateStepTime String
     | UpdateStepDescription String
     | SaveRecipe
+    | AlbumMsg Recipe.Album.Msg
 
 
 
@@ -174,7 +177,7 @@ update msg model =
 
         GoRecipeViewer recipe page ->
             case model of
-                RecipeAlbum recipes _ ->
+                Album (Recipe.Album.Album recipes _) ->
                     ( RecipeViewer
                         recipes
                         recipe
@@ -192,26 +195,43 @@ update msg model =
         GoRecipeAlbum ->
             case model of
                 Front ->
-                    ( RecipeAlbum
-                        [ samplePizzaRecipe
-                        , sampleLasagneRecipe
-                        ]
-                        Nothing
+                    ( Album
+                        (Recipe.Album.Album
+                            [ samplePizzaRecipe
+                            , sampleLasagneRecipe
+                            ]
+                            Nothing
+                        )
                     , Cmd.none
                     )
 
                 RecipeCreator recipes _ _ _ ->
-                    ( RecipeAlbum recipes Nothing, Cmd.none )
+                    ( Album
+                        (Recipe.Album.update
+                            Recipe.Album.NoOp
+                            (Recipe.Album.Album recipes Nothing)
+                        )
+                    , Cmd.none
+                    )
 
                 RecipeViewer recipes _ _ _ _ _ _ ->
-                    ( RecipeAlbum recipes Nothing, Cmd.none )
+                    ( Album
+                        (Recipe.Album.update
+                            Recipe.Album.NoOp
+                            (Recipe.Album.Album
+                                recipes
+                                Nothing
+                            )
+                        )
+                    , Cmd.none
+                    )
 
                 _ ->
                     noChange
 
         GoRecipeCreator ->
             case model of
-                RecipeAlbum recipes _ ->
+                Album (Recipe.Album.Album recipes Nothing) ->
                     ( RecipeCreator
                         recipes
                         { id = ""
@@ -219,7 +239,7 @@ update msg model =
                         , description = ""
                         , ingredients = []
                         , steps = []
-                        , image = Path ""
+                        , image = Domain.Recipe.Path ""
                         }
                         Nothing
                         Nothing
@@ -316,10 +336,12 @@ update msg model =
 
         InputSearchTerm searchTerm ->
             case model of
-                RecipeAlbum recipes _ ->
-                    ( RecipeAlbum
-                        recipes
-                        (Just searchTerm)
+                Album (Recipe.Album.Album recipes _) ->
+                    ( Album
+                        (Recipe.Album.Album
+                            recipes
+                            (Just searchTerm)
+                        )
                     , Cmd.none
                     )
 
@@ -464,7 +486,7 @@ update msg model =
                     ( RecipeCreator
                         recipes
                         { draft
-                            | image = Path imagePath
+                            | image = Domain.Recipe.Path imagePath
                         }
                         ingredientDraft
                         stepDraft
@@ -567,7 +589,7 @@ update msg model =
                                     { id = newId
                                     , label = ""
                                     , amount = 0
-                                    , unit = Gram
+                                    , unit = Domain.Recipe.Gram
                                     }
                         )
                         maybeStepDraft
@@ -595,7 +617,7 @@ update msg model =
                                     { id = ""
                                     , label = newLabel
                                     , amount = 0
-                                    , unit = Gram
+                                    , unit = Domain.Recipe.Gram
                                     }
                         )
                         maybeStepDraft
@@ -625,7 +647,7 @@ update msg model =
                                             { id = ""
                                             , label = ""
                                             , amount = f
-                                            , unit = Gram
+                                            , unit = Domain.Recipe.Gram
                                             }
                                 )
                                 maybeStepDraft
@@ -640,10 +662,10 @@ update msg model =
 
         UpdateIngredientUnit gUnit ->
             let
-                parsedUnit : Unit
+                parsedUnit : Domain.Recipe.Unit
                 parsedUnit =
                     Debug.log gUnit
-                        (Maybe.withDefault Gram (parseUnit gUnit))
+                        (Maybe.withDefault Domain.Recipe.Gram (Domain.Recipe.parseUnit gUnit))
             in
             case model of
                 RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
@@ -820,19 +842,59 @@ update msg model =
         SaveRecipe ->
             case model of
                 RecipeCreator recipes draft _ _ ->
-                    ( RecipeAlbum
-                        (if validateRecipe draft then
-                            draft :: recipes
-
-                         else
-                            recipes
+                    ( Album
+                        (Recipe.Album.update
+                            Recipe.Album.NoOp
+                            (Recipe.Album.Album
+                                (draft :: recipes)
+                                Nothing
+                            )
                         )
-                        Nothing
                     , Cmd.none
                     )
 
                 _ ->
                     noChange
+
+        AlbumMsg albumMsg ->
+            case albumMsg of
+                Recipe.Album.GoRecipeCreator ->
+                    ( RecipeCreator
+                        []
+                        { id = ""
+                        , label = ""
+                        , description = ""
+                        , ingredients = []
+                        , steps = []
+                        , image = Domain.Recipe.Path ""
+                        }
+                        Nothing
+                        Nothing
+                    , Cmd.none
+                    )
+
+                Recipe.Album.GoRecipeViewer recipe ->
+                    ( RecipeViewer
+                        []
+                        recipe
+                        Nothing
+                        0
+                        Nothing
+                        1
+                        RecipeIngredientsPage
+                    , Cmd.none
+                    )
+
+                _ ->
+                    case model of
+                        Album m ->
+                            ( Album
+                                (Recipe.Album.update albumMsg m)
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            noChange
 
         NoOp ->
             noChange
@@ -850,26 +912,6 @@ view model =
 
         Carousel ->
             viewCarousel1
-
-        RecipeAlbum recipes maybeSearchTerm ->
-            contentView
-                RecipeAlbumPage
-                (recipeAlbumView
-                    (case maybeSearchTerm of
-                        Just searchTerm ->
-                            List.filter
-                                (\recipe ->
-                                    List.any
-                                        (String.contains searchTerm)
-                                        [ recipe.label, recipe.id ]
-                                )
-                                recipes
-
-                        Nothing ->
-                            recipes
-                    )
-                )
-                Nothing
 
         RecipeViewer _ recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
             contentView
@@ -907,14 +949,22 @@ view model =
                     )
                 )
 
+        Album m ->
+            contentView
+                RecipeAlbumPage
+                (Recipe.Album.view m
+                    |> Html.map AlbumMsg
+                )
+                Nothing
 
-validateRecipe : Recipe -> Bool
+
+validateRecipe : Domain.Recipe.Recipe -> Bool
 validateRecipe recipe =
     validateIngredients recipe.ingredients
         && validateSteps recipe.steps
 
 
-validateStep : PrepStep -> Bool
+validateStep : Domain.Recipe.PrepStep -> Bool
 validateStep step =
     step.time
         >= -1
@@ -922,7 +972,7 @@ validateStep step =
         && not (String.isEmpty step.description)
 
 
-validateIngredient : Ingredient -> List Ingredient -> Bool
+validateIngredient : Domain.Recipe.Ingredient -> List Domain.Recipe.Ingredient -> Bool
 validateIngredient ing ings =
     let
         listOfIds =
@@ -935,7 +985,7 @@ validateIngredient ing ings =
         && not (String.isEmpty ing.label)
 
 
-validateIngredients : List Ingredient -> Bool
+validateIngredients : List Domain.Recipe.Ingredient -> Bool
 validateIngredients ingredients =
     not
         (List.isEmpty ingredients)
@@ -949,7 +999,7 @@ validateIngredients ingredients =
             ingredients
 
 
-validateSteps : List PrepStep -> Bool
+validateSteps : List Domain.Recipe.PrepStep -> Bool
 validateSteps steps =
     not
         (List.isEmpty steps)
@@ -1242,91 +1292,7 @@ navbarView activePage =
         ]
 
 
-recipeAlbumView : List Recipe -> Html Msg
-recipeAlbumView recipes =
-    let
-        addButtonCard =
-            div [ class "col" ]
-                [ div
-                    [ class "card shadow-sm h-100"
-                    , style "min-width" "220px"
-                    , onClick GoRecipeCreator
-                    ]
-                    [ div
-                        [ class "card-img-top"
-                        , style "height" "225px"
-                        ]
-                        []
-                    , div
-                        [ class "card-body d-flex justify-content-center align-items-center" ]
-                        [ plusIcon 64 ]
-                    ]
-                ]
-    in
-    div []
-        [ div
-            [ class "album py-5" ]
-            [ div
-                [ class "container"
-                , style "max-width" "700px"
-                ]
-                [ div
-                    [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
-                    (List.map recipeAlbumCardView recipes
-                        ++ [ addButtonCard
-                           ]
-                    )
-                ]
-            ]
-        ]
-
-
-recipeAlbumCardView : Recipe -> Html Msg
-recipeAlbumCardView recipe =
-    let
-        isRecipeValid =
-            not (List.isEmpty recipe.ingredients && List.isEmpty recipe.steps)
-    in
-    div
-        [ class "col" ]
-        [ div
-            [ class "card shadow-sm h-100"
-            , style "min-width" "220px"
-            , if isRecipeValid then
-                onClick (GoRecipeViewer recipe RecipeIngredientsPage)
-
-              else
-                emptyStyle
-            ]
-            [ Html.img
-                [ class "card-img-top"
-                , src
-                    (case recipe.image of
-                        Path path ->
-                            path
-                    )
-                , alt recipe.label
-                , style "object-fit" "cover"
-                , style "height" "225px"
-                ]
-                []
-            , div
-                [ class "card-body d-flex flex-column" ]
-                [ Html.h5
-                    [ class "card-title" ]
-                    [ text recipe.label ]
-                , Html.p
-                    [ class "card-text flex-grow-1" ]
-                    [ text recipe.description ]
-                , div
-                    [ class "d-flex justify-content-between align-items-center mt-2" ]
-                    []
-                ]
-            ]
-        ]
-
-
-recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> ActivePage -> Html Msg
+recipeView : Domain.Recipe.Recipe -> Float -> Maybe Domain.Recipe.Ingredient -> Maybe Float -> Int -> ActivePage -> Html Msg
 recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepStepIndex activePage =
     let
         tabListItem : String -> String -> String -> Bool -> ActivePage -> Html Msg
@@ -1450,7 +1416,7 @@ focus id =
         |> Task.attempt (\_ -> NoOp)
 
 
-ingredientsView : List Ingredient -> Float -> Maybe Ingredient -> Maybe Float -> Html Msg
+ingredientsView : List Domain.Recipe.Ingredient -> Float -> Maybe Domain.Recipe.Ingredient -> Maybe Float -> Html Msg
 ingredientsView ingredients ratio selectedIngredient maybeNewAmount =
     div []
         [ div
@@ -1479,7 +1445,7 @@ ingredientsViewActions ratio =
         ]
 
 
-ingredientView : Float -> Maybe Ingredient -> Maybe Float -> Ingredient -> Html Msg
+ingredientView : Float -> Maybe Domain.Recipe.Ingredient -> Maybe Float -> Domain.Recipe.Ingredient -> Html Msg
 ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
     let
         isSelected =
@@ -1510,7 +1476,7 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
                 ++ " ("
                 ++ round2ToString (ingredient.amount * ratio)
                 ++ " "
-                ++ unitToAbbr ingredient.unit
+                ++ Domain.Recipe.unitToAbbr ingredient.unit
                 ++ ")"
 
         purgeValue =
@@ -1563,7 +1529,7 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
         ]
 
 
-prepStepsView : Int -> List Ingredient -> List PrepStep -> Html Msg
+prepStepsView : Int -> List Domain.Recipe.Ingredient -> List Domain.Recipe.PrepStep -> Html Msg
 prepStepsView indexToDisplay ingredients prepSteps =
     if List.length prepSteps == 0 then
         text "no steps :("
@@ -1613,7 +1579,7 @@ prepStepsViewActions indexToDisplay length =
 {- All elements are rendered but displayed conditionally by visibility. By this the layout is fixed on the start and does not crash -}
 
 
-prepStepView : Int -> List Ingredient -> Int -> PrepStep -> Html Msg
+prepStepView : Int -> List Domain.Recipe.Ingredient -> Int -> Domain.Recipe.PrepStep -> Html Msg
 prepStepView indexToDisplay ingredients index prepStep =
     let
         visibility =
@@ -1670,7 +1636,7 @@ prepStepView indexToDisplay ingredients index prepStep =
         ]
 
 
-recipeCreatorView : Recipe -> Maybe Ingredient -> Maybe PrepStep -> Html Msg
+recipeCreatorView : Domain.Recipe.Recipe -> Maybe Domain.Recipe.Ingredient -> Maybe Domain.Recipe.PrepStep -> Html Msg
 recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
     let
         isIngredientValid =
@@ -1758,7 +1724,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                 [ input
                     [ class "form-control"
                     , Html.Attributes.id id
-                    , Html.Attributes.value (getPathStr draft.image)
+                    , Html.Attributes.value (Domain.Recipe.getPathStr draft.image)
                     , onInput UpdateImagePath
                     ]
                     []
@@ -1866,7 +1832,7 @@ recipeCreatorActions isRecipeValid =
         ]
 
 
-addOrEditIngredientView : Maybe Ingredient -> Html Msg
+addOrEditIngredientView : Maybe Domain.Recipe.Ingredient -> Html Msg
 addOrEditIngredientView maybeIngredient =
     let
         idValue =
@@ -1921,7 +1887,7 @@ addOrEditIngredientView maybeIngredient =
                         (List.map
                             (\unit ->
                                 Html.option
-                                    [ Html.Attributes.value (unitToAbbr unit)
+                                    [ Html.Attributes.value (Domain.Recipe.unitToAbbr unit)
                                     , Html.Attributes.selected
                                         (case maybeIngredient of
                                             Just i ->
@@ -1931,9 +1897,9 @@ addOrEditIngredientView maybeIngredient =
                                                 False
                                         )
                                     ]
-                                    [ text (unitToAbbr unit) ]
+                                    [ text (Domain.Recipe.unitToAbbr unit) ]
                             )
-                            allUnits
+                            Domain.Recipe.allUnits
                         )
                     , label
                         []
@@ -1967,7 +1933,7 @@ addOrEditIngredientView maybeIngredient =
         ]
 
 
-addOrEditStepView : Maybe PrepStep -> Html Msg
+addOrEditStepView : Maybe Domain.Recipe.PrepStep -> Html Msg
 addOrEditStepView maybeStep =
     let
         stepTitleValue =
@@ -2056,139 +2022,56 @@ addOrEditStepView maybeStep =
 
 
 
--- TYPES
-
-
-type Unit
-    = Gram
-    | Mililiter
-    | Teaspoon
-
-
-allUnits : List Unit
-allUnits =
-    [ Gram
-    , Mililiter
-    , Teaspoon
-    ]
-
-
-unitToAbbr : Unit -> String
-unitToAbbr unit =
-    case unit of
-        Gram ->
-            "g"
-
-        Mililiter ->
-            "ml"
-
-        Teaspoon ->
-            "tsp"
-
-
-parseUnit : String -> Maybe Unit
-parseUnit s =
-    case s of
-        "g" ->
-            Just Gram
-
-        "ml" ->
-            Just Mililiter
-
-        "tsp" ->
-            Just Teaspoon
-
-        _ ->
-            Nothing
-
-
-type alias Recipe =
-    { id : String
-    , label : String
-    , description : String
-    , ingredients : List Ingredient
-    , steps : List PrepStep
-    , image : Path
-    }
-
-
-type alias PrepStep =
-    { time : Int
-    , title : String
-    , description : String
-    }
-
-
-type Path
-    = Path String
-
-
-getPathStr : Path -> String
-getPathStr p =
-    case p of
-        Path str ->
-            str
-
-
-type alias Ingredient =
-    { id : String
-    , label : String
-    , amount : Float
-    , unit : Unit
-    }
-
-
-
 -- SAMPLE DATA
 
 
-sampleLasagneRecipe : Recipe
+sampleLasagneRecipe : Domain.Recipe.Recipe
 sampleLasagneRecipe =
     { id = "lasanche"
     , label = "Lasanche"
-    , image = Path "public/img/lasanche.jpg"
+    , image = Domain.Recipe.Path "public/img/lasanche.jpg"
     , description = ""
     , ingredients = []
     , steps = []
     }
 
 
-samplePizzaRecipe : Recipe
+samplePizzaRecipe : Domain.Recipe.Recipe
 samplePizzaRecipe =
     { id = "seven-hours-pizza-dough"
     , label = "Pizza dough (7 hours)"
-    , image = Path "public/img/7-hours-pizza-dough.jpg"
+    , image = Domain.Recipe.Path "public/img/7-hours-pizza-dough.jpg"
     , description = ""
     , ingredients =
         [ { id = "flour"
           , label = "Flour"
           , amount = 496
-          , unit = Gram
+          , unit = Domain.Recipe.Gram
           }
         , { id = "water"
           , label = "Water"
           , amount = 313
-          , unit = Gram
+          , unit = Domain.Recipe.Gram
           }
         , { id = "yeast"
           , label = "Yeast"
           , amount = 3.4
-          , unit = Gram
+          , unit = Domain.Recipe.Gram
           }
         , { id = "oliveoil"
           , label = "Olive oil"
           , amount = 12
-          , unit = Mililiter
+          , unit = Domain.Recipe.Mililiter
           }
         , { id = "salt"
           , label = "Salt"
           , amount = 15
-          , unit = Gram
+          , unit = Domain.Recipe.Gram
           }
         , { id = "honey"
           , label = "Honey"
           , amount = 1
-          , unit = Teaspoon
+          , unit = Domain.Recipe.Teaspoon
           }
         ]
     , steps =
@@ -2248,7 +2131,7 @@ samplePizzaRecipe =
     }
 
 
-replaceIngredientAmountFraction : List Ingredient -> String -> String
+replaceIngredientAmountFraction : List Domain.Recipe.Ingredient -> String -> String
 replaceIngredientAmountFraction ingredients string =
     let
         fractionOfWordRegex : Regex.Regex
@@ -2293,7 +2176,7 @@ replaceIngredientAmountFraction ingredients string =
                         _ ->
                             Nothing
 
-                maybeIngredient : Maybe Ingredient
+                maybeIngredient : Maybe Domain.Recipe.Ingredient
                 maybeIngredient =
                     case parts of
                         _ :: _ :: word :: [] ->
@@ -2322,7 +2205,7 @@ replaceIngredientAmountFraction ingredients string =
                     String.replace
                         fullMatch
                         (round2ToString newAmount
-                            ++ unitToAbbr ing.unit
+                            ++ Domain.Recipe.unitToAbbr ing.unit
                             ++ " "
                             ++ ing.id
                         )

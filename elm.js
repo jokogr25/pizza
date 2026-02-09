@@ -5737,19 +5737,24 @@ var $author$project$Main$subscriptions = function (model) {
 				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder))
 			]));
 };
+var $author$project$Main$Album = function (a) {
+	return {$: 'Album', a: a};
+};
+var $author$project$Recipe$Album$Album = F2(
+	function (a, b) {
+		return {$: 'Album', a: a, b: b};
+	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
-var $author$project$Main$Gram = {$: 'Gram'};
-var $author$project$Main$Path = function (a) {
+var $author$project$Domain$Recipe$Gram = {$: 'Gram'};
+var $author$project$Recipe$Album$NoOp = {$: 'NoOp'};
+var $author$project$Domain$Recipe$Path = function (a) {
 	return {$: 'Path', a: a};
 };
-var $author$project$Main$RecipeAlbum = F2(
-	function (a, b) {
-		return {$: 'RecipeAlbum', a: a, b: b};
-	});
 var $author$project$Main$RecipeCreator = F4(
 	function (a, b, c, d) {
 		return {$: 'RecipeCreator', a: a, b: b, c: c, d: d};
 	});
+var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $author$project$Main$RecipeViewer = F7(
 	function (a, b, c, d, e, f, g) {
 		return {$: 'RecipeViewer', a: a, b: b, c: c, d: d, e: e, f: f, g: g};
@@ -5832,16 +5837,16 @@ var $elm$core$Basics$negate = function (n) {
 };
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$Mililiter = {$: 'Mililiter'};
-var $author$project$Main$Teaspoon = {$: 'Teaspoon'};
-var $author$project$Main$parseUnit = function (s) {
+var $author$project$Domain$Recipe$Mililiter = {$: 'Mililiter'};
+var $author$project$Domain$Recipe$Teaspoon = {$: 'Teaspoon'};
+var $author$project$Domain$Recipe$parseUnit = function (s) {
 	switch (s) {
 		case 'g':
-			return $elm$core$Maybe$Just($author$project$Main$Gram);
+			return $elm$core$Maybe$Just($author$project$Domain$Recipe$Gram);
 		case 'ml':
-			return $elm$core$Maybe$Just($author$project$Main$Mililiter);
+			return $elm$core$Maybe$Just($author$project$Domain$Recipe$Mililiter);
 		case 'tsp':
-			return $elm$core$Maybe$Just($author$project$Main$Teaspoon);
+			return $elm$core$Maybe$Just($author$project$Domain$Recipe$Teaspoon);
 		default:
 			return $elm$core$Maybe$Nothing;
 	}
@@ -5849,7 +5854,7 @@ var $author$project$Main$parseUnit = function (s) {
 var $author$project$Main$sampleLasagneRecipe = {
 	description: '',
 	id: 'lasanche',
-	image: $author$project$Main$Path('public/img/lasanche.jpg'),
+	image: $author$project$Domain$Recipe$Path('public/img/lasanche.jpg'),
 	ingredients: _List_Nil,
 	label: 'Lasanche',
 	steps: _List_Nil
@@ -5857,15 +5862,15 @@ var $author$project$Main$sampleLasagneRecipe = {
 var $author$project$Main$samplePizzaRecipe = {
 	description: '',
 	id: 'seven-hours-pizza-dough',
-	image: $author$project$Main$Path('public/img/7-hours-pizza-dough.jpg'),
+	image: $author$project$Domain$Recipe$Path('public/img/7-hours-pizza-dough.jpg'),
 	ingredients: _List_fromArray(
 		[
-			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Main$Gram},
-			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Main$Gram},
-			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Main$Gram},
-			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Main$Mililiter},
-			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Main$Gram},
-			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Main$Teaspoon}
+			{amount: 496, id: 'flour', label: 'Flour', unit: $author$project$Domain$Recipe$Gram},
+			{amount: 313, id: 'water', label: 'Water', unit: $author$project$Domain$Recipe$Gram},
+			{amount: 3.4, id: 'yeast', label: 'Yeast', unit: $author$project$Domain$Recipe$Gram},
+			{amount: 12, id: 'oliveoil', label: 'Olive oil', unit: $author$project$Domain$Recipe$Mililiter},
+			{amount: 15, id: 'salt', label: 'Salt', unit: $author$project$Domain$Recipe$Gram},
+			{amount: 1, id: 'honey', label: 'Honey', unit: $author$project$Domain$Recipe$Teaspoon}
 		]),
 	label: 'Pizza dough (7 hours)',
 	steps: _List_fromArray(
@@ -5886,6 +5891,19 @@ var $author$project$Main$samplePizzaRecipe = {
 		])
 };
 var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Recipe$Album$update = F2(
+	function (msg, model) {
+		if (msg.$ === 'InputAlbumSearch') {
+			var str = msg.a;
+			var recipes = model.a;
+			return A2(
+				$author$project$Recipe$Album$Album,
+				recipes,
+				$elm$core$Maybe$Just(str));
+		} else {
+			return model;
+		}
+	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5926,56 +5944,6 @@ var $author$project$Main$validateIngredient = F2(
 			ings);
 		return (!$elm$core$String$isEmpty(ing.id)) && ((!A2($elm$core$List$member, ing.id, listOfIds)) && ((ing.amount > 0) && (!$elm$core$String$isEmpty(ing.label))));
 	});
-var $elm$core$List$all = F2(
-	function (isOkay, list) {
-		return !A2(
-			$elm$core$List$any,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
-			list);
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $author$project$Main$uniqueStrings = function (list) {
-	return _Utils_eq(
-		$elm$core$List$length(list),
-		$elm$core$List$length(
-			A3(
-				$elm$core$List$foldl,
-				F2(
-					function (id, unique) {
-						return A2($elm$core$List$member, id, unique) ? unique : _Utils_ap(
-							unique,
-							_List_fromArray(
-								[id]));
-					}),
-				_List_Nil,
-				list)));
-};
-var $author$project$Main$validateIngredients = function (ingredients) {
-	return (!$elm$core$List$isEmpty(ingredients)) && ($author$project$Main$uniqueStrings(
-		A2(
-			$elm$core$List$map,
-			function (ingredient) {
-				return ingredient.id;
-			},
-			ingredients)) && A2(
-		$elm$core$List$all,
-		function (i) {
-			return i.amount > 0;
-		},
-		ingredients));
-};
-var $author$project$Main$validateSteps = function (steps) {
-	return !$elm$core$List$isEmpty(steps);
-};
-var $author$project$Main$validateRecipe = function (recipe) {
-	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
-};
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5996,8 +5964,9 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeViewer':
 				var recipe = msg.a;
 				var page = msg.b;
-				if (model.$ === 'RecipeAlbum') {
-					var recipes = model.a;
+				if (model.$ === 'Album') {
+					var _v2 = model.a;
+					var recipes = _v2.a;
 					return _Utils_Tuple2(
 						A7($author$project$Main$RecipeViewer, recipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
 						$elm$core$Platform$Cmd$none);
@@ -6008,28 +5977,39 @@ var $author$project$Main$update = F2(
 				switch (model.$) {
 					case 'Front':
 						return _Utils_Tuple2(
-							A2(
-								$author$project$Main$RecipeAlbum,
-								_List_fromArray(
-									[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
-								$elm$core$Maybe$Nothing),
+							$author$project$Main$Album(
+								A2(
+									$author$project$Recipe$Album$Album,
+									_List_fromArray(
+										[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
+									$elm$core$Maybe$Nothing)),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeCreator':
 						var recipes = model.a;
 						return _Utils_Tuple2(
-							A2($author$project$Main$RecipeAlbum, recipes, $elm$core$Maybe$Nothing),
+							$author$project$Main$Album(
+								A2(
+									$author$project$Recipe$Album$update,
+									$author$project$Recipe$Album$NoOp,
+									A2($author$project$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeViewer':
 						var recipes = model.a;
 						return _Utils_Tuple2(
-							A2($author$project$Main$RecipeAlbum, recipes, $elm$core$Maybe$Nothing),
+							$author$project$Main$Album(
+								A2(
+									$author$project$Recipe$Album$update,
+									$author$project$Recipe$Album$NoOp,
+									A2($author$project$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					default:
 						return noChange;
 				}
 			case 'GoRecipeCreator':
-				if (model.$ === 'RecipeAlbum') {
-					var recipes = model.a;
+				if ((model.$ === 'Album') && (model.a.b.$ === 'Nothing')) {
+					var _v5 = model.a;
+					var recipes = _v5.a;
+					var _v6 = _v5.b;
 					return _Utils_Tuple2(
 						A4(
 							$author$project$Main$RecipeCreator,
@@ -6037,7 +6017,7 @@ var $author$project$Main$update = F2(
 							{
 								description: '',
 								id: '',
-								image: $author$project$Main$Path(''),
+								image: $author$project$Domain$Recipe$Path(''),
 								ingredients: _List_Nil,
 								label: '',
 								steps: _List_Nil
@@ -6134,13 +6114,15 @@ var $author$project$Main$update = F2(
 				}
 			case 'InputSearchTerm':
 				var searchTerm = msg.a;
-				if (model.$ === 'RecipeAlbum') {
-					var recipes = model.a;
+				if (model.$ === 'Album') {
+					var _v13 = model.a;
+					var recipes = _v13.a;
 					return _Utils_Tuple2(
-						A2(
-							$author$project$Main$RecipeAlbum,
-							recipes,
-							$elm$core$Maybe$Just(searchTerm)),
+						$author$project$Main$Album(
+							A2(
+								$author$project$Recipe$Album$Album,
+								recipes,
+								$elm$core$Maybe$Just(searchTerm))),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -6287,7 +6269,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								draft,
 								{
-									image: $author$project$Main$Path(imagePath)
+									image: $author$project$Domain$Recipe$Path(imagePath)
 								}),
 							ingredientDraft,
 							stepDraft),
@@ -6405,7 +6387,7 @@ var $author$project$Main$update = F2(
 											{id: newId}));
 								} else {
 									return $elm$core$Maybe$Just(
-										{amount: 0, id: newId, label: '', unit: $author$project$Main$Gram});
+										{amount: 0, id: newId, label: '', unit: $author$project$Domain$Recipe$Gram});
 								}
 							}(),
 							maybeStepDraft),
@@ -6434,7 +6416,7 @@ var $author$project$Main$update = F2(
 											{label: newLabel}));
 								} else {
 									return $elm$core$Maybe$Just(
-										{amount: 0, id: '', label: newLabel, unit: $author$project$Main$Gram});
+										{amount: 0, id: '', label: newLabel, unit: $author$project$Domain$Recipe$Gram});
 								}
 							}(),
 							maybeStepDraft),
@@ -6449,9 +6431,9 @@ var $author$project$Main$update = F2(
 					var draft = model.b;
 					var maybeIngredientDraft = model.c;
 					var maybeStepDraft = model.d;
-					var _v26 = $elm$core$String$toFloat(newStrAmount);
-					if (_v26.$ === 'Just') {
-						var f = _v26.a;
+					var _v30 = $elm$core$String$toFloat(newStrAmount);
+					if (_v30.$ === 'Just') {
+						var f = _v30.a;
 						return _Utils_Tuple2(
 							A4(
 								$author$project$Main$RecipeCreator,
@@ -6466,7 +6448,7 @@ var $author$project$Main$update = F2(
 												{amount: f}));
 									} else {
 										return $elm$core$Maybe$Just(
-											{amount: f, id: '', label: '', unit: $author$project$Main$Gram});
+											{amount: f, id: '', label: '', unit: $author$project$Domain$Recipe$Gram});
 									}
 								}(),
 								maybeStepDraft),
@@ -6484,8 +6466,8 @@ var $author$project$Main$update = F2(
 					gUnit,
 					A2(
 						$elm$core$Maybe$withDefault,
-						$author$project$Main$Gram,
-						$author$project$Main$parseUnit(gUnit)));
+						$author$project$Domain$Recipe$Gram,
+						$author$project$Domain$Recipe$parseUnit(gUnit)));
 				if (model.$ === 'RecipeCreator') {
 					var recipes = model.a;
 					var draft = model.b;
@@ -6692,18 +6674,60 @@ var $author$project$Main$update = F2(
 					var recipes = model.a;
 					var draft = model.b;
 					return _Utils_Tuple2(
-						A2(
-							$author$project$Main$RecipeAlbum,
-							$author$project$Main$validateRecipe(draft) ? A2($elm$core$List$cons, draft, recipes) : recipes,
-							$elm$core$Maybe$Nothing),
+						$author$project$Main$Album(
+							A2(
+								$author$project$Recipe$Album$update,
+								$author$project$Recipe$Album$NoOp,
+								A2(
+									$author$project$Recipe$Album$Album,
+									A2($elm$core$List$cons, draft, recipes),
+									$elm$core$Maybe$Nothing))),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
+				}
+			case 'AlbumMsg':
+				var albumMsg = msg.a;
+				switch (albumMsg.$) {
+					case 'GoRecipeCreator':
+						return _Utils_Tuple2(
+							A4(
+								$author$project$Main$RecipeCreator,
+								_List_Nil,
+								{
+									description: '',
+									id: '',
+									image: $author$project$Domain$Recipe$Path(''),
+									ingredients: _List_Nil,
+									label: '',
+									steps: _List_Nil
+								},
+								$elm$core$Maybe$Nothing,
+								$elm$core$Maybe$Nothing),
+							$elm$core$Platform$Cmd$none);
+					case 'GoRecipeViewer':
+						var recipe = albumMsg.a;
+						return _Utils_Tuple2(
+							A7($author$project$Main$RecipeViewer, _List_Nil, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
+							$elm$core$Platform$Cmd$none);
+					default:
+						if (model.$ === 'Album') {
+							var m = model.a;
+							return _Utils_Tuple2(
+								$author$project$Main$Album(
+									A2($author$project$Recipe$Album$update, albumMsg, m)),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							return noChange;
+						}
 				}
 			default:
 				return noChange;
 		}
 	});
+var $author$project$Main$AlbumMsg = function (a) {
+	return {$: 'AlbumMsg', a: a};
+};
 var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $author$project$Main$RecipeCreatorPage = {$: 'RecipeCreatorPage'};
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7197,6 +7221,8 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 					[$author$project$Main$resetIcon]))
 			]));
 };
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $author$project$Main$arrowLeftIcon = A2($author$project$Main$genericIcon, 'arrow-left.svg', 32);
 var $author$project$Main$arrowRightIcon = A2($author$project$Main$genericIcon, 'arrow-right.svg', 32);
 var $author$project$Main$prepStepsViewActions = F2(
@@ -7231,170 +7257,6 @@ var $author$project$Main$prepStepsViewActions = F2(
 					$author$project$Main$arrowRightIcon)
 				]));
 	});
-var $author$project$Main$GoRecipeCreator = {$: 'GoRecipeCreator'};
-var $author$project$Main$plusIcon = function (width) {
-	return A2($author$project$Main$genericIcon, 'plus.svg', width);
-};
-var $author$project$Main$GoRecipeViewer = F2(
-	function (a, b) {
-		return {$: 'GoRecipeViewer', a: a, b: b};
-	});
-var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $author$project$Main$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
-var $elm$html$Html$h5 = _VirtualDom_node('h5');
-var $elm$html$Html$p = _VirtualDom_node('p');
-var $author$project$Main$recipeAlbumCardView = function (recipe) {
-	var isRecipeValid = !($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps));
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('col')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
-						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
-						isRecipeValid ? $elm$html$Html$Events$onClick(
-						A2($author$project$Main$GoRecipeViewer, recipe, $author$project$Main$RecipeIngredientsPage)) : $author$project$Main$emptyStyle
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$img,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card-img-top'),
-								$elm$html$Html$Attributes$src(
-								function () {
-									var _v0 = recipe.image;
-									var path = _v0.a;
-									return path;
-								}()),
-								$elm$html$Html$Attributes$alt(recipe.label),
-								A2($elm$html$Html$Attributes$style, 'object-fit', 'cover'),
-								A2($elm$html$Html$Attributes$style, 'height', '225px')
-							]),
-						_List_Nil),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card-body d-flex flex-column')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$h5,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('card-title')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(recipe.label)
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('card-text flex-grow-1')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(recipe.description)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('d-flex justify-content-between align-items-center mt-2')
-									]),
-								_List_Nil)
-							]))
-					]))
-			]));
-};
-var $author$project$Main$recipeAlbumView = function (recipes) {
-	var addButtonCard = A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('col')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
-						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
-						$elm$html$Html$Events$onClick($author$project$Main$GoRecipeCreator)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card-img-top'),
-								A2($elm$html$Html$Attributes$style, 'height', '225px')
-							]),
-						_List_Nil),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('card-body d-flex justify-content-center align-items-center')
-							]),
-						_List_fromArray(
-							[
-								$author$project$Main$plusIcon(64)
-							]))
-					]))
-			]));
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('album py-5')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('container'),
-								A2($elm$html$Html$Attributes$style, 'max-width', '700px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
-									]),
-								_Utils_ap(
-									A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes),
-									_List_fromArray(
-										[addButtonCard])))
-							]))
-					]))
-			]));
-};
 var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
 var $author$project$Main$saveIcon = A2($author$project$Main$genericIcon, 'save.svg', 32);
 var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
@@ -7455,8 +7317,9 @@ var $author$project$Main$UpdateIngredientLabel = function (a) {
 var $author$project$Main$UpdateIngredientUnit = function (a) {
 	return {$: 'UpdateIngredientUnit', a: a};
 };
-var $author$project$Main$allUnits = _List_fromArray(
-	[$author$project$Main$Gram, $author$project$Main$Mililiter, $author$project$Main$Teaspoon]);
+var $author$project$Domain$Recipe$allUnits = _List_fromArray(
+	[$author$project$Domain$Recipe$Gram, $author$project$Domain$Recipe$Mililiter, $author$project$Domain$Recipe$Teaspoon]);
+var $author$project$Main$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
 var $author$project$Main$empyStyleMapper = F2(
 	function (m, f) {
 		return A2(
@@ -7469,7 +7332,7 @@ var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
-var $author$project$Main$unitToAbbr = function (unit) {
+var $author$project$Domain$Recipe$unitToAbbr = function (unit) {
 	switch (unit.$) {
 		case 'Gram':
 			return 'g';
@@ -7526,7 +7389,7 @@ var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$value(
-													$author$project$Main$unitToAbbr(unit)),
+													$author$project$Domain$Recipe$unitToAbbr(unit)),
 													$elm$html$Html$Attributes$selected(
 													function () {
 														if (maybeIngredient.$ === 'Just') {
@@ -7540,10 +7403,10 @@ var $author$project$Main$addOrEditIngredientView = function (maybeIngredient) {
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													$author$project$Main$unitToAbbr(unit))
+													$author$project$Domain$Recipe$unitToAbbr(unit))
 												]));
 									},
-									$author$project$Main$allUnits)),
+									$author$project$Domain$Recipe$allUnits)),
 								A2(
 								$elm$html$Html$label,
 								_List_Nil,
@@ -7756,13 +7619,16 @@ var $author$project$Main$addOrEditStepView = function (maybeStep) {
 };
 var $author$project$Main$closeIcon = A2($author$project$Main$genericIcon, 'close.svg', 16);
 var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
-var $author$project$Main$getPathStr = function (p) {
+var $author$project$Domain$Recipe$getPathStr = function (p) {
 	var str = p.a;
 	return str;
 };
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $author$project$Main$pencilIcon = A2($author$project$Main$genericIcon, 'pencil.svg', 16);
+var $author$project$Main$plusIcon = function (width) {
+	return A2($author$project$Main$genericIcon, 'plus.svg', width);
+};
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$validateStep = function (step) {
 	return (_Utils_cmp(step.time, -1) > -1) && ((!$elm$core$String$isEmpty(step.title)) && (!$elm$core$String$isEmpty(step.description)));
@@ -7926,7 +7792,7 @@ var $author$project$Main$recipeCreatorView = F3(
 												$elm$html$Html$Attributes$class('form-control'),
 												$elm$html$Html$Attributes$id(id),
 												$elm$html$Html$Attributes$value(
-												$author$project$Main$getPathStr(draft.image)),
+												$author$project$Domain$Recipe$getPathStr(draft.image)),
 												$elm$html$Html$Events$onInput($author$project$Main$UpdateImagePath)
 											]),
 										_List_Nil),
@@ -8090,7 +7956,7 @@ var $author$project$Helper$round2ToString = function (x) {
 };
 var $author$project$Main$ingredientView = F4(
 	function (ratio, maybeSelectedIngredient, maybeNewAmount, ingredient) {
-		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount * ratio) + (' ' + ($author$project$Main$unitToAbbr(ingredient.unit) + ')'))));
+		var placeholder = ingredient.label + (' (' + ($author$project$Helper$round2ToString(ingredient.amount * ratio) + (' ' + ($author$project$Domain$Recipe$unitToAbbr(ingredient.unit) + ')'))));
 		var isSelected = A2(
 			$elm$core$Maybe$withDefault,
 			false,
@@ -8288,7 +8154,7 @@ var $author$project$Main$replaceIngredientAmountFraction = F2(
 					return A3(
 						$elm$core$String$replace,
 						fullMatch,
-						$author$project$Helper$round2ToString(newAmount) + ($author$project$Main$unitToAbbr(ing.unit) + (' ' + ing.id)),
+						$author$project$Helper$round2ToString(newAmount) + ($author$project$Domain$Recipe$unitToAbbr(ing.unit) + (' ' + ing.id)),
 						str);
 				} else {
 					return str;
@@ -8519,6 +8385,252 @@ var $author$project$Main$recipeView = F6(
 						]))
 				]));
 	});
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$uniqueStrings = function (list) {
+	return _Utils_eq(
+		$elm$core$List$length(list),
+		$elm$core$List$length(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (id, unique) {
+						return A2($elm$core$List$member, id, unique) ? unique : _Utils_ap(
+							unique,
+							_List_fromArray(
+								[id]));
+					}),
+				_List_Nil,
+				list)));
+};
+var $author$project$Main$validateIngredients = function (ingredients) {
+	return (!$elm$core$List$isEmpty(ingredients)) && ($author$project$Main$uniqueStrings(
+		A2(
+			$elm$core$List$map,
+			function (ingredient) {
+				return ingredient.id;
+			},
+			ingredients)) && A2(
+		$elm$core$List$all,
+		function (i) {
+			return i.amount > 0;
+		},
+		ingredients));
+};
+var $author$project$Main$validateSteps = function (steps) {
+	return !$elm$core$List$isEmpty(steps);
+};
+var $author$project$Main$validateRecipe = function (recipe) {
+	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
+};
+var $author$project$Recipe$Album$GoRecipeCreator = {$: 'GoRecipeCreator'};
+var $author$project$Domain$Icon$genericIcon = F2(
+	function (path, width) {
+		return A2(
+			$elm$html$Html$img,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$width(width),
+					$elm$html$Html$Attributes$src('public/img/icon/' + path)
+				]),
+			_List_Nil);
+	});
+var $author$project$Domain$Icon$plusIcon = function (width) {
+	return A2($author$project$Domain$Icon$genericIcon, 'plus.svg', width);
+};
+var $author$project$Recipe$Album$GoRecipeViewer = function (a) {
+	return {$: 'GoRecipeViewer', a: a};
+};
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $author$project$Domain$Helper$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $author$project$Recipe$Album$recipeAlbumCardView = function (recipe) {
+	var isRecipeValid = !($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps));
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('col')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
+						isRecipeValid ? $elm$html$Html$Events$onClick(
+						$author$project$Recipe$Album$GoRecipeViewer(recipe)) : $author$project$Domain$Helper$emptyStyle
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-img-top'),
+								$elm$html$Html$Attributes$src(
+								function () {
+									var _v0 = recipe.image;
+									var path = _v0.a;
+									return path;
+								}()),
+								$elm$html$Html$Attributes$alt(recipe.label),
+								A2($elm$html$Html$Attributes$style, 'object-fit', 'cover'),
+								A2($elm$html$Html$Attributes$style, 'height', '225px')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-body d-flex flex-column')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$h5,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-title')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(recipe.label)
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('card-text flex-grow-1')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(recipe.description)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('d-flex justify-content-between align-items-center mt-2')
+									]),
+								_List_Nil)
+							]))
+					]))
+			]));
+};
+var $author$project$Recipe$Album$recipeAlbumView = function (recipes) {
+	var addButtonCard = A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('col')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
+						$elm$html$Html$Events$onClick($author$project$Recipe$Album$GoRecipeCreator)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-img-top'),
+								A2($elm$html$Html$Attributes$style, 'height', '225px')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-body d-flex justify-content-center align-items-center')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Domain$Icon$plusIcon(64)
+							]))
+					]))
+			]));
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('album py-5')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('container'),
+								A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
+									]),
+								_Utils_ap(
+									A2($elm$core$List$map, $author$project$Recipe$Album$recipeAlbumCardView, recipes),
+									_List_fromArray(
+										[addButtonCard])))
+							]))
+					]))
+			]));
+};
+var $author$project$Recipe$Album$view = function (model) {
+	var recipes = model.a;
+	var maybeSearch = model.b;
+	var maybeFilteredRecipes = A2(
+		$elm$core$Maybe$withDefault,
+		recipes,
+		A2(
+			$elm$core$Maybe$map,
+			function (m) {
+				return A2(
+					$elm$core$List$filter,
+					function (recipe) {
+						return A2(
+							$elm$core$List$any,
+							$elm$core$String$contains(m),
+							_List_fromArray(
+								[recipe.label, recipe.id]));
+					},
+					recipes);
+			},
+			maybeSearch));
+	return $author$project$Recipe$Album$recipeAlbumView(maybeFilteredRecipes);
+};
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(
@@ -8615,31 +8727,6 @@ var $author$project$Main$view = function (model) {
 			return $author$project$Main$frontView;
 		case 'Carousel':
 			return $author$project$Main$viewCarousel1;
-		case 'RecipeAlbum':
-			var recipes = model.a;
-			var maybeSearchTerm = model.b;
-			return A3(
-				$author$project$Main$contentView,
-				$author$project$Main$RecipeAlbumPage,
-				$author$project$Main$recipeAlbumView(
-					function () {
-						if (maybeSearchTerm.$ === 'Just') {
-							var searchTerm = maybeSearchTerm.a;
-							return A2(
-								$elm$core$List$filter,
-								function (recipe) {
-									return A2(
-										$elm$core$List$any,
-										$elm$core$String$contains(searchTerm),
-										_List_fromArray(
-											[recipe.label, recipe.id]));
-								},
-								recipes);
-						} else {
-							return recipes;
-						}
-					}()),
-				$elm$core$Maybe$Nothing);
 		case 'RecipeViewer':
 			var recipe = model.b;
 			var selectedIngredient = model.c;
@@ -8666,7 +8753,7 @@ var $author$project$Main$view = function (model) {
 							return $elm$core$Maybe$Nothing;
 					}
 				}());
-		default:
+		case 'RecipeCreator':
 			var recipeDraft = model.b;
 			var maybeIngredientDraft = model.c;
 			var maybeStepDraft = model.d;
@@ -8677,6 +8764,16 @@ var $author$project$Main$view = function (model) {
 				$elm$core$Maybe$Just(
 					$author$project$Main$recipeCreatorActions(
 						$author$project$Main$validateRecipe(recipeDraft))));
+		default:
+			var m = model.a;
+			return A3(
+				$author$project$Main$contentView,
+				$author$project$Main$RecipeAlbumPage,
+				A2(
+					$elm$html$Html$map,
+					$author$project$Main$AlbumMsg,
+					$author$project$Recipe$Album$view(m)),
+				$elm$core$Maybe$Nothing);
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
