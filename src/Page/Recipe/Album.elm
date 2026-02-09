@@ -1,4 +1,4 @@
-module Recipe.Album exposing (..)
+module Page.Recipe.Album exposing (..)
 
 import Domain.Helper exposing (emptyStyle)
 import Domain.Icon exposing (plusIcon)

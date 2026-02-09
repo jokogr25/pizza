@@ -5740,13 +5740,13 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$Album = function (a) {
 	return {$: 'Album', a: a};
 };
-var $author$project$Recipe$Album$Album = F2(
+var $author$project$Page$Recipe$Album$Album = F2(
 	function (a, b) {
 		return {$: 'Album', a: a, b: b};
 	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
 var $author$project$Domain$Recipe$Gram = {$: 'Gram'};
-var $author$project$Recipe$Album$NoOp = {$: 'NoOp'};
+var $author$project$Page$Recipe$Album$NoOp = {$: 'NoOp'};
 var $author$project$Domain$Recipe$Path = function (a) {
 	return {$: 'Path', a: a};
 };
@@ -5891,13 +5891,13 @@ var $author$project$Main$samplePizzaRecipe = {
 		])
 };
 var $elm$core$String$toFloat = _String_toFloat;
-var $author$project$Recipe$Album$update = F2(
+var $author$project$Page$Recipe$Album$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'InputAlbumSearch') {
 			var str = msg.a;
 			var recipes = model.a;
 			return A2(
-				$author$project$Recipe$Album$Album,
+				$author$project$Page$Recipe$Album$Album,
 				recipes,
 				$elm$core$Maybe$Just(str));
 		} else {
@@ -5979,7 +5979,7 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							$author$project$Main$Album(
 								A2(
-									$author$project$Recipe$Album$Album,
+									$author$project$Page$Recipe$Album$Album,
 									_List_fromArray(
 										[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
 									$elm$core$Maybe$Nothing)),
@@ -5989,18 +5989,18 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							$author$project$Main$Album(
 								A2(
-									$author$project$Recipe$Album$update,
-									$author$project$Recipe$Album$NoOp,
-									A2($author$project$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
+									$author$project$Page$Recipe$Album$update,
+									$author$project$Page$Recipe$Album$NoOp,
+									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeViewer':
 						var recipes = model.a;
 						return _Utils_Tuple2(
 							$author$project$Main$Album(
 								A2(
-									$author$project$Recipe$Album$update,
-									$author$project$Recipe$Album$NoOp,
-									A2($author$project$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
+									$author$project$Page$Recipe$Album$update,
+									$author$project$Page$Recipe$Album$NoOp,
+									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					default:
 						return noChange;
@@ -6120,7 +6120,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						$author$project$Main$Album(
 							A2(
-								$author$project$Recipe$Album$Album,
+								$author$project$Page$Recipe$Album$Album,
 								recipes,
 								$elm$core$Maybe$Just(searchTerm))),
 						$elm$core$Platform$Cmd$none);
@@ -6676,10 +6676,10 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						$author$project$Main$Album(
 							A2(
-								$author$project$Recipe$Album$update,
-								$author$project$Recipe$Album$NoOp,
+								$author$project$Page$Recipe$Album$update,
+								$author$project$Page$Recipe$Album$NoOp,
 								A2(
-									$author$project$Recipe$Album$Album,
+									$author$project$Page$Recipe$Album$Album,
 									A2($elm$core$List$cons, draft, recipes),
 									$elm$core$Maybe$Nothing))),
 						$elm$core$Platform$Cmd$none);
@@ -6715,7 +6715,7 @@ var $author$project$Main$update = F2(
 							var m = model.a;
 							return _Utils_Tuple2(
 								$author$project$Main$Album(
-									A2($author$project$Recipe$Album$update, albumMsg, m)),
+									A2($author$project$Page$Recipe$Album$update, albumMsg, m)),
 								$elm$core$Platform$Cmd$none);
 						} else {
 							return noChange;
@@ -8435,7 +8435,7 @@ var $author$project$Main$validateSteps = function (steps) {
 var $author$project$Main$validateRecipe = function (recipe) {
 	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
 };
-var $author$project$Recipe$Album$GoRecipeCreator = {$: 'GoRecipeCreator'};
+var $author$project$Page$Recipe$Album$GoRecipeCreator = {$: 'GoRecipeCreator'};
 var $author$project$Domain$Icon$genericIcon = F2(
 	function (path, width) {
 		return A2(
@@ -8450,14 +8450,14 @@ var $author$project$Domain$Icon$genericIcon = F2(
 var $author$project$Domain$Icon$plusIcon = function (width) {
 	return A2($author$project$Domain$Icon$genericIcon, 'plus.svg', width);
 };
-var $author$project$Recipe$Album$GoRecipeViewer = function (a) {
+var $author$project$Page$Recipe$Album$GoRecipeViewer = function (a) {
 	return {$: 'GoRecipeViewer', a: a};
 };
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Domain$Helper$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $author$project$Recipe$Album$recipeAlbumCardView = function (recipe) {
+var $author$project$Page$Recipe$Album$recipeAlbumCardView = function (recipe) {
 	var isRecipeValid = !($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps));
 	return A2(
 		$elm$html$Html$div,
@@ -8474,7 +8474,7 @@ var $author$project$Recipe$Album$recipeAlbumCardView = function (recipe) {
 						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
 						isRecipeValid ? $elm$html$Html$Events$onClick(
-						$author$project$Recipe$Album$GoRecipeViewer(recipe)) : $author$project$Domain$Helper$emptyStyle
+						$author$project$Page$Recipe$Album$GoRecipeViewer(recipe)) : $author$project$Domain$Helper$emptyStyle
 					]),
 				_List_fromArray(
 					[
@@ -8533,7 +8533,7 @@ var $author$project$Recipe$Album$recipeAlbumCardView = function (recipe) {
 					]))
 			]));
 };
-var $author$project$Recipe$Album$recipeAlbumView = function (recipes) {
+var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 	var addButtonCard = A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -8548,7 +8548,7 @@ var $author$project$Recipe$Album$recipeAlbumView = function (recipes) {
 					[
 						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
-						$elm$html$Html$Events$onClick($author$project$Recipe$Album$GoRecipeCreator)
+						$elm$html$Html$Events$onClick($author$project$Page$Recipe$Album$GoRecipeCreator)
 					]),
 				_List_fromArray(
 					[
@@ -8601,14 +8601,14 @@ var $author$project$Recipe$Album$recipeAlbumView = function (recipes) {
 										$elm$html$Html$Attributes$class('row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3')
 									]),
 								_Utils_ap(
-									A2($elm$core$List$map, $author$project$Recipe$Album$recipeAlbumCardView, recipes),
+									A2($elm$core$List$map, $author$project$Page$Recipe$Album$recipeAlbumCardView, recipes),
 									_List_fromArray(
 										[addButtonCard])))
 							]))
 					]))
 			]));
 };
-var $author$project$Recipe$Album$view = function (model) {
+var $author$project$Page$Recipe$Album$view = function (model) {
 	var recipes = model.a;
 	var maybeSearch = model.b;
 	var maybeFilteredRecipes = A2(
@@ -8629,7 +8629,7 @@ var $author$project$Recipe$Album$view = function (model) {
 					recipes);
 			},
 			maybeSearch));
-	return $author$project$Recipe$Album$recipeAlbumView(maybeFilteredRecipes);
+	return $author$project$Page$Recipe$Album$recipeAlbumView(maybeFilteredRecipes);
 };
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
@@ -8772,7 +8772,7 @@ var $author$project$Main$view = function (model) {
 				A2(
 					$elm$html$Html$map,
 					$author$project$Main$AlbumMsg,
-					$author$project$Recipe$Album$view(m)),
+					$author$project$Page$Recipe$Album$view(m)),
 				$elm$core$Maybe$Nothing);
 	}
 };

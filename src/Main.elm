@@ -10,8 +10,8 @@ import Html.Attributes exposing (alt, attribute, class, classList, disabled, id,
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
+import Page.Recipe.Album as PageAlbum
 import Platform.Cmd as Cmd
-import Recipe.Album
 import Regex
 import String
 import Svg.Attributes exposing (visibility)
@@ -39,7 +39,7 @@ main =
 type Model
     = Front
     | Carousel
-    | Album Recipe.Album.Model
+    | Album PageAlbum.Model
     | RecipeViewer (List Domain.Recipe.Recipe) Domain.Recipe.Recipe (Maybe Domain.Recipe.Ingredient) Int (Maybe Float) Float ActivePage
     | RecipeCreator (List Domain.Recipe.Recipe) Domain.Recipe.Recipe (Maybe Domain.Recipe.Ingredient) (Maybe Domain.Recipe.PrepStep)
 
@@ -82,7 +82,7 @@ type Msg
     | UpdateStepTime String
     | UpdateStepDescription String
     | SaveRecipe
-    | AlbumMsg Recipe.Album.Msg
+    | AlbumMsg PageAlbum.Msg
 
 
 
@@ -177,7 +177,7 @@ update msg model =
 
         GoRecipeViewer recipe page ->
             case model of
-                Album (Recipe.Album.Album recipes _) ->
+                Album (PageAlbum.Album recipes _) ->
                     ( RecipeViewer
                         recipes
                         recipe
@@ -196,7 +196,7 @@ update msg model =
             case model of
                 Front ->
                     ( Album
-                        (Recipe.Album.Album
+                        (PageAlbum.Album
                             [ samplePizzaRecipe
                             , sampleLasagneRecipe
                             ]
@@ -207,18 +207,18 @@ update msg model =
 
                 RecipeCreator recipes _ _ _ ->
                     ( Album
-                        (Recipe.Album.update
-                            Recipe.Album.NoOp
-                            (Recipe.Album.Album recipes Nothing)
+                        (PageAlbum.update
+                            PageAlbum.NoOp
+                            (PageAlbum.Album recipes Nothing)
                         )
                     , Cmd.none
                     )
 
                 RecipeViewer recipes _ _ _ _ _ _ ->
                     ( Album
-                        (Recipe.Album.update
-                            Recipe.Album.NoOp
-                            (Recipe.Album.Album
+                        (PageAlbum.update
+                            PageAlbum.NoOp
+                            (PageAlbum.Album
                                 recipes
                                 Nothing
                             )
@@ -231,7 +231,7 @@ update msg model =
 
         GoRecipeCreator ->
             case model of
-                Album (Recipe.Album.Album recipes Nothing) ->
+                Album (PageAlbum.Album recipes Nothing) ->
                     ( RecipeCreator
                         recipes
                         { id = ""
@@ -336,9 +336,9 @@ update msg model =
 
         InputSearchTerm searchTerm ->
             case model of
-                Album (Recipe.Album.Album recipes _) ->
+                Album (PageAlbum.Album recipes _) ->
                     ( Album
-                        (Recipe.Album.Album
+                        (PageAlbum.Album
                             recipes
                             (Just searchTerm)
                         )
@@ -843,9 +843,9 @@ update msg model =
             case model of
                 RecipeCreator recipes draft _ _ ->
                     ( Album
-                        (Recipe.Album.update
-                            Recipe.Album.NoOp
-                            (Recipe.Album.Album
+                        (PageAlbum.update
+                            PageAlbum.NoOp
+                            (PageAlbum.Album
                                 (draft :: recipes)
                                 Nothing
                             )
@@ -858,7 +858,7 @@ update msg model =
 
         AlbumMsg albumMsg ->
             case albumMsg of
-                Recipe.Album.GoRecipeCreator ->
+                PageAlbum.GoRecipeCreator ->
                     ( RecipeCreator
                         []
                         { id = ""
@@ -873,7 +873,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                Recipe.Album.GoRecipeViewer recipe ->
+                PageAlbum.GoRecipeViewer recipe ->
                     ( RecipeViewer
                         []
                         recipe
@@ -889,7 +889,7 @@ update msg model =
                     case model of
                         Album m ->
                             ( Album
-                                (Recipe.Album.update albumMsg m)
+                                (PageAlbum.update albumMsg m)
                             , Cmd.none
                             )
 
@@ -952,7 +952,7 @@ view model =
         Album m ->
             contentView
                 RecipeAlbumPage
-                (Recipe.Album.view m
+                (PageAlbum.view m
                     |> Html.map AlbumMsg
                 )
                 Nothing
