@@ -50,7 +50,7 @@ type Msg
     = GoFront
     | GoCarousel
     | GoRecipeAlbum
-    | GoRecipeViewer Recipe
+    | GoRecipeViewer Recipe ActivePage
     | GoRecipeCreator
     | ResetRecipeViewer
     | SelectIngredient Ingredient
@@ -172,7 +172,7 @@ update msg model =
         GoCarousel ->
             ( Carousel, Cmd.none )
 
-        GoRecipeViewer recipe ->
+        GoRecipeViewer recipe page ->
             case model of
                 RecipeAlbum recipes _ ->
                     ( RecipeViewer
@@ -182,7 +182,7 @@ update msg model =
                         0
                         Nothing
                         1
-                        RecipeIngredientsPage
+                        page
                     , Cmd.none
                     )
 
@@ -1244,6 +1244,25 @@ navbarView activePage =
 
 recipeAlbumView : List Recipe -> Html Msg
 recipeAlbumView recipes =
+    let
+        addButtonCard =
+            div [ class "col" ]
+                [ div
+                    [ class "card shadow-sm h-100"
+                    , style "min-width" "220px"
+                    , onClick GoRecipeCreator
+                    ]
+                    [ div
+                        [ class "card-img-top"
+                        , style "height" "225px"
+                        ]
+                        []
+                    , div
+                        [ class "card-body d-flex justify-content-center align-items-center" ]
+                        [ plusIcon 64 ]
+                    ]
+                ]
+    in
     div []
         [ div
             [ class "album py-5" ]
@@ -1254,18 +1273,7 @@ recipeAlbumView recipes =
                 [ div
                     [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
                     (List.map recipeAlbumCardView recipes
-                        ++ [ div
-                                [ class "col"
-                                ]
-                                [ div
-                                    [ class "card shadow-sm h-100 d-flex justify-content-center align-items-center"
-                                    , style "min-width" "220px"
-                                    , style "min-height" "128px"
-                                    , onClick GoRecipeCreator
-                                    ]
-                                    [ plusIcon 64
-                                    ]
-                                ]
+                        ++ [ addButtonCard
                            ]
                     )
                 ]
@@ -1275,11 +1283,20 @@ recipeAlbumView recipes =
 
 recipeAlbumCardView : Recipe -> Html Msg
 recipeAlbumCardView recipe =
+    let
+        isRecipeValid =
+            not (List.isEmpty recipe.ingredients && List.isEmpty recipe.steps)
+    in
     div
         [ class "col" ]
         [ div
             [ class "card shadow-sm h-100"
             , style "min-width" "220px"
+            , if isRecipeValid then
+                onClick (GoRecipeViewer recipe RecipeIngredientsPage)
+
+              else
+                emptyStyle
             ]
             [ Html.img
                 [ class "card-img-top"
@@ -1303,22 +1320,7 @@ recipeAlbumCardView recipe =
                     [ text recipe.description ]
                 , div
                     [ class "d-flex justify-content-between align-items-center mt-2" ]
-                    [ div
-                        [ class "btn-group" ]
-                        [ if List.isEmpty recipe.ingredients && List.isEmpty recipe.steps then
-                            button
-                                [ class "btn btn-sm btn-outline-primary disabled"
-                                ]
-                                [ text "Under construction :(" ]
-
-                          else
-                            button
-                                [ class "btn btn-sm btn-outline-primary"
-                                , onClick (GoRecipeViewer recipe)
-                                ]
-                                [ text "Open" ]
-                        ]
-                    ]
+                    []
                 ]
             ]
         ]

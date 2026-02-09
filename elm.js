@@ -5750,7 +5750,6 @@ var $author$project$Main$RecipeCreator = F4(
 	function (a, b, c, d) {
 		return {$: 'RecipeCreator', a: a, b: b, c: c, d: d};
 	});
-var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $author$project$Main$RecipeViewer = F7(
 	function (a, b, c, d, e, f, g) {
 		return {$: 'RecipeViewer', a: a, b: b, c: c, d: d, e: e, f: f, g: g};
@@ -5996,10 +5995,11 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2($author$project$Main$Carousel, $elm$core$Platform$Cmd$none);
 			case 'GoRecipeViewer':
 				var recipe = msg.a;
+				var page = msg.b;
 				if (model.$ === 'RecipeAlbum') {
 					var recipes = model.a;
 					return _Utils_Tuple2(
-						A7($author$project$Main$RecipeViewer, recipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
+						A7($author$project$Main$RecipeViewer, recipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return noChange;
@@ -7235,13 +7235,17 @@ var $author$project$Main$GoRecipeCreator = {$: 'GoRecipeCreator'};
 var $author$project$Main$plusIcon = function (width) {
 	return A2($author$project$Main$genericIcon, 'plus.svg', width);
 };
-var $author$project$Main$GoRecipeViewer = function (a) {
-	return {$: 'GoRecipeViewer', a: a};
-};
+var $author$project$Main$GoRecipeViewer = F2(
+	function (a, b) {
+		return {$: 'GoRecipeViewer', a: a, b: b};
+	});
+var $author$project$Main$RecipeIngredientsPage = {$: 'RecipeIngredientsPage'};
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $author$project$Main$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$Main$recipeAlbumCardView = function (recipe) {
+	var isRecipeValid = !($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps));
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7255,7 +7259,9 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
-						A2($elm$html$Html$Attributes$style, 'min-width', '220px')
+						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
+						isRecipeValid ? $elm$html$Html$Events$onClick(
+						A2($author$project$Main$GoRecipeViewer, recipe, $author$project$Main$RecipeIngredientsPage)) : $author$project$Main$emptyStyle
 					]),
 				_List_fromArray(
 					[
@@ -7309,44 +7315,50 @@ var $author$project$Main$recipeAlbumCardView = function (recipe) {
 									[
 										$elm$html$Html$Attributes$class('d-flex justify-content-between align-items-center mt-2')
 									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$div,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('btn-group')
-											]),
-										_List_fromArray(
-											[
-												($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps)) ? A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('btn btn-sm btn-outline-primary disabled')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Under construction :(')
-													])) : A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('btn btn-sm btn-outline-primary'),
-														$elm$html$Html$Events$onClick(
-														$author$project$Main$GoRecipeViewer(recipe))
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Open')
-													]))
-											]))
-									]))
+								_List_Nil)
 							]))
 					]))
 			]));
 };
 var $author$project$Main$recipeAlbumView = function (recipes) {
+	var addButtonCard = A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('col')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
+						$elm$html$Html$Events$onClick($author$project$Main$GoRecipeCreator)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-img-top'),
+								A2($elm$html$Html$Attributes$style, 'height', '225px')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card-body d-flex justify-content-center align-items-center')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$plusIcon(64)
+							]))
+					]))
+			]));
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -7378,30 +7390,7 @@ var $author$project$Main$recipeAlbumView = function (recipes) {
 								_Utils_ap(
 									A2($elm$core$List$map, $author$project$Main$recipeAlbumCardView, recipes),
 									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$div,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('col')
-												]),
-											_List_fromArray(
-												[
-													A2(
-													$elm$html$Html$div,
-													_List_fromArray(
-														[
-															$elm$html$Html$Attributes$class('card shadow-sm h-100 d-flex justify-content-center align-items-center'),
-															A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
-															A2($elm$html$Html$Attributes$style, 'min-height', '128px'),
-															$elm$html$Html$Events$onClick($author$project$Main$GoRecipeCreator)
-														]),
-													_List_fromArray(
-														[
-															$author$project$Main$plusIcon(64)
-														]))
-												]))
-										])))
+										[addButtonCard])))
 							]))
 					]))
 			]));
@@ -7468,7 +7457,6 @@ var $author$project$Main$UpdateIngredientUnit = function (a) {
 };
 var $author$project$Main$allUnits = _List_fromArray(
 	[$author$project$Main$Gram, $author$project$Main$Mililiter, $author$project$Main$Teaspoon]);
-var $author$project$Main$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
 var $author$project$Main$empyStyleMapper = F2(
 	function (m, f) {
 		return A2(
