@@ -1,8 +1,8 @@
 module Domain.Helper exposing (..)
 
 import Browser.Dom
-import Html
-import Html.Attributes
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Regex
 import Task
 
@@ -48,3 +48,20 @@ safeRegexOf : String -> Regex.Regex
 safeRegexOf s =
     Maybe.withDefault Regex.never <|
         Regex.fromString s
+
+
+uniqueStrings : List String -> Bool
+uniqueStrings list =
+    List.length list
+        == List.length
+            (List.foldl
+                (\id unique ->
+                    if List.member id unique then
+                        unique
+
+                    else
+                        unique ++ [ id ]
+                )
+                []
+                list
+            )

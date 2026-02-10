@@ -23,6 +23,11 @@ type OutMsg
     | GoRecipeCreator
 
 
+init : List Recipe -> Model
+init recipes =
+    Album recipes Nothing
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of

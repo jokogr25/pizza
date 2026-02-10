@@ -3,15 +3,16 @@ module Main exposing (Msg(..), main, update, view)
 import Browser
 import Browser.Dom exposing (Error(..))
 import Browser.Events
+import Domain.Helper exposing (..)
 import Domain.Icon exposing (..)
 import Domain.Recipe exposing (..)
-import Helper exposing (round2ToString, safeRegexOf)
-import Html exposing (Html, button, div, i, img, input, label, s, span, text)
+import Html exposing (Html, button, div, img, input, label, span, text)
 import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
-import Page.Recipe.Album as RecipeAlbum
+import Page.Recipe.Album as RecipeAlbum exposing (Model(..))
+import Page.Recipe.Create as RecipeCreate exposing (Model(..))
 import Platform.Cmd as Cmd
 import Regex
 import String
@@ -41,8 +42,8 @@ type Model
     = Front (Maybe (List Recipe))
     | Carousel
     | RecipeAlbum RecipeAlbum.Model
+    | RecipeCreate RecipeCreate.Model
     | RecipeViewer (List Recipe) Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
-    | RecipeCreator (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep)
 
 
 
@@ -54,7 +55,6 @@ type Msg
     | GoCarousel
     | GoRecipeAlbum
     | GoRecipeViewer Recipe ActivePage
-    | GoRecipeCreator
     | ResetRecipeViewer
     | SelectIngredient Ingredient
     | SelectPage ActivePage
@@ -66,24 +66,9 @@ type Msg
     | Next
     | Prev
     | NoOp
-    | UpdateLabel String
-    | UpdateDescription String
-    | UpdateImagePath String
-    | AddIngredient
-    | RemoveIngredient String
-    | EditIngredient Ingredient
-    | UpdateIngredientId String
-    | UpdateIngredientLabel String
-    | UpdateIngredientAmount String
-    | UpdateIngredientUnit String
-    | AddStep
-    | RemoveStep PrepStep
-    | EditStep PrepStep
-    | UpdateStepTitle String
-    | UpdateStepTime String
-    | UpdateStepDescription String
-    | SaveRecipe
+      -- SubComponents
     | AlbumMsg RecipeAlbum.Msg
+    | CreateMsg RecipeCreate.Msg
 
 
 
@@ -182,7 +167,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreator recipes _ _ _ ->
+                RecipeCreate (RecipeCreate.Create recipes _ _ _) ->
                     ( Front (Just recipes)
                     , Cmd.none
                     )
@@ -229,18 +214,6 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreator recipes _ _ _ ->
-                    ( RecipeAlbum
-                        (RecipeAlbum.update
-                            RecipeAlbum.NoOp
-                            (RecipeAlbum.Album
-                                recipes
-                                Nothing
-                            )
-                        )
-                    , Cmd.none
-                    )
-
                 RecipeViewer recipes _ _ _ _ _ _ ->
                     ( RecipeAlbum
                         (RecipeAlbum.update
@@ -250,26 +223,6 @@ update msg model =
                                 Nothing
                             )
                         )
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        GoRecipeCreator ->
-            case model of
-                RecipeAlbum (RecipeAlbum.Album recipes Nothing) ->
-                    ( RecipeCreator
-                        recipes
-                        { id = ""
-                        , label = ""
-                        , description = ""
-                        , ingredients = []
-                        , steps = []
-                        , image = Path ""
-                        }
-                        Nothing
-                        Nothing
                     , Cmd.none
                     )
 
@@ -475,466 +428,68 @@ update msg model =
                 _ ->
                     noChange
 
-        UpdateLabel label ->
-            case model of
-                RecipeCreator recipes draft ingredientDraft stepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | label = label
-                        }
-                        ingredientDraft
-                        stepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateDescription description ->
-            case model of
-                RecipeCreator recipes draft ingredientDraft stepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | description = description
-                        }
-                        ingredientDraft
-                        stepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateImagePath imagePath ->
-            case model of
-                RecipeCreator recipes draft ingredientDraft stepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | image = Path imagePath
-                        }
-                        ingredientDraft
-                        stepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        AddIngredient ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | ingredients =
-                                draft.ingredients
-                                    ++ (case maybeIngredientDraft of
-                                            Just ingredient ->
-                                                if validateIngredient ingredient draft.ingredients then
-                                                    [ ingredient ]
-
-                                                else
-                                                    []
-
-                                            Nothing ->
-                                                []
-                                       )
-                        }
-                        (maybeIngredientDraft
-                            |> Maybe.andThen
-                                (\i ->
-                                    if not (validateIngredient i draft.ingredients) then
-                                        Just i
-
-                                    else
-                                        Nothing
-                                )
-                        )
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        EditIngredient ing ->
-            case model of
-                RecipeCreator recipes draft _ maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | ingredients =
-                                List.filter (\i -> i.id /= ing.id) draft.ingredients
-                        }
-                        (Just ing)
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        RemoveIngredient id ->
-            case model of
-                RecipeCreator recipes draft ingredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | ingredients =
-                                List.filter
-                                    (\ingredient ->
-                                        ingredient.id /= id
-                                    )
-                                    draft.ingredients
-                        }
-                        ingredientDraft
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateIngredientId newId ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just ing ->
-                                Just
-                                    { ing
-                                        | id = newId
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { id = newId
-                                    , label = ""
-                                    , amount = 0
-                                    , unit = Gram
-                                    }
-                        )
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateIngredientLabel newLabel ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just ing ->
-                                Just
-                                    { ing
-                                        | label = newLabel
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { id = ""
-                                    , label = newLabel
-                                    , amount = 0
-                                    , unit = Gram
-                                    }
-                        )
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateIngredientAmount newStrAmount ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    case String.toFloat newStrAmount of
-                        Just f ->
-                            ( RecipeCreator
-                                recipes
-                                draft
-                                (case maybeIngredientDraft of
-                                    Just ing ->
-                                        Just
-                                            { ing
-                                                | amount = f
-                                            }
-
-                                    Nothing ->
-                                        Just
-                                            { id = ""
-                                            , label = ""
-                                            , amount = f
-                                            , unit = Gram
-                                            }
-                                )
-                                maybeStepDraft
-                            , Cmd.none
-                            )
-
-                        Nothing ->
-                            noChange
-
-                _ ->
-                    noChange
-
-        UpdateIngredientUnit gUnit ->
-            let
-                parsedUnit : Unit
-                parsedUnit =
-                    Debug.log gUnit
-                        (Maybe.withDefault Gram (parseUnit gUnit))
-            in
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just i ->
-                                Just { i | unit = parsedUnit }
-
-                            Nothing ->
-                                Just
-                                    { id = ""
-                                    , label = ""
-                                    , amount = 0
-                                    , unit = parsedUnit
-                                    }
-                        )
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        AddStep ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | steps =
-                                draft.steps
-                                    ++ (case maybeStepDraft of
-                                            Just step ->
-                                                [ step ]
-
-                                            Nothing ->
-                                                []
-                                       )
-                        }
-                        maybeIngredientDraft
-                        maybeStepDraft
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateStepTitle newTitle ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | title = newTitle
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { title = newTitle
-                                    , time = -1
-                                    , description = ""
-                                    }
-                        )
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateStepDescription newDescription ->
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | description = newDescription
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { description = newDescription
-                                    , time = -1
-                                    , title = ""
-                                    }
-                        )
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        UpdateStepTime newTime ->
-            let
-                parsedTime : Int
-                parsedTime =
-                    String.toInt newTime |> Maybe.withDefault -1
-            in
-            case model of
-                RecipeCreator recipes draft maybeIngredientDraft maybeStepDraft ->
-                    ( RecipeCreator
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | time = parsedTime
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { time = parsedTime
-                                    , description = "newDescription"
-                                    , title = ""
-                                    }
-                        )
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        EditStep step ->
-            case model of
-                RecipeCreator recipes draft maybeIngredient _ ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | steps =
-                                List.filter
-                                    (\s -> s /= step)
-                                    draft.steps
-                        }
-                        maybeIngredient
-                        (Just step)
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        RemoveStep step ->
-            case model of
-                RecipeCreator recipes draft maybeIngredient _ ->
-                    ( RecipeCreator
-                        recipes
-                        { draft
-                            | steps =
-                                List.filter
-                                    (\s -> s /= step)
-                                    draft.steps
-                        }
-                        maybeIngredient
-                        Nothing
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
-        SaveRecipe ->
-            case model of
-                RecipeCreator recipes draft _ _ ->
-                    ( RecipeAlbum
-                        (RecipeAlbum.update
-                            RecipeAlbum.NoOp
-                            (RecipeAlbum.Album
-                                (draft :: recipes)
-                                Nothing
-                            )
-                        )
-                    , Cmd.none
-                    )
-
-                _ ->
-                    noChange
-
         AlbumMsg albumMsg ->
-            case albumMsg of
-                RecipeAlbum.Out outMsg ->
-                    let
-                        currentRecipes =
-                            case model of
-                                RecipeAlbum subModel ->
-                                    case subModel of
-                                        RecipeAlbum.Album recipes _ ->
-                                            recipes
+            case model of
+                RecipeAlbum (RecipeAlbum.Album recipes _) ->
+                    case albumMsg of
+                        RecipeAlbum.Out outMsg ->
+                            case outMsg of
+                                RecipeAlbum.GoRecipeCreator ->
+                                    ( RecipeCreate (RecipeCreate.init recipes)
+                                    , Cmd.none
+                                    )
 
-                                _ ->
-                                    []
-                    in
-                    case outMsg of
-                        RecipeAlbum.GoRecipeCreator ->
-                            ( RecipeCreator
-                                currentRecipes
-                                { id = ""
-                                , label = ""
-                                , description = ""
-                                , ingredients = []
-                                , steps = []
-                                , image = Path ""
-                                }
-                                Nothing
-                                Nothing
-                            , Cmd.none
-                            )
-
-                        RecipeAlbum.GoRecipeViewer recipe ->
-                            ( RecipeViewer
-                                currentRecipes
-                                recipe
-                                Nothing
-                                0
-                                Nothing
-                                1
-                                RecipeIngredientsPage
-                            , Cmd.none
-                            )
-
-                _ ->
-                    case model of
-                        RecipeAlbum m ->
-                            ( RecipeAlbum
-                                (RecipeAlbum.update albumMsg m)
-                            , Cmd.none
-                            )
+                                RecipeAlbum.GoRecipeViewer recipe ->
+                                    ( RecipeViewer
+                                        recipes
+                                        recipe
+                                        Nothing
+                                        0
+                                        Nothing
+                                        1
+                                        RecipeIngredientsPage
+                                    , Cmd.none
+                                    )
 
                         _ ->
-                            noChange
+                            case model of
+                                RecipeAlbum m ->
+                                    ( RecipeAlbum
+                                        (RecipeAlbum.update albumMsg m)
+                                    , Cmd.none
+                                    )
+
+                                _ ->
+                                    noChange
+
+                _ ->
+                    noChange
+
+        CreateMsg createMsg ->
+            case model of
+                RecipeCreate (RecipeCreate.Create recipes draft maybeIngredient maybeStep) ->
+                    case createMsg of
+                        RecipeCreate.Out outMsg ->
+                            case outMsg of
+                                RecipeCreate.SaveRecipe recipe ->
+                                    ( RecipeAlbum
+                                        (RecipeAlbum.init (recipe :: recipes))
+                                    , Cmd.none
+                                    )
+
+                        _ ->
+                            ( RecipeCreate
+                                (Tuple.first
+                                    (RecipeCreate.update
+                                        createMsg
+                                        (RecipeCreate.Create recipes draft maybeIngredient maybeStep)
+                                    )
+                                )
+                            , Cmd.none
+                            )
+
+                _ ->
+                    noChange
 
         NoOp ->
             noChange
@@ -979,16 +534,6 @@ view model =
                         Nothing
                 )
 
-        RecipeCreator _ recipeDraft maybeIngredientDraft maybeStepDraft ->
-            contentView
-                RecipeCreatorPage
-                (recipeCreatorView recipeDraft maybeIngredientDraft maybeStepDraft)
-                (Just
-                    (recipeCreatorActions
-                        (validateRecipe recipeDraft)
-                    )
-                )
-
         RecipeAlbum m ->
             contentView
                 RecipeAlbumPage
@@ -997,69 +542,13 @@ view model =
                 )
                 Nothing
 
-
-validateRecipe : Recipe -> Bool
-validateRecipe recipe =
-    validateIngredients recipe.ingredients
-        && validateSteps recipe.steps
-
-
-validateStep : PrepStep -> Bool
-validateStep step =
-    step.time
-        >= -1
-        && not (String.isEmpty step.title)
-        && not (String.isEmpty step.description)
-
-
-validateIngredient : Ingredient -> List Ingredient -> Bool
-validateIngredient ing ings =
-    let
-        listOfIds =
-            List.map (\i -> i.id) ings
-    in
-    not (String.isEmpty ing.id)
-        && not (List.member ing.id listOfIds)
-        && ing.amount
-        > 0
-        && not (String.isEmpty ing.label)
-
-
-validateIngredients : List Ingredient -> Bool
-validateIngredients ingredients =
-    not
-        (List.isEmpty ingredients)
-        && uniqueStrings
-            (List.map
-                (\ingredient -> ingredient.id)
-                ingredients
-            )
-        && List.all
-            (\i -> i.amount > 0)
-            ingredients
-
-
-validateSteps : List PrepStep -> Bool
-validateSteps steps =
-    not
-        (List.isEmpty steps)
-
-
-uniqueStrings : List String -> Bool
-uniqueStrings list =
-    List.length list
-        == List.length
-            (List.foldl
-                (\id unique ->
-                    if List.member id unique then
-                        unique
-
-                    else
-                        unique ++ [ id ]
+        RecipeCreate m ->
+            contentView
+                RecipeCreatorPage
+                (RecipeCreate.view m
+                    |> Html.map CreateMsg
                 )
-                []
-                list
-            )
+                Nothing
 
 
 frontView : Html Msg
@@ -1689,390 +1178,6 @@ prepStepView indexToDisplay ingredients index prepStep =
         ]
 
 
-recipeCreatorView : Recipe -> Maybe Ingredient -> Maybe PrepStep -> Html Msg
-recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
-    let
-        isIngredientValid =
-            maybeIngredientToEdit
-                |> Maybe.map (\i -> validateIngredient i draft.ingredients)
-                |> Maybe.withDefault False
-
-        isStepValid =
-            maybePrepStepToEdit
-                |> Maybe.map (\i -> validateStep i)
-                |> Maybe.withDefault False
-
-        addButton msg isDisabled =
-            button
-                [ class "btn btn-sm w-100 d-flex justify-content-center align-items-center mt-3"
-                , disabled isDisabled
-                , onClick msg
-                ]
-                [ ionIcon "add" 32 ]
-    in
-    div
-        [ class "container my-4 flex-grow-1"
-        , style "max-width" "700px"
-        ]
-        [ Html.h2
-            []
-            [ text "Create recipe" ]
-        , let
-            id =
-                "createRecipeLabel"
-          in
-          div
-            [ class "col-md-12 mb-3"
-            ]
-            [ div
-                [ class "form-floating"
-                ]
-                [ input
-                    [ class "form-control"
-                    , Html.Attributes.value id
-                    , Html.Attributes.value draft.label
-                    , onInput UpdateLabel
-                    ]
-                    []
-                , label
-                    [ Html.Attributes.for id
-                    ]
-                    [ text "Name"
-                    ]
-                ]
-            ]
-        , let
-            id =
-                "createRecipeDescription"
-          in
-          div
-            [ class "col-md-12 mb-3" ]
-            [ div
-                [ class "form-floating"
-                ]
-                [ Html.textarea
-                    [ class "form-control"
-                    , Html.Attributes.id id
-                    , Html.Attributes.rows 3
-                    , Html.Attributes.value draft.description
-                    , onInput UpdateDescription
-                    ]
-                    []
-                , label
-                    [ Html.Attributes.for id
-                    ]
-                    [ text "Description"
-                    ]
-                ]
-            ]
-        , let
-            id =
-                "createRecipeImagePath"
-          in
-          div
-            [ class "col-md-12 mb-4" ]
-            [ div
-                [ class "form-floating"
-                ]
-                [ input
-                    [ class "form-control"
-                    , Html.Attributes.id id
-                    , Html.Attributes.value (getPathStr draft.image)
-                    , onInput UpdateImagePath
-                    ]
-                    []
-                , label
-                    [ Html.Attributes.for id ]
-                    [ text "Image path" ]
-                ]
-            ]
-
-        -- Ingredients
-        , Html.h4
-            [ class "mt-4"
-            ]
-            [ text "Ingredients"
-            ]
-        , div
-            []
-            (List.map
-                (\ing ->
-                    div
-                        [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                        ]
-                        [ div
-                            []
-                            [ text ing.id ]
-                        , button
-                            [ class
-                                "btn btn-sm btn-warn"
-                            , Html.Attributes.title "Edit ingredient"
-                            , onClick (EditIngredient ing)
-                            ]
-                            [ ionIcon "pencil" 32
-                            ]
-                        , button
-                            [ class
-                                "btn btn-sm btn-danger"
-                            , onClick (RemoveIngredient ing.id)
-                            , Html.Attributes.title "Remove ingredient"
-                            ]
-                            [ ionIcon "close" 32
-                            ]
-                        ]
-                )
-                draft.ingredients
-                ++ [ addOrEditIngredientView maybeIngredientToEdit
-                   , addButton AddIngredient (not isIngredientValid)
-                   ]
-            )
-
-        -- Steps
-        , Html.h4
-            [ class "mt-4"
-            ]
-            [ text "Steps"
-            ]
-        , div
-            []
-            (List.map
-                (\step ->
-                    div
-                        [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                        ]
-                        [ div
-                            []
-                            [ text step.title
-                            ]
-                        , button
-                            [ class "btn btn-sm btn-warn"
-                            , Html.Attributes.title "Edit step"
-                            , onClick (EditStep step)
-                            ]
-                            [ ionIcon "pencil" 32
-                            ]
-                        , button
-                            [ class "btn btn-sm btn-danger"
-                            , onClick (RemoveStep step)
-                            , Html.Attributes.title "Remove step"
-                            ]
-                            [ ionIcon "close" 32
-                            ]
-                        ]
-                )
-                draft.steps
-                ++ [ addOrEditStepView maybePrepStepToEdit
-                   , addButton AddStep (not isStepValid)
-                   ]
-            )
-        ]
-
-
-recipeCreatorActions : Bool -> Html Msg
-recipeCreatorActions isRecipeValid =
-    div
-        [ class "w-100 d-flex justify-content-center"
-        ]
-        [ button
-            [ type_ "button"
-            , class "btn"
-            , disabled (not isRecipeValid)
-            , onClick SaveRecipe
-            ]
-            [ ionIcon "save" 32
-            ]
-        ]
-
-
-addOrEditIngredientView : Maybe Ingredient -> Html Msg
-addOrEditIngredientView maybeIngredient =
-    let
-        idValue =
-            empyStyleMapper
-                maybeIngredient
-                (\ing -> Html.Attributes.value ing.id)
-
-        labelValue =
-            empyStyleMapper
-                maybeIngredient
-                (\ing -> Html.Attributes.value ing.label)
-
-        amountValue =
-            empyStyleMapper
-                maybeIngredient
-                (\ing ->
-                    if ing.amount > 0 then
-                        Html.Attributes.value (String.fromFloat ing.amount)
-
-                    else
-                        emptyStyle
-                )
-
-        colInput l v message =
-            div
-                [ class "col-md-3" ]
-                [ div
-                    [ class "form-floating"
-                    ]
-                    [ input
-                        [ class "form-control"
-                        , onInput message
-                        , v
-                        ]
-                        []
-                    , label
-                        []
-                        [ text l ]
-                    ]
-                ]
-
-        colSelect l message =
-            div
-                [ class "col-md-3"
-                ]
-                [ div
-                    [ class "form-floating" ]
-                    [ Html.select
-                        [ class "form-select"
-                        , onInput message
-                        ]
-                        (List.map
-                            (\unit ->
-                                Html.option
-                                    [ Html.Attributes.value (unitToAbbr unit)
-                                    , Html.Attributes.selected
-                                        (case maybeIngredient of
-                                            Just i ->
-                                                i.unit == unit
-
-                                            Nothing ->
-                                                False
-                                        )
-                                    ]
-                                    [ text (unitToAbbr unit) ]
-                            )
-                            allUnits
-                        )
-                    , label
-                        []
-                        [ text l
-                        ]
-                    ]
-                ]
-    in
-    div
-        [ class "mb-3 position-relative"
-        ]
-        [ div
-            [ class "row g-2"
-            ]
-            [ colInput
-                "Id"
-                idValue
-                UpdateIngredientId
-            , colInput
-                "Label"
-                labelValue
-                UpdateIngredientLabel
-            , colInput
-                "Amount"
-                amountValue
-                UpdateIngredientAmount
-            , colSelect
-                "Unit"
-                UpdateIngredientUnit
-            ]
-        ]
-
-
-addOrEditStepView : Maybe PrepStep -> Html Msg
-addOrEditStepView maybeStep =
-    let
-        stepTitleValue =
-            empyStyleMapper
-                maybeStep
-                (\step -> Html.Attributes.value step.title)
-
-        stepTimeValue =
-            empyStyleMapper
-                maybeStep
-                (\step ->
-                    if step.time > -1 then
-                        Html.Attributes.value (String.fromInt step.time)
-
-                    else
-                        emptyStyle
-                )
-
-        stepDescriptionValue =
-            empyStyleMapper
-                maybeStep
-                (\step ->
-                    Html.Attributes.value step.description
-                )
-
-        colInput l v message =
-            div
-                [ class "col-md-12"
-                ]
-                [ div
-                    [ class "form-floating"
-                    ]
-                    [ input
-                        [ class "form-control"
-                        , onInput message
-                        , v
-                        ]
-                        []
-                    , label
-                        []
-                        [ text l ]
-                    ]
-                ]
-
-        colTextArea l v message =
-            div
-                [ class "col-md-12"
-                ]
-                [ div
-                    [ class "form-floating"
-                    ]
-                    [ Html.textarea
-                        [ class "form-control"
-                        , Html.Attributes.rows 2
-                        , v
-                        , onInput message
-                        ]
-                        []
-                    , label
-                        []
-                        [ text l
-                        ]
-                    ]
-                ]
-    in
-    div
-        [ class "mb-3 position-relative"
-        ]
-        [ div
-            [ class "row g-2"
-            ]
-            [ colInput
-                "Title"
-                stepTitleValue
-                UpdateStepTitle
-            , colTextArea
-                "Description"
-                stepDescriptionValue
-                UpdateStepDescription
-            , colInput
-                "Time"
-                stepTimeValue
-                UpdateStepTime
-            ]
-        ]
-
-
 
 -- SAMPLE DATA
 
@@ -2267,19 +1372,3 @@ replaceIngredientAmountFraction ingredients string =
                     str
     in
     List.foldl replaceMatch string matches
-
-
-
--- helper
-
-
-empyStyleMapper : Maybe a -> (a -> Html.Attribute msg) -> Html.Attribute msg
-empyStyleMapper m f =
-    m
-        |> Maybe.map f
-        |> Maybe.withDefault emptyStyle
-
-
-emptyStyle : Html.Attribute msg
-emptyStyle =
-    Html.Attributes.style "" ""

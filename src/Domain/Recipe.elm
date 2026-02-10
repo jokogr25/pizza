@@ -1,6 +1,6 @@
 module Domain.Recipe exposing (..)
 
-import Domain.Helper exposing (round2ToString, safeRegexOf)
+import Domain.Helper exposing (round2ToString, safeRegexOf, uniqueStrings)
 import Regex
 
 
@@ -188,3 +188,50 @@ getPathStr p =
     case p of
         Path str ->
             str
+
+
+validateRecipe : Recipe -> Bool
+validateRecipe recipe =
+    validateIngredients recipe.ingredients
+        && validateSteps recipe.steps
+
+
+validateStep : PrepStep -> Bool
+validateStep step =
+    step.time
+        >= -1
+        && not (String.isEmpty step.title)
+        && not (String.isEmpty step.description)
+
+
+validateIngredient : Ingredient -> List Ingredient -> Bool
+validateIngredient ing ings =
+    let
+        listOfIds =
+            List.map (\i -> i.id) ings
+    in
+    not (String.isEmpty ing.id)
+        && not (List.member ing.id listOfIds)
+        && ing.amount
+        > 0
+        && not (String.isEmpty ing.label)
+
+
+validateIngredients : List Ingredient -> Bool
+validateIngredients ingredients =
+    not
+        (List.isEmpty ingredients)
+        && uniqueStrings
+            (List.map
+                (\ingredient -> ingredient.id)
+                ingredients
+            )
+        && List.all
+            (\i -> i.amount > 0)
+            ingredients
+
+
+validateSteps : List PrepStep -> Bool
+validateSteps steps =
+    not
+        (List.isEmpty steps)
