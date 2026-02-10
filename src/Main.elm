@@ -26,7 +26,7 @@ import Task
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \_ -> ( Front, Cmd.none )
+        { init = \_ -> ( Front Nothing, Cmd.none )
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -38,7 +38,7 @@ main =
 
 
 type Model
-    = Front
+    = Front (Maybe (List Recipe))
     | Carousel
     | RecipeAlbum RecipeAlbum.Model
     | RecipeViewer (List Recipe) Recipe (Maybe Ingredient) Int (Maybe Float) Float ActivePage
@@ -171,7 +171,24 @@ update msg model =
     in
     case msg of
         GoFront ->
-            ( Front, Cmd.none )
+            case model of
+                RecipeAlbum (RecipeAlbum.Album recipes _) ->
+                    ( Front (Just recipes)
+                    , Cmd.none
+                    )
+
+                RecipeViewer recipes _ _ _ _ _ _ ->
+                    ( Front (Just recipes)
+                    , Cmd.none
+                    )
+
+                RecipeCreator recipes _ _ _ ->
+                    ( Front (Just recipes)
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
 
         GoCarousel ->
             ( Carousel, Cmd.none )
@@ -195,12 +212,18 @@ update msg model =
 
         GoRecipeAlbum ->
             case model of
-                Front ->
+                Front maybeRecipes ->
+                    let
+                        recipes =
+                            maybeRecipes
+                                |> Maybe.withDefault
+                                    [ samplePizzaRecipe
+                                    , sampleLasagneRecipe
+                                    ]
+                    in
                     ( RecipeAlbum
                         (RecipeAlbum.Album
-                            [ samplePizzaRecipe
-                            , sampleLasagneRecipe
-                            ]
+                            recipes
                             Nothing
                         )
                     , Cmd.none
@@ -210,7 +233,10 @@ update msg model =
                     ( RecipeAlbum
                         (RecipeAlbum.update
                             RecipeAlbum.NoOp
-                            (RecipeAlbum.Album recipes Nothing)
+                            (RecipeAlbum.Album
+                                recipes
+                                Nothing
+                            )
                         )
                     , Cmd.none
                     )
@@ -859,32 +885,45 @@ update msg model =
 
         AlbumMsg albumMsg ->
             case albumMsg of
-                RecipeAlbum.GoRecipeCreator ->
-                    ( RecipeCreator
-                        []
-                        { id = ""
-                        , label = ""
-                        , description = ""
-                        , ingredients = []
-                        , steps = []
-                        , image = Path ""
-                        }
-                        Nothing
-                        Nothing
-                    , Cmd.none
-                    )
+                RecipeAlbum.Out outMsg ->
+                    let
+                        currentRecipes =
+                            case model of
+                                RecipeAlbum subModel ->
+                                    case subModel of
+                                        RecipeAlbum.Album recipes _ ->
+                                            recipes
 
-                RecipeAlbum.GoRecipeViewer recipe ->
-                    ( RecipeViewer
-                        []
-                        recipe
-                        Nothing
-                        0
-                        Nothing
-                        1
-                        RecipeIngredientsPage
-                    , Cmd.none
-                    )
+                                _ ->
+                                    []
+                    in
+                    case outMsg of
+                        RecipeAlbum.GoRecipeCreator ->
+                            ( RecipeCreator
+                                currentRecipes
+                                { id = ""
+                                , label = ""
+                                , description = ""
+                                , ingredients = []
+                                , steps = []
+                                , image = Path ""
+                                }
+                                Nothing
+                                Nothing
+                            , Cmd.none
+                            )
+
+                        RecipeAlbum.GoRecipeViewer recipe ->
+                            ( RecipeViewer
+                                currentRecipes
+                                recipe
+                                Nothing
+                                0
+                                Nothing
+                                1
+                                RecipeIngredientsPage
+                            , Cmd.none
+                            )
 
                 _ ->
                     case model of
@@ -908,7 +947,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     case model of
-        Front ->
+        Front _ ->
             frontView
 
         Carousel ->
@@ -1191,7 +1230,7 @@ navbarView activePage =
                 ]
     in
     Html.nav
-        [ class "navbar navbar-expand-sm bg-body-tertiary"
+        [ class "navbar navbar-expand-sm bg-body-tertiary border-bottom"
         ]
         [ div
             [ class "container-fluid" ]

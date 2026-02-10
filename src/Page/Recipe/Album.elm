@@ -14,9 +14,13 @@ type Model
 
 type Msg
     = InputAlbumSearch String
-    | GoRecipeViewer Recipe
-    | GoRecipeCreator
+    | Out OutMsg
     | NoOp
+
+
+type OutMsg
+    = GoRecipeViewer Recipe
+    | GoRecipeCreator
 
 
 update : Msg -> Model -> Model
@@ -61,7 +65,7 @@ recipeAlbumView recipes =
                 [ div
                     [ class "card shadow-sm h-100 rounded-4"
                     , style "min-width" "220px"
-                    , onClick GoRecipeCreator
+                    , onClick (Out GoRecipeCreator)
                     ]
                     [ div
                         [ class "card-img-top"
@@ -104,7 +108,7 @@ recipeAlbumCardView recipe =
             [ class "card shadow-sm h-100"
             , style "min-width" "220px"
             , if isRecipeValid then
-                onClick (GoRecipeViewer recipe)
+                onClick (Out (GoRecipeViewer recipe))
 
               else
                 emptyStyle

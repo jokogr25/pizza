@@ -4559,7 +4559,10 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = {$: 'GT'};
-var $author$project$Main$Front = {$: 'Front'};
+var $author$project$Main$Front = function (a) {
+	return {$: 'Front', a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -4586,7 +4589,6 @@ var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -5958,15 +5960,37 @@ var $author$project$Main$update = F2(
 		var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		switch (msg.$) {
 			case 'GoFront':
-				return _Utils_Tuple2($author$project$Main$Front, $elm$core$Platform$Cmd$none);
+				switch (model.$) {
+					case 'RecipeAlbum':
+						var _v2 = model.a;
+						var recipes = _v2.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Front(
+								$elm$core$Maybe$Just(recipes)),
+							$elm$core$Platform$Cmd$none);
+					case 'RecipeViewer':
+						var recipes = model.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Front(
+								$elm$core$Maybe$Just(recipes)),
+							$elm$core$Platform$Cmd$none);
+					case 'RecipeCreator':
+						var recipes = model.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Front(
+								$elm$core$Maybe$Just(recipes)),
+							$elm$core$Platform$Cmd$none);
+					default:
+						return noChange;
+				}
 			case 'GoCarousel':
 				return _Utils_Tuple2($author$project$Main$Carousel, $elm$core$Platform$Cmd$none);
 			case 'GoRecipeViewer':
 				var recipe = msg.a;
 				var page = msg.b;
 				if (model.$ === 'RecipeAlbum') {
-					var _v2 = model.a;
-					var recipes = _v2.a;
+					var _v4 = model.a;
+					var recipes = _v4.a;
 					return _Utils_Tuple2(
 						A7($author$project$Main$RecipeViewer, recipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, page),
 						$elm$core$Platform$Cmd$none);
@@ -5976,13 +6000,15 @@ var $author$project$Main$update = F2(
 			case 'GoRecipeAlbum':
 				switch (model.$) {
 					case 'Front':
+						var maybeRecipes = model.a;
+						var recipes = A2(
+							$elm$core$Maybe$withDefault,
+							_List_fromArray(
+								[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
+							maybeRecipes);
 						return _Utils_Tuple2(
 							$author$project$Main$RecipeAlbum(
-								A2(
-									$author$project$Page$Recipe$Album$Album,
-									_List_fromArray(
-										[$author$project$Main$samplePizzaRecipe, $author$project$Main$sampleLasagneRecipe]),
-									$elm$core$Maybe$Nothing)),
+								A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing)),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeCreator':
 						var recipes = model.a;
@@ -6007,9 +6033,9 @@ var $author$project$Main$update = F2(
 				}
 			case 'GoRecipeCreator':
 				if ((model.$ === 'RecipeAlbum') && (model.a.b.$ === 'Nothing')) {
-					var _v5 = model.a;
-					var recipes = _v5.a;
-					var _v6 = _v5.b;
+					var _v7 = model.a;
+					var recipes = _v7.a;
+					var _v8 = _v7.b;
 					return _Utils_Tuple2(
 						A4(
 							$author$project$Main$RecipeCreator,
@@ -6115,8 +6141,8 @@ var $author$project$Main$update = F2(
 			case 'InputSearchTerm':
 				var searchTerm = msg.a;
 				if (model.$ === 'RecipeAlbum') {
-					var _v13 = model.a;
-					var recipes = _v13.a;
+					var _v15 = model.a;
+					var recipes = _v15.a;
 					return _Utils_Tuple2(
 						$author$project$Main$RecipeAlbum(
 							A2(
@@ -6431,9 +6457,9 @@ var $author$project$Main$update = F2(
 					var draft = model.b;
 					var maybeIngredientDraft = model.c;
 					var maybeStepDraft = model.d;
-					var _v30 = $elm$core$String$toFloat(newStrAmount);
-					if (_v30.$ === 'Just') {
-						var f = _v30.a;
+					var _v32 = $elm$core$String$toFloat(newStrAmount);
+					if (_v32.$ === 'Just') {
+						var f = _v32.a;
 						return _Utils_Tuple2(
 							A4(
 								$author$project$Main$RecipeCreator,
@@ -6688,12 +6714,22 @@ var $author$project$Main$update = F2(
 				}
 			case 'AlbumMsg':
 				var albumMsg = msg.a;
-				switch (albumMsg.$) {
-					case 'GoRecipeCreator':
+				if (albumMsg.$ === 'Out') {
+					var outMsg = albumMsg.a;
+					var currentRecipes = function () {
+						if (model.$ === 'RecipeAlbum') {
+							var subModel = model.a;
+							var recipes = subModel.a;
+							return recipes;
+						} else {
+							return _List_Nil;
+						}
+					}();
+					if (outMsg.$ === 'GoRecipeCreator') {
 						return _Utils_Tuple2(
 							A4(
 								$author$project$Main$RecipeCreator,
-								_List_Nil,
+								currentRecipes,
 								{
 									description: '',
 									id: '',
@@ -6705,21 +6741,22 @@ var $author$project$Main$update = F2(
 								$elm$core$Maybe$Nothing,
 								$elm$core$Maybe$Nothing),
 							$elm$core$Platform$Cmd$none);
-					case 'GoRecipeViewer':
-						var recipe = albumMsg.a;
+					} else {
+						var recipe = outMsg.a;
 						return _Utils_Tuple2(
-							A7($author$project$Main$RecipeViewer, _List_Nil, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
+							A7($author$project$Main$RecipeViewer, currentRecipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Main$RecipeIngredientsPage),
 							$elm$core$Platform$Cmd$none);
-					default:
-						if (model.$ === 'RecipeAlbum') {
-							var m = model.a;
-							return _Utils_Tuple2(
-								$author$project$Main$RecipeAlbum(
-									A2($author$project$Page$Recipe$Album$update, albumMsg, m)),
-								$elm$core$Platform$Cmd$none);
-						} else {
-							return noChange;
-						}
+					}
+				} else {
+					if (model.$ === 'RecipeAlbum') {
+						var m = model.a;
+						return _Utils_Tuple2(
+							$author$project$Main$RecipeAlbum(
+								A2($author$project$Page$Recipe$Album$update, albumMsg, m)),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				}
 			default:
 				return noChange;
@@ -6944,7 +6981,7 @@ var $author$project$Main$navbarView = function (activePage) {
 		$elm$html$Html$nav,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('navbar navbar-expand-sm bg-body-tertiary')
+				$elm$html$Html$Attributes$class('navbar navbar-expand-sm bg-body-tertiary border-bottom')
 			]),
 		_List_fromArray(
 			[
@@ -8499,6 +8536,9 @@ var $author$project$Main$validateRecipe = function (recipe) {
 	return $author$project$Main$validateIngredients(recipe.ingredients) && $author$project$Main$validateSteps(recipe.steps);
 };
 var $author$project$Page$Recipe$Album$GoRecipeCreator = {$: 'GoRecipeCreator'};
+var $author$project$Page$Recipe$Album$Out = function (a) {
+	return {$: 'Out', a: a};
+};
 var $author$project$Page$Recipe$Album$GoRecipeViewer = function (a) {
 	return {$: 'GoRecipeViewer', a: a};
 };
@@ -8523,7 +8563,8 @@ var $author$project$Page$Recipe$Album$recipeAlbumCardView = function (recipe) {
 						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
 						isRecipeValid ? $elm$html$Html$Events$onClick(
-						$author$project$Page$Recipe$Album$GoRecipeViewer(recipe)) : $author$project$Domain$Helper$emptyStyle
+						$author$project$Page$Recipe$Album$Out(
+							$author$project$Page$Recipe$Album$GoRecipeViewer(recipe))) : $author$project$Domain$Helper$emptyStyle
 					]),
 				_List_fromArray(
 					[
@@ -8597,7 +8638,8 @@ var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 					[
 						$elm$html$Html$Attributes$class('card shadow-sm h-100 rounded-4'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
-						$elm$html$Html$Events$onClick($author$project$Page$Recipe$Album$GoRecipeCreator)
+						$elm$html$Html$Events$onClick(
+						$author$project$Page$Recipe$Album$Out($author$project$Page$Recipe$Album$GoRecipeCreator))
 					]),
 				_List_fromArray(
 					[
@@ -8828,7 +8870,9 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
-			return _Utils_Tuple2($author$project$Main$Front, $elm$core$Platform$Cmd$none);
+			return _Utils_Tuple2(
+				$author$project$Main$Front($elm$core$Maybe$Nothing),
+				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: $author$project$Main$subscriptions,
 		update: $author$project$Main$update,
