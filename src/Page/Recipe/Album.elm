@@ -1,7 +1,7 @@
 module Page.Recipe.Album exposing (..)
 
 import Domain.Helper exposing (emptyStyle)
-import Domain.Icon exposing (addIcon)
+import Domain.Icon exposing (ionIcon)
 import Domain.Recipe exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -63,7 +63,7 @@ recipeAlbumView recipes =
         addButtonCard =
             div [ class "col" ]
                 [ div
-                    [ class "card shadow-sm h-100 rounded-4"
+                    [ class "card shadow-sm h-100 rounded-3"
                     , style "min-width" "220px"
                     , onClick (Out GoRecipeCreator)
                     ]
@@ -74,7 +74,7 @@ recipeAlbumView recipes =
                         []
                     , div
                         [ class "card-body d-flex justify-content-center align-items-center" ]
-                        [ addIcon 64 ]
+                        [ ionIcon "add-outline" 64 ]
                     ]
                 ]
     in
@@ -105,7 +105,7 @@ recipeAlbumCardView recipe =
     div
         [ class "col" ]
         [ div
-            [ class "card shadow-sm h-100"
+            [ class "card rounded-3 shadow-sm h-100"
             , style "min-width" "220px"
             , if isRecipeValid then
                 onClick (Out (GoRecipeViewer recipe))

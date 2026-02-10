@@ -2,9 +2,10 @@
     "scripts": {
         "make": "elm make src/Main.elm --output elm.js",
         "start": "elm make src/Main.elm --output elm.js && elm reactor",
-        "hot": "parcel index.html"
+        "hot": "parcel parcel.html"
     },
     "dependencies": {
+        "ionicons": "^8.0.13",
         "parcel": "^2.16.4"
     },
     "devDependencies": {

@@ -6854,6 +6854,26 @@ var $elm$html$Html$Attributes$href = function (url) {
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
+	return _VirtualDom_keyedNode(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
+var $author$project$Domain$Icon$ionIcon = F2(
+	function (name, size) {
+		return A3(
+			$elm$html$Html$Keyed$node,
+			'ion-icon',
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$attribute, 'name', name),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'style',
+					'font-size:' + ($elm$core$String$fromInt(size) + 'px; vertical-align: middle;'))
+				]),
+			_List_Nil);
+	});
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -6904,35 +6924,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $elm$html$Html$Attributes$width = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'width',
-		$elm$core$String$fromInt(n));
-};
-var $author$project$Domain$Icon$genericIcon = F2(
-	function (path, width) {
-		return A2(
-			$elm$html$Html$img,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$width(width),
-					$elm$html$Html$Attributes$src('public/img/icon/' + path)
-				]),
-			_List_Nil);
-	});
-var $author$project$Domain$Icon$pizzaIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'pizza.svg', size);
-};
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -7002,7 +6994,7 @@ var $author$project$Main$navbarView = function (activePage) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Domain$Icon$pizzaIcon(32)
+								A2($author$project$Domain$Icon$ionIcon, 'pizza', 32)
 							])),
 						A2(
 						$elm$html$Html$button,
@@ -7017,13 +7009,7 @@ var $author$project$Main$navbarView = function (activePage) {
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('navbar-toggler-icon')
-									]),
-								_List_Nil)
+								A2($author$project$Domain$Icon$ionIcon, 'menu', 32)
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -7242,13 +7228,10 @@ var $author$project$Main$frontView = A2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('🍕 🧮')
+					A2($author$project$Domain$Icon$ionIcon, 'pizza', 32)
 				]))
 		]));
 var $author$project$Main$ResetRecipeViewer = {$: 'ResetRecipeViewer'};
-var $author$project$Domain$Icon$refreshIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'refresh.svg', size);
-};
 var $author$project$Main$ingredientsViewActions = function (ratio) {
 	return A2(
 		$elm$html$Html$div,
@@ -7269,12 +7252,36 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 					]),
 				_List_fromArray(
 					[
-						$author$project$Domain$Icon$refreshIcon(32)
+						A2($author$project$Domain$Icon$ionIcon, 'refresh', 32)
 					]))
 			]));
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Domain$Icon$genericIcon = F2(
+	function (path, width) {
+		return A2(
+			$elm$html$Html$img,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$width(width),
+					$elm$html$Html$Attributes$src('public/img/icon/' + path)
+				]),
+			_List_Nil);
+	});
 var $author$project$Domain$Icon$arrowLeftIcon = function (size) {
 	return A2($author$project$Domain$Icon$genericIcon, 'left.svg', size);
 };
@@ -7328,6 +7335,9 @@ var $author$project$Main$prepStepsViewActions = F2(
 				]));
 	});
 var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
+var $author$project$Domain$Icon$pizzaIcon = function (size) {
+	return A2($author$project$Domain$Icon$genericIcon, 'pizza.svg', size);
+};
 var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 	return A2(
 		$elm$html$Html$div,
@@ -7375,9 +7385,6 @@ var $author$project$Main$UpdateImagePath = function (a) {
 };
 var $author$project$Main$UpdateLabel = function (a) {
 	return {$: 'UpdateLabel', a: a};
-};
-var $author$project$Domain$Icon$addIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'add.svg', size);
 };
 var $author$project$Main$UpdateIngredientAmount = function (a) {
 	return {$: 'UpdateIngredientAmount', a: a};
@@ -7740,7 +7747,7 @@ var $author$project$Main$recipeCreatorView = F3(
 						]),
 					_List_fromArray(
 						[
-							$author$project$Domain$Icon$addIcon(32)
+							A2($author$project$Domain$Icon$ionIcon, 'plus', 32)
 						]));
 			});
 		return A2(
@@ -8031,9 +8038,6 @@ var $author$project$Main$SelectIngredient = function (a) {
 	return {$: 'SelectIngredient', a: a};
 };
 var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
-var $author$project$Domain$Icon$checkIcon = function (s) {
-	return A2($author$project$Domain$Icon$genericIcon, 'check.svg', s);
-};
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Helper$round2ToString = function (x) {
 	var rounded = $elm$core$Basics$round(x * 100) / 100.0;
@@ -8078,17 +8082,17 @@ var $author$project$Main$ingredientView = F4(
 						[icon]));
 			});
 		var btn = function () {
-			var size = 24;
+			var size = 20;
 			return isSelected ? (isNewAmountValid ? A2(
 				inputButton,
 				$author$project$Main$CalculateRatio,
-				$author$project$Domain$Icon$checkIcon(size)) : A2(
+				A2($author$project$Domain$Icon$ionIcon, 'checkmark', size)) : A2(
 				inputButton,
 				$author$project$Main$Abort,
-				$author$project$Domain$Icon$closeIcon(size))) : A2(
+				A2($author$project$Domain$Icon$ionIcon, 'close', size))) : A2(
 				inputButton,
 				$author$project$Main$SelectIngredient(ingredient),
-				$author$project$Domain$Icon$editIcon(size));
+				A2($author$project$Domain$Icon$ionIcon, 'pencil', size));
 		}();
 		return A2(
 			$elm$html$Html$div,
@@ -8560,7 +8564,7 @@ var $author$project$Page$Recipe$Album$recipeAlbumCardView = function (recipe) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100'),
+						$elm$html$Html$Attributes$class('card rounded-3 shadow-sm h-100'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
 						isRecipeValid ? $elm$html$Html$Events$onClick(
 						$author$project$Page$Recipe$Album$Out(
@@ -8636,7 +8640,7 @@ var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('card shadow-sm h-100 rounded-4'),
+						$elm$html$Html$Attributes$class('card shadow-sm h-100 rounded-3'),
 						A2($elm$html$Html$Attributes$style, 'min-width', '220px'),
 						$elm$html$Html$Events$onClick(
 						$author$project$Page$Recipe$Album$Out($author$project$Page$Recipe$Album$GoRecipeCreator))
@@ -8659,7 +8663,7 @@ var $author$project$Page$Recipe$Album$recipeAlbumView = function (recipes) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Domain$Icon$addIcon(64)
+								A2($author$project$Domain$Icon$ionIcon, 'add-outline', 64)
 							]))
 					]))
 			]));
@@ -8722,6 +8726,7 @@ var $author$project$Page$Recipe$Album$view = function (model) {
 			maybeSearch));
 	return $author$project$Page$Recipe$Album$recipeAlbumView(maybeFilteredRecipes);
 };
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
 	function (direction, label, btnClass, iconClass) {
 		return A2(

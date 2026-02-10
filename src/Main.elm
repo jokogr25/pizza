@@ -1086,7 +1086,8 @@ frontView =
             , style "margin-top" "2rem"
             , style "padding" "0.75rem 2rem"
             ]
-            [ text "🍕 🧮" ]
+            [ ionIcon "pizza" 32
+            ]
         ]
 
 
@@ -1238,7 +1239,7 @@ navbarView activePage =
                 [ class "navbar-brand"
                 , onClick GoFront
                 ]
-                [ pizzaIcon 32 ]
+                [ ionIcon "pizza" 32 ]
             , button
                 [ class "navbar-toggler collapsed"
                 , type_ "button"
@@ -1247,10 +1248,7 @@ navbarView activePage =
                 , attribute "aria-controls" "navbarSupportedContent"
                 , attribute "aria-label" "Toggle navigation"
                 ]
-                [ span
-                    [ class "navbar-toggler-icon"
-                    ]
-                    []
+                [ ionIcon "menu" 32
                 ]
             , div
                 [ class "collapse navbar-collapse"
@@ -1481,7 +1479,7 @@ ingredientsViewActions ratio =
             , onClick ResetRecipeViewer
             , disabled (ratio == 1)
             ]
-            [ refreshIcon 32
+            [ ionIcon "refresh" 32
             ]
         ]
 
@@ -1530,17 +1528,17 @@ ingredientView ratio maybeSelectedIngredient maybeNewAmount ingredient =
         btn =
             let
                 size =
-                    24
+                    20
             in
             if isSelected then
                 if isNewAmountValid then
-                    inputButton CalculateRatio (checkIcon size)
+                    inputButton CalculateRatio (ionIcon "checkmark" size)
 
                 else
-                    inputButton Abort (closeIcon size)
+                    inputButton Abort (ionIcon "close" size)
 
             else
-                inputButton (SelectIngredient ingredient) (editIcon size)
+                inputButton (SelectIngredient ingredient) (ionIcon "pencil" size)
     in
     div
         [ class "mt-3"
@@ -1710,7 +1708,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                 , disabled isDisabled
                 , onClick msg
                 ]
-                [ addIcon 32 ]
+                [ ionIcon "plus" 32 ]
     in
     div
         [ class "container my-4 flex-grow-1"
