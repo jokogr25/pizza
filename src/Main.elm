@@ -1704,11 +1704,11 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
 
         addButton msg isDisabled =
             button
-                [ class "btn btn-outline-secondary btn-sm w-100 d-flex justify-content-center align-items-center mt-3"
+                [ class "btn btn-sm w-100 d-flex justify-content-center align-items-center mt-3"
                 , disabled isDisabled
                 , onClick msg
                 ]
-                [ ionIcon "plus" 32 ]
+                [ ionIcon "add" 32 ]
     in
     div
         [ class "container my-4 flex-grow-1"
@@ -1809,7 +1809,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , Html.Attributes.title "Edit ingredient"
                             , onClick (EditIngredient ing)
                             ]
-                            [ editIcon 32
+                            [ ionIcon "pencil" 32
                             ]
                         , button
                             [ class
@@ -1817,7 +1817,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , onClick (RemoveIngredient ing.id)
                             , Html.Attributes.title "Remove ingredient"
                             ]
-                            [ closeIcon 32
+                            [ ionIcon "close" 32
                             ]
                         ]
                 )
@@ -1849,14 +1849,14 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                             , Html.Attributes.title "Edit step"
                             , onClick (EditStep step)
                             ]
-                            [ editIcon 32
+                            [ ionIcon "pencil" 32
                             ]
                         , button
                             [ class "btn btn-sm btn-danger"
                             , onClick (RemoveStep step)
                             , Html.Attributes.title "Remove step"
                             ]
-                            [ closeIcon 32
+                            [ ionIcon "close" 32
                             ]
                         ]
                 )
@@ -1871,8 +1871,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
 recipeCreatorActions : Bool -> Html Msg
 recipeCreatorActions isRecipeValid =
     div
-        [ class "btn-group"
-        , attribute "role" "group"
+        [ class "w-100 d-flex justify-content-center"
         ]
         [ button
             [ type_ "button"
@@ -1880,7 +1879,7 @@ recipeCreatorActions isRecipeValid =
             , disabled (not isRecipeValid)
             , onClick SaveRecipe
             ]
-            [ pizzaIcon 32
+            [ ionIcon "save" 32
             ]
         ]
 

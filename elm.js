@@ -7305,40 +7305,12 @@ var $author$project$Main$prepStepsViewActions = F2(
 				]));
 	});
 var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $elm$html$Html$Attributes$width = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'width',
-		$elm$core$String$fromInt(n));
-};
-var $author$project$Domain$Icon$genericIcon = F2(
-	function (path, width) {
-		return A2(
-			$elm$html$Html$img,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$width(width),
-					$elm$html$Html$Attributes$src('public/img/icon/' + path)
-				]),
-			_List_Nil);
-	});
-var $author$project$Domain$Icon$pizzaIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'pizza.svg', size);
-};
 var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('btn-group'),
-				A2($elm$html$Html$Attributes$attribute, 'role', 'group')
+				$elm$html$Html$Attributes$class('w-100 d-flex justify-content-center')
 			]),
 		_List_fromArray(
 			[
@@ -7353,7 +7325,7 @@ var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 					]),
 				_List_fromArray(
 					[
-						$author$project$Domain$Icon$pizzaIcon(32)
+						A2($author$project$Domain$Icon$ionIcon, 'save', 32)
 					]))
 			]));
 };
@@ -7692,12 +7664,6 @@ var $author$project$Main$addOrEditStepView = function (maybeStep) {
 					]))
 			]));
 };
-var $author$project$Domain$Icon$closeIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'close.svg', size);
-};
-var $author$project$Domain$Icon$editIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'pen.svg', size);
-};
 var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $author$project$Domain$Recipe$getPathStr = function (p) {
 	var str = p.a;
@@ -7735,13 +7701,13 @@ var $author$project$Main$recipeCreatorView = F3(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('btn btn-outline-secondary btn-sm w-100 d-flex justify-content-center align-items-center mt-3'),
+							$elm$html$Html$Attributes$class('btn btn-sm w-100 d-flex justify-content-center align-items-center mt-3'),
 							$elm$html$Html$Attributes$disabled(isDisabled),
 							$elm$html$Html$Events$onClick(msg)
 						]),
 					_List_fromArray(
 						[
-							A2($author$project$Domain$Icon$ionIcon, 'plus', 32)
+							A2($author$project$Domain$Icon$ionIcon, 'add', 32)
 						]));
 			});
 		return A2(
@@ -7928,7 +7894,7 @@ var $author$project$Main$recipeCreatorView = F3(
 												]),
 											_List_fromArray(
 												[
-													$author$project$Domain$Icon$editIcon(32)
+													A2($author$project$Domain$Icon$ionIcon, 'pencil', 32)
 												])),
 											A2(
 											$elm$html$Html$button,
@@ -7941,7 +7907,7 @@ var $author$project$Main$recipeCreatorView = F3(
 												]),
 											_List_fromArray(
 												[
-													$author$project$Domain$Icon$closeIcon(32)
+													A2($author$project$Domain$Icon$ionIcon, 'close', 32)
 												]))
 										]));
 							},
@@ -7994,7 +7960,7 @@ var $author$project$Main$recipeCreatorView = F3(
 												]),
 											_List_fromArray(
 												[
-													$author$project$Domain$Icon$editIcon(32)
+													A2($author$project$Domain$Icon$ionIcon, 'pencil', 32)
 												])),
 											A2(
 											$elm$html$Html$button,
@@ -8007,7 +7973,7 @@ var $author$project$Main$recipeCreatorView = F3(
 												]),
 											_List_fromArray(
 												[
-													$author$project$Domain$Icon$closeIcon(32)
+													A2($author$project$Domain$Icon$ionIcon, 'close', 32)
 												]))
 										]));
 							},
@@ -8543,7 +8509,14 @@ var $author$project$Page$Recipe$Album$GoRecipeViewer = function (a) {
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Domain$Helper$emptyStyle = A2($elm$html$Html$Attributes$style, '', '');
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
 var $author$project$Page$Recipe$Album$recipeAlbumCardView = function (recipe) {
 	var isRecipeValid = !($elm$core$List$isEmpty(recipe.ingredients) && $elm$core$List$isEmpty(recipe.steps));
 	return A2(
