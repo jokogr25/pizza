@@ -595,39 +595,9 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
             ]
             [ text "Ingredients"
             ]
-        , div
-            []
-            (List.map
-                (\ing ->
-                    div
-                        [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                        ]
-                        [ div
-                            []
-                            [ text ing.id ]
-                        , button
-                            [ class
-                                "btn btn-sm btn-warn"
-                            , Html.Attributes.title "Edit ingredient"
-                            , onClick (EditIngredient ing)
-                            ]
-                            [ ionIcon "pencil" 32
-                            ]
-                        , button
-                            [ class
-                                "btn btn-sm btn-danger"
-                            , onClick (RemoveIngredient ing.id)
-                            , Html.Attributes.title "Remove ingredient"
-                            ]
-                            [ ionIcon "close" 32
-                            ]
-                        ]
-                )
-                draft.ingredients
-                ++ [ addOrEditIngredientView maybeIngredientToEdit
-                   , addButton AddIngredient (not isIngredientValid)
-                   ]
-            )
+        , ingredientsAddedView draft.ingredients
+        , editIngredientView maybeIngredientToEdit
+        , addButton AddIngredient (not isIngredientValid)
 
         -- Steps
         , Html.h4
@@ -635,43 +605,48 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
             ]
             [ text "Steps"
             ]
-        , div
-            []
-            (List.map
-                (\step ->
-                    div
-                        [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                        ]
-                        [ div
-                            []
-                            [ text step.title
-                            ]
-                        , button
-                            [ class "btn btn-sm btn-warn"
-                            , Html.Attributes.title "Edit step"
-                            , onClick (EditStep step)
-                            ]
-                            [ ionIcon "pencil" 32
-                            ]
-                        , button
-                            [ class "btn btn-sm btn-danger"
-                            , onClick (RemoveStep step)
-                            , Html.Attributes.title "Remove step"
-                            ]
-                            [ ionIcon "close" 32
-                            ]
-                        ]
-                )
-                draft.steps
-                ++ [ addOrEditStepView maybePrepStepToEdit
-                   , addButton AddStep (not isStepValid)
-                   ]
-            )
+        , stepsAddedView draft.steps
+        , editStepView maybePrepStepToEdit
+        , addButton AddStep (not isStepValid)
         ]
 
 
-addOrEditIngredientView : Maybe Ingredient -> Html Msg
-addOrEditIngredientView maybeIngredient =
+ingredientsAddedView : List Ingredient -> Html Msg
+ingredientsAddedView ingredients =
+    div
+        []
+        (List.map
+            (\ing ->
+                div
+                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
+                    ]
+                    [ div
+                        []
+                        [ text ing.id ]
+                    , button
+                        [ class
+                            "btn btn-sm btn-warn"
+                        , Html.Attributes.title "Edit ingredient"
+                        , onClick (EditIngredient ing)
+                        ]
+                        [ ionIcon "pencil" 32
+                        ]
+                    , button
+                        [ class
+                            "btn btn-sm btn-danger"
+                        , onClick (RemoveIngredient ing.id)
+                        , Html.Attributes.title "Remove ingredient"
+                        ]
+                        [ ionIcon "close" 32
+                        ]
+                    ]
+            )
+            ingredients
+        )
+
+
+editIngredientView : Maybe Ingredient -> Html Msg
+editIngredientView maybeIngredient =
     let
         idValue =
             empyStyleMapper
@@ -771,17 +746,47 @@ addOrEditIngredientView maybeIngredient =
         ]
 
 
-addOrEditStepView : Maybe PrepStep -> Html Msg
-addOrEditStepView maybeStep =
+stepsAddedView : List PrepStep -> Html Msg
+stepsAddedView steps =
+    div
+        []
+        (List.map
+            (\step ->
+                div
+                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
+                    ]
+                    [ div
+                        []
+                        [ text step.title
+                        ]
+                    , button
+                        [ class "btn btn-sm btn-warn"
+                        , Html.Attributes.title "Edit step"
+                        , onClick (EditStep step)
+                        ]
+                        [ ionIcon "pencil" 32
+                        ]
+                    , button
+                        [ class "btn btn-sm btn-danger"
+                        , onClick (RemoveStep step)
+                        , Html.Attributes.title "Remove step"
+                        ]
+                        [ ionIcon "close" 32
+                        ]
+                    ]
+            )
+            steps
+        )
+
+
+editStepView : Maybe PrepStep -> Html Msg
+editStepView maybeStep =
     let
         stepTitleValue =
-            empyStyleMapper
-                maybeStep
-                (\step -> Html.Attributes.value step.title)
+            empyStyleMapper maybeStep (\step -> Html.Attributes.value step.title)
 
         stepTimeValue =
-            empyStyleMapper
-                maybeStep
+            empyStyleMapper maybeStep
                 (\step ->
                     if step.time > -1 then
                         Html.Attributes.value (String.fromInt step.time)
@@ -791,16 +796,11 @@ addOrEditStepView maybeStep =
                 )
 
         stepDescriptionValue =
-            empyStyleMapper
-                maybeStep
-                (\step ->
-                    Html.Attributes.value step.description
-                )
+            empyStyleMapper maybeStep (\step -> Html.Attributes.value step.description)
 
-        colInput l v message =
+        colInput classes l v message =
             div
-                [ class "col-md-12"
-                ]
+                [ class classes ]
                 [ div
                     [ class "form-floating"
                     ]
@@ -812,20 +812,22 @@ addOrEditStepView maybeStep =
                         []
                     , label
                         []
-                        [ text l ]
+                        [ text l
+                        ]
                     ]
                 ]
 
         colTextArea l v message =
             div
-                [ class "col-md-12"
+                [ class "col-12"
                 ]
                 [ div
                     [ class "form-floating"
                     ]
                     [ Html.textarea
                         [ class "form-control"
-                        , Html.Attributes.rows 2
+                        , style "min-height" "120px"
+                        , Html.Attributes.rows 6
                         , v
                         , onInput message
                         ]
@@ -838,22 +840,26 @@ addOrEditStepView maybeStep =
                 ]
     in
     div
-        [ class "mb-3 position-relative"
+        [ class "mb-3"
         ]
         [ div
             [ class "row g-2"
             ]
-            [ colInput
+            [ colInput "col-12 col-md-9"
                 "Title"
                 stepTitleValue
                 UpdateStepTitle
-            , colTextArea
-                "Description"
-                stepDescriptionValue
-                UpdateStepDescription
             , colInput
+                "col-12 col-md-3"
                 "Time"
                 stepTimeValue
                 UpdateStepTime
+            ]
+        , div
+            [ class "row g-2 mt-1"
+            ]
+            [ colTextArea "Description"
+                stepDescriptionValue
+                UpdateStepDescription
             ]
         ]
