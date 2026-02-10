@@ -59,11 +59,11 @@ view model =
                             )
                         |> Maybe.withDefault recipes
             in
-            recipeAlbumView maybeFilteredRecipes
+            recipeAlbumView maybeFilteredRecipes (List.length maybeFilteredRecipes < List.length recipes)
 
 
-recipeAlbumView : List Recipe -> Html Msg
-recipeAlbumView recipes =
+recipeAlbumView : List Recipe -> Bool -> Html Msg
+recipeAlbumView recipes hide =
     let
         addButtonCard =
             div [ class "col" ]
@@ -93,7 +93,11 @@ recipeAlbumView recipes =
                 [ div
                     [ class "row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" ]
                     (List.map recipeAlbumCardView recipes
-                        ++ [ addButtonCard
+                        ++ [ if hide then
+                                text ""
+
+                             else
+                                addButtonCard
                            ]
                     )
                 ]

@@ -235,3 +235,119 @@ validateSteps : List PrepStep -> Bool
 validateSteps steps =
     not
         (List.isEmpty steps)
+
+
+
+-- sample data
+
+
+samples =
+    [ samplePizzaRecipe
+    , sampleLasagneRecipe
+    ]
+
+
+sampleLasagneRecipe : Recipe
+sampleLasagneRecipe =
+    { id = "lasanche"
+    , label = "Lasanche"
+    , image = Path "public/img/lasanche.jpg"
+    , description = ""
+    , ingredients = []
+    , steps = []
+    }
+
+
+samplePizzaRecipe : Recipe
+samplePizzaRecipe =
+    { id = "seven-hours-pizza-dough"
+    , label = "Pizza dough (7 hours)"
+    , image = Path "public/img/7-hours-pizza-dough.jpg"
+    , description = ""
+    , ingredients =
+        [ { id = "flour"
+          , label = "Flour"
+          , amount = 496
+          , unit = Gram
+          }
+        , { id = "water"
+          , label = "Water"
+          , amount = 313
+          , unit = Gram
+          }
+        , { id = "yeast"
+          , label = "Yeast"
+          , amount = 3.4
+          , unit = Gram
+          }
+        , { id = "oliveoil"
+          , label = "Olive oil"
+          , amount = 12
+          , unit = Mililiter
+          }
+        , { id = "salt"
+          , label = "Salt"
+          , amount = 15
+          , unit = Gram
+          }
+        , { id = "honey"
+          , label = "Honey"
+          , amount = 1
+          , unit = Teaspoon
+          }
+        ]
+    , steps =
+        [ { time = 15
+          , title = "Pre mix"
+          , description = "Mix flour and roughly π/4 of water in a bowl, leave it."
+          }
+        , { time = 15
+          , title = "BRING THE YEAST TO LIFE"
+          , description = "Mix rest of the water with yeast and honey, leave it."
+          }
+        , { time = 10
+          , title = "imx"
+          , description = "Put all ingredients to flour/water bowl and knead, as if your life depends on it. The dough is ready, when it stops being clingy"
+          }
+        , { time = 7 * 60
+          , title = "slumber time"
+          , description = "Put the dough in an airtight box in the fridge and LET IT GOOoOOOOOoooooooo"
+          }
+        , { time = 5
+          , title = "Roll it, baby"
+          , description = "Portion dough into 5-6 parts (~140-170g per roll) and roll each to a smoooooth ball."
+          }
+        , { time = 60
+          , title = "stueckgare"
+          , description = "After this stressful first hours in life, each of the pizza balls needs to rest separated from their siblings, to meditate and grow, question existence, in an (almost) airtight box."
+          }
+        , { time = 5
+          , title = "MAX POWER"
+          , description = "Pre-heat oven to max"
+          }
+        , { time = 5
+          , title = "Don't we all need a little stretch when we're older?"
+          , description = "Put some semola on a clean and smooooth surface, carefully put one ball on the semola (in their current state they're very sensitive, so be really cautious) and stretch it from the inner to the outer in a circling motion. we want it shallow on the inside and thick on the edge"
+          }
+        , { time = 5
+          , title = "What belongs together will be together in the end"
+          , description = "Add tomate sauce, cheese and everything else you like. Yes, pineapple is allowed. No, hollandaise is not, get over it. It's BLASFEMIA. Do it and I'll call the cops"
+          }
+        , { time = 0
+          , title = "Ich bin nicht sauer, ich bin enttäuscht"
+          , description = "You did it, right? That's okay. Pizza is for everyone, even taste-impaired germans."
+          }
+        , { time = 0
+          , title = "CIIIIIIRCLEE OF LIIIIFEE"
+          , description = "Put pizza in oven until cheese starts bubbling and the circle of life gets a little color"
+          }
+        , { time = 0
+          , title = "Enjoy"
+          , description = "You need instructions for that too?"
+          }
+        , { time = -1
+          , title = "I knew it"
+          , description = "Call some friends, your parents, grandma and get together at your table. Eat, play, talk, laugh. Have some quality time with your loved ones."
+          }
+        ]
+    }
