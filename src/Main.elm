@@ -1475,7 +1475,7 @@ ingredientsViewActions ratio =
         ]
         [ button
             [ type_ "button"
-            , class "btn btn-light"
+            , class "btn"
             , onClick ResetRecipeViewer
             , disabled (ratio == 1)
             ]
@@ -1604,7 +1604,7 @@ prepStepsViewActions indexToDisplay length =
                 [ button
                     [ onClick message
                     , disabled isDisabled
-                    , class "btn btn-light"
+                    , class "btn"
                     ]
                     [ icon ]
                 ]
@@ -1620,11 +1620,11 @@ prepStepsViewActions indexToDisplay length =
         [ prepStepButton
             Prev
             (indexToDisplay <= 0)
-            (arrowLeftIcon btnSize)
+            (ionIcon "chevron-back-outline" btnSize)
         , prepStepButton
             Next
             (indexToDisplay >= length - 1)
-            (arrowRightIcon btnSize)
+            (ionIcon "chevron-forward-outline" btnSize)
         ]
 
 
@@ -1876,7 +1876,7 @@ recipeCreatorActions isRecipeValid =
         ]
         [ button
             [ type_ "button"
-            , class "btn btn-light"
+            , class "btn"
             , disabled (not isRecipeValid)
             , onClick SaveRecipe
             ]

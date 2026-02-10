@@ -7246,7 +7246,7 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('button'),
-						$elm$html$Html$Attributes$class('btn btn-light'),
+						$elm$html$Html$Attributes$class('btn'),
 						$elm$html$Html$Events$onClick($author$project$Main$ResetRecipeViewer),
 						$elm$html$Html$Attributes$disabled(ratio === 1)
 					]),
@@ -7258,6 +7258,53 @@ var $author$project$Main$ingredientsViewActions = function (ratio) {
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $author$project$Main$prepStepsViewActions = F2(
+	function (indexToDisplay, length) {
+		var prepStepButton = F3(
+			function (message, isDisabled, icon) {
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('d-flex justify-content-center w-50')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(message),
+									$elm$html$Html$Attributes$disabled(isDisabled),
+									$elm$html$Html$Attributes$class('btn')
+								]),
+							_List_fromArray(
+								[icon]))
+						]));
+			});
+		var btnSize = 32;
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('d-flex w-100 m-auto gap-2'),
+					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
+				]),
+			_List_fromArray(
+				[
+					A3(
+					prepStepButton,
+					$author$project$Main$Prev,
+					indexToDisplay <= 0,
+					A2($author$project$Domain$Icon$ionIcon, 'chevron-back-outline', btnSize)),
+					A3(
+					prepStepButton,
+					$author$project$Main$Next,
+					_Utils_cmp(indexToDisplay, length - 1) > -1,
+					A2($author$project$Domain$Icon$ionIcon, 'chevron-forward-outline', btnSize))
+				]));
+	});
+var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -7282,59 +7329,6 @@ var $author$project$Domain$Icon$genericIcon = F2(
 				]),
 			_List_Nil);
 	});
-var $author$project$Domain$Icon$arrowLeftIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'left.svg', size);
-};
-var $author$project$Domain$Icon$arrowRightIcon = function (size) {
-	return A2($author$project$Domain$Icon$genericIcon, 'right.svg', size);
-};
-var $author$project$Main$prepStepsViewActions = F2(
-	function (indexToDisplay, length) {
-		var prepStepButton = F3(
-			function (message, isDisabled, icon) {
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('d-flex justify-content-center w-50')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick(message),
-									$elm$html$Html$Attributes$disabled(isDisabled),
-									$elm$html$Html$Attributes$class('btn btn-light')
-								]),
-							_List_fromArray(
-								[icon]))
-						]));
-			});
-		var btnSize = 32;
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('d-flex w-100 m-auto gap-2'),
-					A2($elm$html$Html$Attributes$style, 'max-width', '700px')
-				]),
-			_List_fromArray(
-				[
-					A3(
-					prepStepButton,
-					$author$project$Main$Prev,
-					indexToDisplay <= 0,
-					$author$project$Domain$Icon$arrowLeftIcon(btnSize)),
-					A3(
-					prepStepButton,
-					$author$project$Main$Next,
-					_Utils_cmp(indexToDisplay, length - 1) > -1,
-					$author$project$Domain$Icon$arrowRightIcon(btnSize))
-				]));
-	});
-var $author$project$Main$SaveRecipe = {$: 'SaveRecipe'};
 var $author$project$Domain$Icon$pizzaIcon = function (size) {
 	return A2($author$project$Domain$Icon$genericIcon, 'pizza.svg', size);
 };
@@ -7353,7 +7347,7 @@ var $author$project$Main$recipeCreatorActions = function (isRecipeValid) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('button'),
-						$elm$html$Html$Attributes$class('btn btn-light'),
+						$elm$html$Html$Attributes$class('btn'),
 						$elm$html$Html$Attributes$disabled(!isRecipeValid),
 						$elm$html$Html$Events$onClick($author$project$Main$SaveRecipe)
 					]),
