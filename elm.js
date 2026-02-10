@@ -7967,13 +7967,13 @@ var $author$project$Page$Recipe$Create$editIngredientView = function (maybeIngre
 		function (ing) {
 			return $elm$html$Html$Attributes$value(ing.id);
 		});
-	var colSelect = F2(
-		function (l, message) {
+	var colSelect = F3(
+		function (classes, l, message) {
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('col-md-3')
+						$elm$html$Html$Attributes$class(classes)
 					]),
 				_List_fromArray(
 					[
@@ -8028,13 +8028,13 @@ var $author$project$Page$Recipe$Create$editIngredientView = function (maybeIngre
 							]))
 					]));
 		});
-	var colInput = F3(
-		function (l, v, message) {
+	var colInput = F4(
+		function (classes, l, v, message) {
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('col-md-3')
+						$elm$html$Html$Attributes$class(classes)
 					]),
 				_List_fromArray(
 					[
@@ -8076,7 +8076,7 @@ var $author$project$Page$Recipe$Create$editIngredientView = function (maybeIngre
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mb-3 position-relative')
+				$elm$html$Html$Attributes$class('mb-3')
 			]),
 		_List_fromArray(
 			[
@@ -8088,10 +8088,19 @@ var $author$project$Page$Recipe$Create$editIngredientView = function (maybeIngre
 					]),
 				_List_fromArray(
 					[
-						A3(colInput, 'Id', idValue, $author$project$Page$Recipe$Create$UpdateIngredientId),
-						A3(colInput, 'Label', labelValue, $author$project$Page$Recipe$Create$UpdateIngredientLabel),
-						A3(colInput, 'Amount', amountValue, $author$project$Page$Recipe$Create$UpdateIngredientAmount),
-						A2(colSelect, 'Unit', $author$project$Page$Recipe$Create$UpdateIngredientUnit)
+						A4(colInput, 'col-12 col-md-9', 'Label', labelValue, $author$project$Page$Recipe$Create$UpdateIngredientLabel),
+						A4(colInput, 'col-12 col-md-3', 'Id', idValue, $author$project$Page$Recipe$Create$UpdateIngredientId)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('row g-2 mt-1')
+					]),
+				_List_fromArray(
+					[
+						A4(colInput, 'col-9', 'Amount', amountValue, $author$project$Page$Recipe$Create$UpdateIngredientAmount),
+						A3(colSelect, 'col-3', 'Unit', $author$project$Page$Recipe$Create$UpdateIngredientUnit)
 					]))
 			]));
 };

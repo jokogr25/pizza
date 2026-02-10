@@ -649,18 +649,13 @@ editIngredientView : Maybe Ingredient -> Html Msg
 editIngredientView maybeIngredient =
     let
         idValue =
-            empyStyleMapper
-                maybeIngredient
-                (\ing -> Html.Attributes.value ing.id)
+            empyStyleMapper maybeIngredient (\ing -> Html.Attributes.value ing.id)
 
         labelValue =
-            empyStyleMapper
-                maybeIngredient
-                (\ing -> Html.Attributes.value ing.label)
+            empyStyleMapper maybeIngredient (\ing -> Html.Attributes.value ing.label)
 
         amountValue =
-            empyStyleMapper
-                maybeIngredient
+            empyStyleMapper maybeIngredient
                 (\ing ->
                     if ing.amount > 0 then
                         Html.Attributes.value (String.fromFloat ing.amount)
@@ -669,30 +664,24 @@ editIngredientView maybeIngredient =
                         emptyStyle
                 )
 
-        colInput l v message =
+        colInput classes l v message =
             div
-                [ class "col-md-3" ]
-                [ div
-                    [ class "form-floating"
-                    ]
+                [ class classes ]
+                [ div [ class "form-floating" ]
                     [ input
                         [ class "form-control"
                         , onInput message
                         , v
                         ]
                         []
-                    , label
-                        []
-                        [ text l ]
+                    , label [] [ text l ]
                     ]
                 ]
 
-        colSelect l message =
+        colSelect classes l message =
             div
-                [ class "col-md-3"
-                ]
-                [ div
-                    [ class "form-floating" ]
+                [ class classes ]
+                [ div [ class "form-floating" ]
                     [ Html.select
                         [ class "form-select"
                         , onInput message
@@ -716,32 +705,24 @@ editIngredientView maybeIngredient =
                         )
                     , label
                         []
-                        [ text l
-                        ]
+                        [ text l ]
                     ]
                 ]
     in
     div
-        [ class "mb-3 position-relative"
+        [ class "mb-3"
         ]
         [ div
             [ class "row g-2"
             ]
-            [ colInput
-                "Id"
-                idValue
-                UpdateIngredientId
-            , colInput
-                "Label"
-                labelValue
-                UpdateIngredientLabel
-            , colInput
-                "Amount"
-                amountValue
-                UpdateIngredientAmount
-            , colSelect
-                "Unit"
-                UpdateIngredientUnit
+            [ colInput "col-12 col-md-9" "Label" labelValue UpdateIngredientLabel
+            , colInput "col-12 col-md-3" "Id" idValue UpdateIngredientId
+            ]
+        , div
+            [ class "row g-2 mt-1"
+            ]
+            [ colInput "col-9" "Amount" amountValue UpdateIngredientAmount
+            , colSelect "col-3" "Unit" UpdateIngredientUnit
             ]
         ]
 
