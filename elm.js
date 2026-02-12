@@ -6780,7 +6780,7 @@ var $author$project$Main$actionToIcon = function (action) {
 			]),
 		_List_fromArray(
 			[
-				A2($author$project$Domain$Icon$ionIcon, icon, 64)
+				A2($author$project$Domain$Icon$ionIcon, icon, 32)
 			]));
 };
 var $author$project$Main$footerView = function (actions) {

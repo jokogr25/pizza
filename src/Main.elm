@@ -375,7 +375,7 @@ actionToIcon action =
         [ class "btn"
         , onClick message
         ]
-        [ ionIcon icon 64
+        [ ionIcon icon 32
         ]
 
 
