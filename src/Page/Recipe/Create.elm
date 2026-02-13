@@ -295,7 +295,7 @@ update msg model =
                                        )
                         }
                         maybeIngredientDraft
-                        maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
@@ -516,10 +516,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
         [ class "container my-4 flex-grow-1"
         , style "max-width" "700px"
         ]
-        [ Html.h2
-            []
-            [ text "Create recipe" ]
-        , let
+        [ let
             id =
                 "createRecipeLabel"
           in
@@ -596,6 +593,10 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
             [ text "Ingredients"
             ]
         , ingredientsAddedView draft.ingredients
+        , Html.hr
+            [ class "border border-2 border-light"
+            ]
+            []
         , editIngredientView maybeIngredientToEdit
         , addButton AddIngredient (not isIngredientValid)
 
@@ -606,6 +607,10 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
             [ text "Steps"
             ]
         , stepsAddedView draft.steps
+        , Html.hr
+            [ class "border border-2 border-light"
+            ]
+            []
         , editStepView maybePrepStepToEdit
         , addButton AddStep (not isStepValid)
         ]
@@ -613,31 +618,27 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
 
 ingredientsAddedView : List Ingredient -> Html Msg
 ingredientsAddedView ingredients =
-    div
-        []
+    div []
         (List.map
             (\ing ->
                 div
-                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                    ]
-                    [ div
-                        []
+                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2" ]
+                    [ div []
                         [ text ing.id ]
-                    , button
-                        [ class
-                            "btn btn-sm btn-warn"
-                        , Html.Attributes.title "Edit ingredient"
-                        , onClick (EditIngredient ing)
-                        ]
-                        [ ionIcon "pencil" 32
-                        ]
-                    , button
-                        [ class
-                            "btn btn-sm btn-danger"
-                        , onClick (RemoveIngredient ing.id)
-                        , Html.Attributes.title "Remove ingredient"
-                        ]
-                        [ ionIcon "close" 32
+                    , div
+                        [ class "d-flex gap-2" ]
+                        [ button
+                            [ class "btn btn-sm btn-outline action-btn-danger"
+                            , Html.Attributes.title "Remove ingredient"
+                            , onClick (RemoveIngredient ing.id)
+                            ]
+                            [ ionIcon "close" 20 ]
+                        , button
+                            [ class "btn btn-sm btn-outline action-btn-warning"
+                            , Html.Attributes.title "Edit ingredient"
+                            , onClick (EditIngredient ing)
+                            ]
+                            [ ionIcon "pencil" 20 ]
                         ]
                     ]
             )
@@ -729,30 +730,27 @@ editIngredientView maybeIngredient =
 
 stepsAddedView : List PrepStep -> Html Msg
 stepsAddedView steps =
-    div
-        []
+    div []
         (List.map
             (\step ->
                 div
-                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2 position-relative"
-                    ]
-                    [ div
-                        []
-                        [ text step.title
-                        ]
-                    , button
-                        [ class "btn btn-sm btn-warn"
-                        , Html.Attributes.title "Edit step"
-                        , onClick (EditStep step)
-                        ]
-                        [ ionIcon "pencil" 32
-                        ]
-                    , button
-                        [ class "btn btn-sm btn-danger"
-                        , onClick (RemoveStep step)
-                        , Html.Attributes.title "Remove step"
-                        ]
-                        [ ionIcon "close" 32
+                    [ class "d-flex align-items-center justify-content-between border rounded p-2 mb-2" ]
+                    [ div []
+                        [ text step.title ]
+                    , div
+                        [ class "d-flex gap-2" ]
+                        [ button
+                            [ class "btn btn-sm btn-outline action-btn-danger"
+                            , Html.Attributes.title "Remove step"
+                            , onClick (RemoveStep step)
+                            ]
+                            [ ionIcon "close" 20 ]
+                        , button
+                            [ class "btn btn-sm btn-outline action-btn-warning"
+                            , Html.Attributes.title "Edit step"
+                            , onClick (EditStep step)
+                            ]
+                            [ ionIcon "pencil" 20 ]
                         ]
                     ]
             )

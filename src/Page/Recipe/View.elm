@@ -30,6 +30,12 @@ type Msg
     | Next
     | Prev
     | NoOp
+      -- OutMsg
+    | OutMsg OutMsg
+
+
+type OutMsg
+    = EditRecipe
 
 
 init : List Recipe -> Recipe -> Model
@@ -181,7 +187,8 @@ update msg model =
                         ratio
                         page
 
-        NoOp ->
+        -- "ignore" NoOp and OutMsg, because main evaluates
+        _ ->
             model
 
 
@@ -371,6 +378,12 @@ ingredientsView ingredients ratio selectedIngredient maybeNewAmount =
                 (ingredientView ratio selectedIngredient maybeNewAmount)
                 ingredients
             )
+        , button
+            [ class "btn"
+            , onClick (OutMsg EditRecipe)
+            ]
+            [ ionIcon "pencil" 32
+            ]
         ]
 
 

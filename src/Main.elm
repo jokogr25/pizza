@@ -264,13 +264,25 @@ update msg model =
 
         ViewMsg viewMsg ->
             case model of
-                RecipeView m ->
+                RecipeView (RecipeView.View recipes recipe maybeIngredient stepIndex maybeAmount ratio tab) ->
+                    let
+                        m =
+                            RecipeView.View recipes recipe maybeIngredient stepIndex maybeAmount ratio tab
+                    in
                     case viewMsg of
                         RecipeView.SelectIngredient ing ->
                             ( RecipeView
                                 (RecipeView.update (RecipeView.SelectIngredient ing) m)
                             , focus ing.id
                             )
+
+                        RecipeView.OutMsg outMsg ->
+                            case outMsg of
+                                RecipeView.EditRecipe ->
+                                    ( RecipeCreate
+                                        (RecipeCreate.Create [] recipe Nothing Nothing)
+                                    , Cmd.none
+                                    )
 
                         _ ->
                             ( RecipeView

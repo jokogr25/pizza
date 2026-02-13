@@ -35,3 +35,13 @@ button.btn[disabled] {
     color: #6c757d;
     /* optional: gray text like default disabled */
 }
+
+.action-btn-warning:hover {
+    background-color: var(--bs-warning);
+    color: black;
+}
+
+.action-btn-danger:hover {
+    background-color: var(--bs-danger);
+    color: white;
+}
