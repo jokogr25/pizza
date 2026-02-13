@@ -1,11 +1,14 @@
 module Page.Recipe.View exposing (..)
 
+import Domain.ActionButton as ActionButton exposing (ActionButton)
 import Domain.Helper exposing (round2ToString)
 import Domain.Icon exposing (ionIcon)
 import Domain.Recipe exposing (Ingredient, Path(..), PrepStep, Recipe, Unit(..), replaceIngredientAmountFraction, unitToAbbr)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, disabled, id, style, type_)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode exposing (maybe)
+import Maybe exposing (withDefault)
 
 
 type Tab
@@ -188,13 +191,22 @@ view : Model -> Html Msg
 view model =
     case model of
         View _ recipe selectedIngredient prepStepIndex maybeNewAmount ratio page ->
-            recipeView
-                recipe
-                ratio
-                selectedIngredient
-                maybeNewAmount
-                prepStepIndex
-                page
+            div
+                [ class "d-flex flex-column h-100"
+                ]
+                [ div
+                    [ class "flex-grow-1 overflow-auto"
+                    ]
+                    [ recipeView
+                        recipe
+                        ratio
+                        selectedIngredient
+                        maybeNewAmount
+                        prepStepIndex
+                        page
+                    ]
+                , footerView model
+                ]
 
 
 recipeView : Recipe -> Float -> Maybe Ingredient -> Maybe Float -> Int -> Tab -> Html Msg
@@ -313,6 +325,43 @@ recipeView recipe ratio selectedIngredient maybeNewAmount currentDisplayedPrepSt
                 ]
             ]
         ]
+
+
+footerView : Model -> Html Msg
+footerView model =
+    case model of
+        View _ recipe _ prepStepIndex _ ratio activeTab ->
+            let
+                isSteps =
+                    activeTab == Steps
+
+                isFirst =
+                    prepStepIndex == 0
+
+                isLast =
+                    prepStepIndex == List.length recipe.steps - 1
+            in
+            div
+                [ class "p-3 border-top"
+                ]
+                [ div
+                    [ class "container d-flex justify-content-center"
+                    ]
+                    (if isSteps then
+                        List.map ActionButton.actionToIcon
+                            [ ActionButton.Pre Prev isFirst
+                            , ActionButton.Nex Next isLast
+                            ]
+                        -- ]
+
+                     else
+                        List.map ActionButton.actionToIcon
+                            [ ActionButton.Refresh
+                                Refresh
+                                (ratio == 1)
+                            ]
+                    )
+                ]
 
 
 ingredientsView : List Ingredient -> Float -> Maybe Ingredient -> Maybe Float -> Html Msg

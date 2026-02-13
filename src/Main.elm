@@ -303,7 +303,6 @@ view model =
                 (RecipeAlbum.view m
                     |> Html.map AlbumMsg
                 )
-                []
 
         RecipeCreate m ->
             contentView
@@ -311,7 +310,6 @@ view model =
                 (RecipeCreate.view m
                     |> Html.map CreateMsg
                 )
-                [ Save (CreateMsg RecipeCreate.NoOp) ]
 
         RecipeView (View recipes recipe maybeIngredient stepIndex maybeAmount ratio tab) ->
             let
@@ -322,24 +320,12 @@ view model =
 
                         RecipeView.Steps ->
                             RecipeCreatorPage
-
-                actions =
-                    case tab of
-                        RecipeView.Ingredients ->
-                            [ Refresh (ViewMsg RecipeView.Refresh)
-                            ]
-
-                        RecipeView.Steps ->
-                            [ Pre (ViewMsg RecipeView.Prev)
-                            , Nex (ViewMsg RecipeView.Next)
-                            ]
             in
             contentView
                 currentTab
                 (RecipeView.view (View recipes recipe maybeIngredient stepIndex maybeAmount ratio tab)
                     |> Html.map ViewMsg
                 )
-                actions
 
 
 type ActivePage
@@ -347,40 +333,8 @@ type ActivePage
     | RecipeCreatorPage
 
 
-type ActionButton
-    = Pre Msg
-    | Nex Msg
-    | Save Msg
-    | Refresh Msg
-
-
-actionToIcon : ActionButton -> Html Msg
-actionToIcon action =
-    let
-        ( icon, message ) =
-            case action of
-                Pre msg ->
-                    ( "chevron-back-outline", msg )
-
-                Nex msg ->
-                    ( "chevron-forward-outline", msg )
-
-                Save msg ->
-                    ( "save", msg )
-
-                Refresh msg ->
-                    ( "refresh", msg )
-    in
-    button
-        [ class "btn"
-        , onClick message
-        ]
-        [ ionIcon icon 32
-        ]
-
-
-contentView : ActivePage -> Html Msg -> List ActionButton -> Html Msg
-contentView activePage content actions =
+contentView : ActivePage -> Html Msg -> Html Msg
+contentView activePage content =
     div
         [ class "d-flex flex-column vh-100"
         ]
@@ -390,17 +344,6 @@ contentView activePage content actions =
             ]
             [ content
             ]
-        , footerView actions
-        ]
-
-
-footerView : List ActionButton -> Html Msg
-footerView actions =
-    div
-        [ class "p-3 border-top" ]
-        [ div
-            [ class "w-100 d-flex justify-content-center" ]
-            (List.map actionToIcon actions)
         ]
 
 

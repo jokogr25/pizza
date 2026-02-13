@@ -6680,22 +6680,8 @@ var $author$project$Main$AlbumMsg = function (a) {
 var $author$project$Main$CreateMsg = function (a) {
 	return {$: 'CreateMsg', a: a};
 };
-var $author$project$Main$Nex = function (a) {
-	return {$: 'Nex', a: a};
-};
-var $author$project$Page$Recipe$Create$NoOp = {$: 'NoOp'};
-var $author$project$Main$Pre = function (a) {
-	return {$: 'Pre', a: a};
-};
 var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $author$project$Main$RecipeCreatorPage = {$: 'RecipeCreatorPage'};
-var $author$project$Main$Refresh = function (a) {
-	return {$: 'Refresh', a: a};
-};
-var $author$project$Page$Recipe$View$Refresh = {$: 'Refresh'};
-var $author$project$Main$Save = function (a) {
-	return {$: 'Save', a: a};
-};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6706,7 +6692,12 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$GoFront = {$: 'GoFront'};
+var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
+var $author$project$Main$InputSearch = function (a) {
+	return {$: 'InputSearch', a: a};
+};
+var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -6715,98 +6706,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
-	return _VirtualDom_keyedNode(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
-var $author$project$Domain$Icon$ionIcon = F2(
-	function (name, size) {
-		return A3(
-			$elm$html$Html$Keyed$node,
-			'ion-icon',
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$attribute, 'name', name),
-					A2(
-					$elm$html$Html$Attributes$attribute,
-					'style',
-					'font-size:' + ($elm$core$String$fromInt(size) + 'px; vertical-align: middle;'))
-				]),
-			_List_Nil);
-	});
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $author$project$Main$actionToIcon = function (action) {
-	var _v0 = function () {
-		switch (action.$) {
-			case 'Pre':
-				var msg = action.a;
-				return _Utils_Tuple2('chevron-back-outline', msg);
-			case 'Nex':
-				var msg = action.a;
-				return _Utils_Tuple2('chevron-forward-outline', msg);
-			case 'Save':
-				var msg = action.a;
-				return _Utils_Tuple2('save', msg);
-			default:
-				var msg = action.a;
-				return _Utils_Tuple2('refresh', msg);
-		}
-	}();
-	var icon = _v0.a;
-	var message = _v0.b;
-	return A2(
-		$elm$html$Html$button,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('btn'),
-				$elm$html$Html$Events$onClick(message)
-			]),
-		_List_fromArray(
-			[
-				A2($author$project$Domain$Icon$ionIcon, icon, 32)
-			]));
-};
-var $author$project$Main$footerView = function (actions) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('p-3 border-top')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('w-100 d-flex justify-content-center')
-					]),
-				A2($elm$core$List$map, $author$project$Main$actionToIcon, actions))
-			]));
-};
-var $author$project$Main$GoFront = {$: 'GoFront'};
-var $author$project$Main$GoRecipeAlbum = {$: 'GoRecipeAlbum'};
-var $author$project$Main$InputSearch = function (a) {
-	return {$: 'InputSearch', a: a};
-};
-var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -6840,8 +6740,45 @@ var $elm$html$Html$Attributes$href = function (url) {
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
+	return _VirtualDom_keyedNode(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
+var $author$project$Domain$Icon$ionIcon = F2(
+	function (name, size) {
+		return A3(
+			$elm$html$Html$Keyed$node,
+			'ion-icon',
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$attribute, 'name', name),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'style',
+					'font-size:' + ($elm$core$String$fromInt(size) + 'px; vertical-align: middle;'))
+				]),
+			_List_Nil);
+	});
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -7113,8 +7050,8 @@ var $author$project$Main$navbarView = function (activePage) {
 					]))
 			]));
 };
-var $author$project$Main$contentView = F3(
-	function (activePage, content, actions) {
+var $author$project$Main$contentView = F2(
+	function (activePage, content) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -7131,8 +7068,7 @@ var $author$project$Main$contentView = F3(
 							$elm$html$Html$Attributes$class('flex-grow-1 overflow-auto')
 						]),
 					_List_fromArray(
-						[content])),
-					$author$project$Main$footerView(actions)
+						[content]))
 				]));
 	});
 var $author$project$Main$GoCarousel = {$: 'GoCarousel'};
@@ -8076,10 +8012,100 @@ var $author$project$Page$Recipe$Create$view = function (model) {
 	var maybeStepDraft = model.d;
 	return A3($author$project$Page$Recipe$Create$recipeCreatorView, recipeDraft, maybeIngredientDraft, maybeStepDraft);
 };
+var $author$project$Domain$ActionButton$Nex = F2(
+	function (a, b) {
+		return {$: 'Nex', a: a, b: b};
+	});
+var $author$project$Domain$ActionButton$Pre = F2(
+	function (a, b) {
+		return {$: 'Pre', a: a, b: b};
+	});
+var $author$project$Domain$ActionButton$Refresh = F2(
+	function (a, b) {
+		return {$: 'Refresh', a: a, b: b};
+	});
+var $author$project$Page$Recipe$View$Refresh = {$: 'Refresh'};
+var $author$project$Page$Recipe$View$Steps = {$: 'Steps'};
+var $author$project$Domain$ActionButton$actionToIcon = function (action) {
+	var _v0 = function () {
+		switch (action.$) {
+			case 'Pre':
+				var m = action.a;
+				var d = action.b;
+				return _Utils_Tuple3('chevron-back-outline', m, d);
+			case 'Nex':
+				var m = action.a;
+				var d = action.b;
+				return _Utils_Tuple3('chevron-forward-outline', m, d);
+			case 'Save':
+				var m = action.a;
+				var d = action.b;
+				return _Utils_Tuple3('save', m, d);
+			default:
+				var m = action.a;
+				var d = action.b;
+				return _Utils_Tuple3('refresh', m, d);
+		}
+	}();
+	var icon = _v0.a;
+	var message = _v0.b;
+	var isDisabled = _v0.c;
+	return A2(
+		$elm$html$Html$button,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('btn'),
+				$elm$html$Html$Events$onClick(message),
+				$elm$html$Html$Attributes$disabled(isDisabled)
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$Domain$Icon$ionIcon, icon, 32)
+			]));
+};
+var $author$project$Page$Recipe$View$footerView = function (model) {
+	var recipe = model.b;
+	var prepStepIndex = model.d;
+	var ratio = model.f;
+	var activeTab = model.g;
+	var isSteps = _Utils_eq(activeTab, $author$project$Page$Recipe$View$Steps);
+	var isLast = _Utils_eq(
+		prepStepIndex,
+		$elm$core$List$length(recipe.steps) - 1);
+	var isFirst = !prepStepIndex;
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('p-3 border-top')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container d-flex justify-content-center')
+					]),
+				isSteps ? A2(
+					$elm$core$List$map,
+					$author$project$Domain$ActionButton$actionToIcon,
+					_List_fromArray(
+						[
+							A2($author$project$Domain$ActionButton$Pre, $author$project$Page$Recipe$View$Prev, isFirst),
+							A2($author$project$Domain$ActionButton$Nex, $author$project$Page$Recipe$View$Next, isLast)
+						])) : A2(
+					$elm$core$List$map,
+					$author$project$Domain$ActionButton$actionToIcon,
+					_List_fromArray(
+						[
+							A2($author$project$Domain$ActionButton$Refresh, $author$project$Page$Recipe$View$Refresh, ratio === 1)
+						])))
+			]));
+};
 var $author$project$Page$Recipe$View$SelectTab = function (a) {
 	return {$: 'SelectTab', a: a};
 };
-var $author$project$Page$Recipe$View$Steps = {$: 'Steps'};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Page$Recipe$View$Abort = {$: 'Abort'};
 var $author$project$Page$Recipe$View$InputNewAmount = function (a) {
@@ -8544,7 +8570,26 @@ var $author$project$Page$Recipe$View$view = function (model) {
 	var maybeNewAmount = model.e;
 	var ratio = model.f;
 	var page = model.g;
-	return A6($author$project$Page$Recipe$View$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex, page);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('d-flex flex-column h-100')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('flex-grow-1 overflow-auto')
+					]),
+				_List_fromArray(
+					[
+						A6($author$project$Page$Recipe$View$recipeView, recipe, ratio, selectedIngredient, maybeNewAmount, prepStepIndex, page)
+					])),
+				$author$project$Page$Recipe$View$footerView(model)
+			]));
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$carouselButton = F4(
@@ -8645,28 +8690,22 @@ var $author$project$Main$view = function (model) {
 			return $author$project$Main$viewCarousel1;
 		case 'RecipeAlbum':
 			var m = model.a;
-			return A3(
+			return A2(
 				$author$project$Main$contentView,
 				$author$project$Main$RecipeAlbumPage,
 				A2(
 					$elm$html$Html$map,
 					$author$project$Main$AlbumMsg,
-					$author$project$Page$Recipe$Album$view(m)),
-				_List_Nil);
+					$author$project$Page$Recipe$Album$view(m)));
 		case 'RecipeCreate':
 			var m = model.a;
-			return A3(
+			return A2(
 				$author$project$Main$contentView,
 				$author$project$Main$RecipeCreatorPage,
 				A2(
 					$elm$html$Html$map,
 					$author$project$Main$CreateMsg,
-					$author$project$Page$Recipe$Create$view(m)),
-				_List_fromArray(
-					[
-						$author$project$Main$Save(
-						$author$project$Main$CreateMsg($author$project$Page$Recipe$Create$NoOp))
-					]));
+					$author$project$Page$Recipe$Create$view(m)));
 		default:
 			var _v1 = model.a;
 			var recipes = _v1.a;
@@ -8683,32 +8722,14 @@ var $author$project$Main$view = function (model) {
 					return $author$project$Main$RecipeCreatorPage;
 				}
 			}();
-			var actions = function () {
-				if (tab.$ === 'Ingredients') {
-					return _List_fromArray(
-						[
-							$author$project$Main$Refresh(
-							$author$project$Main$ViewMsg($author$project$Page$Recipe$View$Refresh))
-						]);
-				} else {
-					return _List_fromArray(
-						[
-							$author$project$Main$Pre(
-							$author$project$Main$ViewMsg($author$project$Page$Recipe$View$Prev)),
-							$author$project$Main$Nex(
-							$author$project$Main$ViewMsg($author$project$Page$Recipe$View$Next))
-						]);
-				}
-			}();
-			return A3(
+			return A2(
 				$author$project$Main$contentView,
 				currentTab,
 				A2(
 					$elm$html$Html$map,
 					$author$project$Main$ViewMsg,
 					$author$project$Page$Recipe$View$view(
-						A7($author$project$Page$Recipe$View$View, recipes, recipe, maybeIngredient, stepIndex, maybeAmount, ratio, tab))),
-				actions);
+						A7($author$project$Page$Recipe$View$View, recipes, recipe, maybeIngredient, stepIndex, maybeAmount, ratio, tab))));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
