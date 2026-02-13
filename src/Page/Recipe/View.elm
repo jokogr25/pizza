@@ -1,14 +1,13 @@
 module Page.Recipe.View exposing (..)
 
-import Domain.ActionButton as ActionButton exposing (ActionButton)
+import Domain.ActionButton as ActionButton
 import Domain.Helper exposing (round2ToString)
 import Domain.Icon exposing (ionIcon)
 import Domain.Recipe exposing (Ingredient, Path(..), PrepStep, Recipe, Unit(..), replaceIngredientAmountFraction, unitToAbbr)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, disabled, id, style, type_)
 import Html.Events exposing (onClick, onInput)
-import Json.Decode exposing (maybe)
-import Maybe exposing (withDefault)
+import Maybe
 
 
 type Tab

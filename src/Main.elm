@@ -7,7 +7,7 @@ import Domain.Helper exposing (..)
 import Domain.Icon exposing (..)
 import Domain.Recipe exposing (..)
 import Html exposing (Html, button, div, img, input, label, span, text)
-import Html.Attributes exposing (action, alt, attribute, class, classList, disabled, id, src, style, type_)
+import Html.Attributes exposing (alt, attribute, class, classList, disabled, id, src, style, type_)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
