@@ -29,7 +29,6 @@ type Msg
     | Abort
     | Next
     | Prev
-      -- OutMsg
     | NoOp
 
 
