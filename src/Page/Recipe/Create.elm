@@ -11,7 +11,7 @@ import Platform.Cmd as Cmd
 
 
 type Model
-    = Create (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep)
+    = Create (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep) (Maybe Modal)
 
 
 type Msg
@@ -34,6 +34,9 @@ type Msg
     | UpdateStepTime String
     | UpdateStepDescription String
       --
+    | OpenModal Msg
+    | Ack
+    | Abort
     | NoOp
       --
     | Out OutMsg
@@ -41,6 +44,10 @@ type Msg
 
 type OutMsg
     = SaveRecipe Recipe
+
+
+type Modal
+    = Acknowledge Msg
 
 
 init : List Recipe -> Model
@@ -56,6 +63,7 @@ init recipes =
         }
         Nothing
         Nothing
+        Nothing
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -67,7 +75,7 @@ update msg model =
     case msg of
         UpdateLabel label ->
             case model of
-                Create recipes draft ingredientDraft stepDraft ->
+                Create recipes draft ingredientDraft stepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -75,12 +83,13 @@ update msg model =
                         }
                         ingredientDraft
                         stepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateDescription description ->
             case model of
-                Create recipes draft ingredientDraft stepDraft ->
+                Create recipes draft ingredientDraft stepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -88,12 +97,13 @@ update msg model =
                         }
                         ingredientDraft
                         stepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateImagePath imagePath ->
             case model of
-                Create recipes draft ingredientDraft stepDraft ->
+                Create recipes draft ingredientDraft stepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -101,12 +111,13 @@ update msg model =
                         }
                         ingredientDraft
                         stepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         AddIngredient ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -135,12 +146,13 @@ update msg model =
                                 )
                         )
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         EditIngredient ing ->
             case model of
-                Create recipes draft _ maybeStepDraft ->
+                Create recipes draft _ maybeStepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -149,12 +161,13 @@ update msg model =
                         }
                         (Just ing)
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         RemoveIngredient id ->
             case model of
-                Create recipes draft ingredientDraft maybeStepDraft ->
+                Create recipes draft ingredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -167,12 +180,13 @@ update msg model =
                         }
                         ingredientDraft
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateIngredientId newId ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -192,12 +206,13 @@ update msg model =
                                     }
                         )
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateIngredientLabel newLabel ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -217,12 +232,13 @@ update msg model =
                                     }
                         )
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateIngredientAmount newStrAmount ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     case String.toFloat newStrAmount of
                         Just f ->
                             ( Create
@@ -244,6 +260,7 @@ update msg model =
                                             }
                                 )
                                 maybeStepDraft
+                                Nothing
                             , Cmd.none
                             )
 
@@ -258,7 +275,7 @@ update msg model =
                         (Maybe.withDefault Gram (parseUnit gUnit))
             in
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -275,12 +292,13 @@ update msg model =
                                     }
                         )
                         maybeStepDraft
+                        Nothing
                     , Cmd.none
                     )
 
         AddStep ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         { draft
@@ -296,12 +314,13 @@ update msg model =
                         }
                         maybeIngredientDraft
                         Nothing
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateStepTitle newTitle ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -320,12 +339,13 @@ update msg model =
                                     , description = ""
                                     }
                         )
+                        Nothing
                     , Cmd.none
                     )
 
         UpdateStepDescription newDescription ->
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -344,6 +364,7 @@ update msg model =
                                     , title = ""
                                     }
                         )
+                        Nothing
                     , Cmd.none
                     )
 
@@ -354,7 +375,7 @@ update msg model =
                     String.toInt newTime |> Maybe.withDefault -1
             in
             case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft ->
+                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
                     ( Create
                         recipes
                         draft
@@ -373,12 +394,13 @@ update msg model =
                                     , title = ""
                                     }
                         )
+                        Nothing
                     , Cmd.none
                     )
 
         EditStep step ->
             case model of
-                Create recipes draft maybeIngredient _ ->
+                Create recipes draft maybeIngredient _ _ ->
                     ( Create
                         recipes
                         { draft
@@ -389,12 +411,13 @@ update msg model =
                         }
                         maybeIngredient
                         (Just step)
+                        Nothing
                     , Cmd.none
                     )
 
         RemoveStep step ->
             case model of
-                Create recipes draft maybeIngredient _ ->
+                Create recipes draft maybeIngredient _ _ ->
                     ( Create
                         recipes
                         { draft
@@ -404,6 +427,42 @@ update msg model =
                                     draft.steps
                         }
                         maybeIngredient
+                        Nothing
+                        Nothing
+                    , Cmd.none
+                    )
+
+        OpenModal m ->
+            case model of
+                Create recipes draft maybeIngredient maybeAmount Nothing ->
+                    ( Create
+                        recipes
+                        draft
+                        maybeIngredient
+                        maybeAmount
+                        (Just (Acknowledge m))
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noChange
+
+        Ack ->
+            case model of
+                Create _ _ _ _ (Just (Acknowledge m)) ->
+                    update m model
+
+                _ ->
+                    noChange
+
+        Abort ->
+            case model of
+                Create recipes draft maybeIngredient maybeAmount _ ->
+                    ( Create
+                        recipes
+                        draft
+                        maybeIngredient
+                        maybeAmount
                         Nothing
                     , Cmd.none
                     )
@@ -484,11 +543,17 @@ uniqueStrings list =
 view : Model -> Html Msg
 view model =
     case model of
-        Create _ recipeDraft maybeIngredientDraft maybeStepDraft ->
-            recipeCreatorView
-                recipeDraft
-                maybeIngredientDraft
-                maybeStepDraft
+        Create _ recipeDraft maybeIngredientDraft maybeStepDraft modal ->
+            div
+                []
+                [ recipeCreatorView
+                    recipeDraft
+                    maybeIngredientDraft
+                    maybeStepDraft
+                , modal
+                    |> Maybe.map (\_ -> modalView)
+                    |> Maybe.withDefault (text "")
+                ]
 
 
 recipeCreatorView : Recipe -> Maybe Ingredient -> Maybe PrepStep -> Html Msg
@@ -630,7 +695,7 @@ ingredientsAddedView ingredients =
                         [ button
                             [ class "btn btn-sm btn-outline action-btn-danger"
                             , Html.Attributes.title "Remove ingredient"
-                            , onClick (RemoveIngredient ing.id)
+                            , onClick (OpenModal (RemoveIngredient ing.id))
                             ]
                             [ ionIcon "close" 20 ]
                         , button
@@ -840,5 +905,57 @@ editStepView maybeStep =
             [ colTextArea "Description"
                 stepDescriptionValue
                 UpdateStepDescription
+            ]
+        ]
+
+
+modalView : Html Msg
+modalView =
+    div
+        [ class "modal fade show"
+        , style "display" "block"
+        , id "exampleModal"
+        ]
+        [ div
+            [ class "modal-dialog"
+            ]
+            [ div
+                [ class "modal-content"
+                ]
+                [ div
+                    [ class "modal-header"
+                    ]
+                    [ h5
+                        [ class "modal-title"
+                        ]
+                        [ text "Modal Title"
+                        ]
+                    , button
+                        [ class "btn-close"
+                        , onClick Abort
+                        ]
+                        []
+                    ]
+                , div
+                    [ class "modal-body"
+                    ]
+                    [ text "This is the popup content!"
+                    ]
+                , div
+                    [ class "modal-footer"
+                    ]
+                    [ button
+                        [ class "btn btn-warning"
+                        , onClick Abort
+                        ]
+                        [ text "Close" ]
+                    , button
+                        [ class "btn btn-danger"
+                        , onClick Ack
+                        ]
+                        [ text "Save Changes"
+                        ]
+                    ]
+                ]
             ]
         ]

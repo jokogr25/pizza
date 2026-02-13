@@ -157,7 +157,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreate (RecipeCreate.Create recipes _ _ _) ->
+                RecipeCreate (RecipeCreate.Create recipes _ _ _ _) ->
                     ( Front recipes
                     , Cmd.none
                     )
@@ -191,7 +191,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreate (RecipeCreate.Create recipes _ _ _) ->
+                RecipeCreate (RecipeCreate.Create recipes _ _ _ _) ->
                     ( RecipeAlbum
                         (RecipeAlbum.update
                             RecipeAlbum.NoOp
@@ -238,7 +238,7 @@ update msg model =
 
         CreateMsg createMsg ->
             case model of
-                RecipeCreate (RecipeCreate.Create recipes draft maybeIngredient maybeStep) ->
+                RecipeCreate (RecipeCreate.Create recipes draft maybeIngredient maybeStep modal) ->
                     case createMsg of
                         RecipeCreate.Out outMsg ->
                             case outMsg of
@@ -253,7 +253,7 @@ update msg model =
                                 (Tuple.first
                                     (RecipeCreate.update
                                         createMsg
-                                        (RecipeCreate.Create recipes draft maybeIngredient maybeStep)
+                                        (RecipeCreate.Create recipes draft maybeIngredient maybeStep modal)
                                     )
                                 )
                             , Cmd.none
@@ -280,7 +280,7 @@ update msg model =
                             case outMsg of
                                 RecipeView.EditRecipe ->
                                     ( RecipeCreate
-                                        (RecipeCreate.Create [] recipe Nothing Nothing)
+                                        (RecipeCreate.Create [] recipe Nothing Nothing Nothing)
                                     , Cmd.none
                                     )
 
