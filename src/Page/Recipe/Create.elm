@@ -914,7 +914,6 @@ modalView =
     div
         [ class "modal fade show"
         , style "display" "block"
-        , id "exampleModal"
         ]
         [ div
             [ class "modal-dialog"

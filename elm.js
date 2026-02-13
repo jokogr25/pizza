@@ -7430,8 +7430,7 @@ var $author$project$Page$Recipe$Create$modalView = A2(
 	_List_fromArray(
 		[
 			$elm$html$Html$Attributes$class('modal fade show'),
-			A2($elm$html$Html$Attributes$style, 'display', 'block'),
-			$elm$html$Html$Attributes$id('exampleModal')
+			A2($elm$html$Html$Attributes$style, 'display', 'block')
 		]),
 	_List_fromArray(
 		[
