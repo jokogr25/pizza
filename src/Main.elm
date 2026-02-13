@@ -191,6 +191,18 @@ update msg model =
                     , Cmd.none
                     )
 
+                RecipeCreate (RecipeCreate.Create recipes _ _ _) ->
+                    ( RecipeAlbum
+                        (RecipeAlbum.update
+                            RecipeAlbum.NoOp
+                            (RecipeAlbum.Album
+                                recipes
+                                Nothing
+                            )
+                        )
+                    , Cmd.none
+                    )
+
                 _ ->
                     noChange
 

@@ -6570,14 +6570,24 @@ var $author$project$Main$update = F2(
 									$author$project$Page$Recipe$Album$NoOp,
 									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
+					case 'RecipeCreate':
+						var _v7 = model.a;
+						var recipes = _v7.a;
+						return _Utils_Tuple2(
+							$author$project$Main$RecipeAlbum(
+								A2(
+									$author$project$Page$Recipe$Album$update,
+									$author$project$Page$Recipe$Album$NoOp,
+									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
+							$elm$core$Platform$Cmd$none);
 					default:
 						return noChange;
 				}
 			case 'AlbumMsg':
 				var albumMsg = msg.a;
 				if (model.$ === 'RecipeAlbum') {
-					var _v8 = model.a;
-					var recipes = _v8.a;
+					var _v9 = model.a;
+					var recipes = _v9.a;
 					if (albumMsg.$ === 'Out') {
 						var outMsg = albumMsg.a;
 						if (outMsg.$ === 'GoRecipeCreator') {
@@ -6609,11 +6619,11 @@ var $author$project$Main$update = F2(
 			case 'CreateMsg':
 				var createMsg = msg.a;
 				if (model.$ === 'RecipeCreate') {
-					var _v13 = model.a;
-					var recipes = _v13.a;
-					var draft = _v13.b;
-					var maybeIngredient = _v13.c;
-					var maybeStep = _v13.d;
+					var _v14 = model.a;
+					var recipes = _v14.a;
+					var draft = _v14.b;
+					var maybeIngredient = _v14.c;
+					var maybeStep = _v14.d;
 					if (createMsg.$ === 'Out') {
 						var outMsg = createMsg.a;
 						var recipe = outMsg.a;
