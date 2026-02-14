@@ -7344,7 +7344,7 @@ var $author$project$Page$Recipe$Album$view = function (model) {
 };
 var $author$project$Page$Recipe$Create$Abort = {$: 'Abort'};
 var $author$project$Page$Recipe$Create$Confirm = {$: 'Confirm'};
-var $author$project$Page$Recipe$Create$modalView = A2(
+var $author$project$Page$Recipe$Create$confirmModalView = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
 		[
@@ -8173,7 +8173,7 @@ var $author$project$Page$Recipe$Create$view = function (model) {
 				A2(
 					$elm$core$Maybe$map,
 					function (_v2) {
-						return $author$project$Page$Recipe$Create$modalView;
+						return $author$project$Page$Recipe$Create$confirmModalView;
 					},
 					model.modal))
 			]));

@@ -417,7 +417,7 @@ view model =
                     Nothing
             )
         , model.modal
-            |> Maybe.map (\_ -> modalView)
+            |> Maybe.map (\_ -> confirmModalView)
             |> Maybe.withDefault (text "")
         ]
 
@@ -775,8 +775,8 @@ editStepView maybeStep =
         ]
 
 
-modalView : Html Msg
-modalView =
+confirmModalView : Html Msg
+confirmModalView =
     div
         [ class "modal fade show"
         , style "display" "block"
