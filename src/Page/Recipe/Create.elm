@@ -34,8 +34,8 @@ type Msg
     | UpdateStepTime String
     | UpdateStepDescription String
       --
-    | OpenModal Msg
-    | Ack
+    | OpenConfirmModal Msg
+    | Confirm
     | Abort
     | NoOp
       --
@@ -47,7 +47,7 @@ type OutMsg
 
 
 type Modal
-    = Acknowledge Msg
+    = ConfirmModal Msg
 
 
 init : List Recipe -> Model
@@ -432,7 +432,8 @@ update msg model =
                     , Cmd.none
                     )
 
-        OpenModal m ->
+        -- m is the message that will be sent after clicking confirm button
+        OpenConfirmModal m ->
             case model of
                 Create recipes draft maybeIngredient maybeAmount Nothing ->
                     ( Create
@@ -440,16 +441,16 @@ update msg model =
                         draft
                         maybeIngredient
                         maybeAmount
-                        (Just (Acknowledge m))
+                        (Just (ConfirmModal m))
                     , Cmd.none
                     )
 
                 _ ->
                     noChange
 
-        Ack ->
+        Confirm ->
             case model of
-                Create _ _ _ _ (Just (Acknowledge m)) ->
+                Create _ _ _ _ (Just (ConfirmModal m)) ->
                     update m model
 
                 _ ->
@@ -695,7 +696,7 @@ ingredientsAddedView ingredients =
                         [ button
                             [ class "btn btn-sm btn-outline action-btn-danger"
                             , Html.Attributes.title "Remove ingredient"
-                            , onClick (OpenModal (RemoveIngredient ing.id))
+                            , onClick (OpenConfirmModal (RemoveIngredient ing.id))
                             ]
                             [ ionIcon "close" 20 ]
                         , button
@@ -950,7 +951,7 @@ modalView =
                         [ text "Close" ]
                     , button
                         [ class "btn btn-danger"
-                        , onClick Ack
+                        , onClick Confirm
                         ]
                         [ text "Save Changes"
                         ]

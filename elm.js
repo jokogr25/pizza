@@ -5894,8 +5894,8 @@ var $author$project$Page$Recipe$Album$update = F2(
 			return model;
 		}
 	});
-var $author$project$Page$Recipe$Create$Acknowledge = function (a) {
-	return {$: 'Acknowledge', a: a};
+var $author$project$Page$Recipe$Create$ConfirmModal = function (a) {
+	return {$: 'ConfirmModal', a: a};
 };
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
@@ -6394,7 +6394,7 @@ var $author$project$Page$Recipe$Create$update = F2(
 							$elm$core$Maybe$Nothing,
 							$elm$core$Maybe$Nothing),
 						$elm$core$Platform$Cmd$none);
-				case 'OpenModal':
+				case 'OpenConfirmModal':
 					var m = msg.a;
 					if (model.e.$ === 'Nothing') {
 						var recipes = model.a;
@@ -6410,12 +6410,12 @@ var $author$project$Page$Recipe$Create$update = F2(
 								maybeIngredient,
 								maybeAmount,
 								$elm$core$Maybe$Just(
-									$author$project$Page$Recipe$Create$Acknowledge(m))),
+									$author$project$Page$Recipe$Create$ConfirmModal(m))),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return noChange;
 					}
-				case 'Ack':
+				case 'Confirm':
 					if (model.e.$ === 'Just') {
 						var m = model.e.a.a;
 						var $temp$msg = m,
@@ -7424,7 +7424,7 @@ var $author$project$Page$Recipe$Album$view = function (model) {
 			$elm$core$List$length(recipes)) < 0);
 };
 var $author$project$Page$Recipe$Create$Abort = {$: 'Abort'};
-var $author$project$Page$Recipe$Create$Ack = {$: 'Ack'};
+var $author$project$Page$Recipe$Create$Confirm = {$: 'Confirm'};
 var $author$project$Page$Recipe$Create$modalView = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -7511,7 +7511,7 @@ var $author$project$Page$Recipe$Create$modalView = A2(
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('btn btn-danger'),
-											$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Ack)
+											$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Confirm)
 										]),
 									_List_fromArray(
 										[
@@ -7871,8 +7871,8 @@ var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $author$project$Page$Recipe$Create$EditIngredient = function (a) {
 	return {$: 'EditIngredient', a: a};
 };
-var $author$project$Page$Recipe$Create$OpenModal = function (a) {
-	return {$: 'OpenModal', a: a};
+var $author$project$Page$Recipe$Create$OpenConfirmModal = function (a) {
+	return {$: 'OpenConfirmModal', a: a};
 };
 var $author$project$Page$Recipe$Create$RemoveIngredient = function (a) {
 	return {$: 'RemoveIngredient', a: a};
@@ -7915,7 +7915,7 @@ var $author$project$Page$Recipe$Create$ingredientsAddedView = function (ingredie
 											$elm$html$Html$Attributes$class('btn btn-sm btn-outline action-btn-danger'),
 											$elm$html$Html$Attributes$title('Remove ingredient'),
 											$elm$html$Html$Events$onClick(
-											$author$project$Page$Recipe$Create$OpenModal(
+											$author$project$Page$Recipe$Create$OpenConfirmModal(
 												$author$project$Page$Recipe$Create$RemoveIngredient(ing.id)))
 										]),
 									_List_fromArray(
