@@ -5866,7 +5866,7 @@ var $author$project$Page$Recipe$Create$recipeDraft = {
 	steps: _List_Nil
 };
 var $author$project$Page$Recipe$Create$init = function (recipes) {
-	return {draft: $author$project$Page$Recipe$Create$recipeDraft, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: recipes};
+	return {draft: $author$project$Page$Recipe$Create$recipeDraft, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: recipes, removedIngredients: _List_Nil, removedSteps: _List_Nil};
 };
 var $author$project$Page$Recipe$View$Ingredients = {$: 'Ingredients'};
 var $author$project$Page$Recipe$View$init = F2(
@@ -5875,7 +5875,7 @@ var $author$project$Page$Recipe$View$init = F2(
 	});
 var $author$project$Page$Recipe$Create$initWithRecipe = F2(
 	function (r, l) {
-		return {draft: r, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: l};
+		return {draft: r, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: l, removedIngredients: _List_Nil, removedSteps: _List_Nil};
 	});
 var $author$project$Page$Recipe$Album$update = F2(
 	function (msg, model) {
@@ -6149,7 +6149,8 @@ var $author$project$Page$Recipe$Create$update = F2(
 						_Utils_update(
 							model,
 							{
-								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft)
+								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
+								removedIngredients: A2($elm$core$List$cons, ing, model.removedIngredients)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 'UpdateIngredientId':
@@ -6303,7 +6304,8 @@ var $author$project$Page$Recipe$Create$update = F2(
 							_Utils_update(
 								model,
 								{
-									edit: $author$project$Page$Recipe$Create$PrepStep(step)
+									edit: $author$project$Page$Recipe$Create$PrepStep(step),
+									removedSteps: A2($elm$core$List$cons, step, model.removedSteps)
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {

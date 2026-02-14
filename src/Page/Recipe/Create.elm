@@ -14,6 +14,8 @@ import Platform.Cmd as Cmd
 type alias Model =
     { recipes : List Recipe.Recipe
     , draft : Recipe.Recipe
+    , removedIngredients : List Recipe.Ingredient
+    , removedSteps : List Recipe.PrepStep
     , modal : Maybe Modal
     , edit : Edit
     }
@@ -65,6 +67,8 @@ init : List Recipe.Recipe -> Model
 init recipes =
     { recipes = recipes
     , draft = recipeDraft
+    , removedIngredients = []
+    , removedSteps = []
     , modal = Nothing
     , edit = None
     }
@@ -74,6 +78,8 @@ initWithRecipe : Recipe.Recipe -> List Recipe.Recipe -> Model
 initWithRecipe r l =
     { recipes = l
     , draft = r
+    , removedIngredients = []
+    , removedSteps = []
     , modal = Nothing
     , edit = None
     }
@@ -138,6 +144,7 @@ update msg model =
         RemoveIngredient ing ->
             ( { model
                 | draft = Recipe.removeIngredient ing model.draft
+                , removedIngredients = ing :: model.removedIngredients
               }
             , Cmd.none
             )
@@ -267,6 +274,7 @@ update msg model =
                 None ->
                     ( { model
                         | edit = PrepStep step
+                        , removedSteps = step :: model.removedSteps
                       }
                     , Cmd.none
                     )
