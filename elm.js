@@ -6088,7 +6088,7 @@ var $author$project$Page$Recipe$Create$update = F2(
 		while (true) {
 			var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			switch (msg.$) {
-				case 'UpdateLabel':
+				case 'UpdateRecipeLabel':
 					var label = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6097,7 +6097,7 @@ var $author$project$Page$Recipe$Create$update = F2(
 								draft: A2($author$project$Domain$Recipe$updateLabel, label, model.draft)
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdateDescription':
+				case 'UpdateRecipeDescription':
 					var description = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6106,7 +6106,7 @@ var $author$project$Page$Recipe$Create$update = F2(
 								draft: A2($author$project$Domain$Recipe$updateDescription, description, model.draft)
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdateImagePath':
+				case 'UpdateRecipeImagePath':
 					var imagePath = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -7442,14 +7442,14 @@ var $author$project$Page$Recipe$Create$modalView = A2(
 		]));
 var $author$project$Page$Recipe$Create$AddIngredient = {$: 'AddIngredient'};
 var $author$project$Page$Recipe$Create$AddStep = {$: 'AddStep'};
-var $author$project$Page$Recipe$Create$UpdateDescription = function (a) {
-	return {$: 'UpdateDescription', a: a};
+var $author$project$Page$Recipe$Create$UpdateRecipeDescription = function (a) {
+	return {$: 'UpdateRecipeDescription', a: a};
 };
-var $author$project$Page$Recipe$Create$UpdateImagePath = function (a) {
-	return {$: 'UpdateImagePath', a: a};
+var $author$project$Page$Recipe$Create$UpdateRecipeImagePath = function (a) {
+	return {$: 'UpdateRecipeImagePath', a: a};
 };
-var $author$project$Page$Recipe$Create$UpdateLabel = function (a) {
-	return {$: 'UpdateLabel', a: a};
+var $author$project$Page$Recipe$Create$UpdateRecipeLabel = function (a) {
+	return {$: 'UpdateRecipeLabel', a: a};
 };
 var $author$project$Page$Recipe$Create$UpdateIngredientAmount = function (a) {
 	return {$: 'UpdateIngredientAmount', a: a};
@@ -7998,7 +7998,7 @@ var $author$project$Page$Recipe$Create$recipeCreatorView = F3(
 												$elm$html$Html$Attributes$class('form-control'),
 												$elm$html$Html$Attributes$value(id),
 												$elm$html$Html$Attributes$value(draft.label),
-												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateLabel)
+												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateRecipeLabel)
 											]),
 										_List_Nil),
 										A2(
@@ -8040,7 +8040,7 @@ var $author$project$Page$Recipe$Create$recipeCreatorView = F3(
 												$elm$html$Html$Attributes$id(id),
 												$elm$html$Html$Attributes$rows(3),
 												$elm$html$Html$Attributes$value(draft.description),
-												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateDescription)
+												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateRecipeDescription)
 											]),
 										_List_Nil),
 										A2(
@@ -8082,7 +8082,7 @@ var $author$project$Page$Recipe$Create$recipeCreatorView = F3(
 												$elm$html$Html$Attributes$id(id),
 												$elm$html$Html$Attributes$value(
 												$author$project$Domain$Recipe$getPathStr(draft.image)),
-												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateImagePath)
+												$elm$html$Html$Events$onInput($author$project$Page$Recipe$Create$UpdateRecipeImagePath)
 											]),
 										_List_Nil),
 										A2(

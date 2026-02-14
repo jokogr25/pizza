@@ -28,9 +28,9 @@ type Edit
 
 
 type Msg
-    = UpdateLabel String
-    | UpdateDescription String
-    | UpdateImagePath String
+    = UpdateRecipeLabel String
+    | UpdateRecipeDescription String
+    | UpdateRecipeImagePath String
       -- Ingredient
     | AddIngredient
     | RemoveIngredient Recipe.Ingredient
@@ -92,21 +92,21 @@ update msg model =
             ( model, Cmd.none )
     in
     case msg of
-        UpdateLabel label ->
+        UpdateRecipeLabel label ->
             ( { model
                 | draft = Recipe.updateLabel label model.draft
               }
             , Cmd.none
             )
 
-        UpdateDescription description ->
+        UpdateRecipeDescription description ->
             ( { model
                 | draft = Recipe.updateDescription description model.draft
               }
             , Cmd.none
             )
 
-        UpdateImagePath imagePath ->
+        UpdateRecipeImagePath imagePath ->
             ( { model
                 | draft = Recipe.updateImage (Recipe.Path imagePath) model.draft
               }
@@ -461,7 +461,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                     [ class "form-control"
                     , Html.Attributes.value id
                     , Html.Attributes.value draft.label
-                    , onInput UpdateLabel
+                    , onInput UpdateRecipeLabel
                     ]
                     []
                 , label
@@ -485,7 +485,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                     , Html.Attributes.id id
                     , Html.Attributes.rows 3
                     , Html.Attributes.value draft.description
-                    , onInput UpdateDescription
+                    , onInput UpdateRecipeDescription
                     ]
                     []
                 , label
@@ -508,7 +508,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                     [ class "form-control"
                     , Html.Attributes.id id
                     , Html.Attributes.value (Recipe.getPathStr draft.image)
-                    , onInput UpdateImagePath
+                    , onInput UpdateRecipeImagePath
                     ]
                     []
                 , label
