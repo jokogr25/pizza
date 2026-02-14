@@ -777,48 +777,52 @@ editStepView maybeStep =
 
 confirmModalView : Html Msg
 confirmModalView =
-    div
-        [ class "modal fade show"
-        , style "display" "block"
-        ]
+    div []
         [ div
-            [ class "modal-dialog"
+            [ class
+                "modal-backdrop fade show"
+            ]
+            []
+        , div
+            [ class "modal fade show"
+            , style "display" "block"
             ]
             [ div
-                [ class "modal-content"
+                [ class "modal-dialog"
                 ]
                 [ div
-                    [ class "modal-header"
+                    [ class "modal-content"
                     ]
-                    [ h5
-                        [ class "modal-title"
+                    [ div
+                        [ class "modal-header"
                         ]
-                        [ text "Modal Title"
+                        [ h5
+                            [ class "modal-title"
+                            ]
+                            [ text "Modal Title"
+                            ]
+                        , button
+                            [ class "btn-close", onClick Abort ]
+                            []
                         ]
-                    , button
-                        [ class "btn-close"
-                        , onClick Abort
+                    , div
+                        [ class "modal-body"
                         ]
-                        []
-                    ]
-                , div
-                    [ class "modal-body"
-                    ]
-                    [ text "This is the popup content!"
-                    ]
-                , div
-                    [ class "modal-footer"
-                    ]
-                    [ button
-                        [ class "btn btn-warning"
-                        , onClick Abort
+                        [ text "This is the popup content!"
                         ]
-                        [ text "Close" ]
-                    , button
-                        [ class "btn btn-danger"
-                        , onClick Confirm
+                    , div
+                        [ class "modal-footer"
                         ]
-                        [ text "Save Changes"
+                        [ button
+                            [ class "btn action-btn-light"
+                            , onClick Abort
+                            ]
+                            [ text "Close" ]
+                        , button
+                            [ class "btn action-btn-danger"
+                            , onClick Confirm
+                            ]
+                            [ text "Save Changes" ]
                         ]
                     ]
                 ]

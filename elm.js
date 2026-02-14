@@ -7346,18 +7346,22 @@ var $author$project$Page$Recipe$Create$Abort = {$: 'Abort'};
 var $author$project$Page$Recipe$Create$Confirm = {$: 'Confirm'};
 var $author$project$Page$Recipe$Create$confirmModalView = A2(
 	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('modal fade show'),
-			A2($elm$html$Html$Attributes$style, 'display', 'block')
-		]),
+	_List_Nil,
 	_List_fromArray(
 		[
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('modal-dialog')
+					$elm$html$Html$Attributes$class('modal-backdrop fade show')
+				]),
+			_List_Nil),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('modal fade show'),
+					A2($elm$html$Html$Attributes$style, 'display', 'block')
 				]),
 			_List_fromArray(
 				[
@@ -7365,7 +7369,7 @@ var $author$project$Page$Recipe$Create$confirmModalView = A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('modal-content')
+							$elm$html$Html$Attributes$class('modal-dialog')
 						]),
 					_List_fromArray(
 						[
@@ -7373,68 +7377,77 @@ var $author$project$Page$Recipe$Create$confirmModalView = A2(
 							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('modal-header')
+									$elm$html$Html$Attributes$class('modal-content')
 								]),
 							_List_fromArray(
 								[
 									A2(
-									$elm$html$Html$h5,
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('modal-title')
+											$elm$html$Html$Attributes$class('modal-header')
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Modal Title')
+											A2(
+											$elm$html$Html$h5,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('modal-title')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Modal Title')
+												])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn-close'),
+													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
+												]),
+											_List_Nil)
 										])),
 									A2(
-									$elm$html$Html$button,
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('btn-close'),
-											$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-body')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('This is the popup content!')
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-footer')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('btn btn-warning'),
-											$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
+											$elm$html$Html$Attributes$class('modal-body')
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Close')
+											$elm$html$Html$text('This is the popup content!')
 										])),
 									A2(
-									$elm$html$Html$button,
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('btn btn-danger'),
-											$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Confirm)
+											$elm$html$Html$Attributes$class('modal-footer')
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text('Save Changes')
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn action-btn-light'),
+													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Close')
+												])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('btn action-btn-danger'),
+													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Confirm)
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Save Changes')
+												]))
 										]))
 								]))
 						]))

@@ -36,6 +36,11 @@ button.btn[disabled] {
     /* optional: gray text like default disabled */
 }
 
+.action-btn-light:hover {
+    background-color: var(--bs-light);
+    color: black;
+}
+
 .action-btn-warning:hover {
     background-color: var(--bs-warning);
     color: black;
