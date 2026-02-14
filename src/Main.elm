@@ -249,14 +249,14 @@ update msg model =
                                     )
 
                         _ ->
-                            ( RecipeCreate
-                                (Tuple.first
-                                    (RecipeCreate.update
+                            let
+                                ( m, cm ) =
+                                    RecipeCreate.update
                                         createMsg
                                         c
-                                    )
-                                )
-                            , Cmd.none
+                            in
+                            ( RecipeCreate m
+                            , Cmd.map CreateMsg cm
                             )
 
                 _ ->

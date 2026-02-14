@@ -5800,6 +5800,9 @@ var $author$project$Page$Recipe$Album$Album = F2(
 		return {$: 'Album', a: a, b: b};
 	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
+var $author$project$Main$CreateMsg = function (a) {
+	return {$: 'CreateMsg', a: a};
+};
 var $author$project$Page$Recipe$Album$InputAlbumSearch = function (a) {
 	return {$: 'InputAlbumSearch', a: a};
 };
@@ -5866,7 +5869,7 @@ var $author$project$Page$Recipe$Create$recipeDraft = {
 	steps: _List_Nil
 };
 var $author$project$Page$Recipe$Create$init = function (recipes) {
-	return {draft: $author$project$Page$Recipe$Create$recipeDraft, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: recipes, removedIngredients: _List_Nil, removedSteps: _List_Nil};
+	return {draft: $author$project$Page$Recipe$Create$recipeDraft, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: recipes, removedIngredients: _List_Nil, removedSteps: _List_Nil, showModal: false};
 };
 var $author$project$Page$Recipe$View$Ingredients = {$: 'Ingredients'};
 var $author$project$Page$Recipe$View$init = F2(
@@ -5875,8 +5878,9 @@ var $author$project$Page$Recipe$View$init = F2(
 	});
 var $author$project$Page$Recipe$Create$initWithRecipe = F2(
 	function (r, l) {
-		return {draft: r, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: l, removedIngredients: _List_Nil, removedSteps: _List_Nil};
+		return {draft: r, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: l, removedIngredients: _List_Nil, removedSteps: _List_Nil, showModal: false};
 	});
+var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Page$Recipe$Album$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'InputAlbumSearch') {
@@ -5899,6 +5903,7 @@ var $author$project$Page$Recipe$Create$Ingredient = function (a) {
 var $author$project$Page$Recipe$Create$PrepStep = function (a) {
 	return {$: 'PrepStep', a: a};
 };
+var $author$project$Page$Recipe$Create$ShowModal = {$: 'ShowModal'};
 var $author$project$Domain$Recipe$addIngredient = F2(
 	function (ing, recipe) {
 		return _Utils_update(
@@ -5921,6 +5926,7 @@ var $author$project$Domain$Recipe$addPrepStep = F2(
 						[step]))
 			});
 	});
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Domain$Recipe$parseUnit = function (s) {
 	switch (s) {
 		case 'g':
@@ -5971,6 +5977,7 @@ var $author$project$Domain$Recipe$removePrepStep = F2(
 					recipe.steps)
 			});
 	});
+var $elm$core$Process$sleep = _Process_sleep;
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Domain$Recipe$updateDescription = F2(
 	function (description, recipe) {
@@ -6084,291 +6091,311 @@ var $elm$core$Maybe$withDefault = F2(
 	});
 var $author$project$Page$Recipe$Create$update = F2(
 	function (msg, model) {
-		update:
-		while (true) {
-			var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			switch (msg.$) {
-				case 'UpdateRecipeLabel':
-					var label = msg.a;
+		var noChange = _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'UpdateRecipeLabel':
+				var label = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							draft: A2($author$project$Domain$Recipe$updateLabel, label, model.draft)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateRecipeDescription':
+				var description = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							draft: A2($author$project$Domain$Recipe$updateDescription, description, model.draft)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateRecipeImagePath':
+				var imagePath = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							draft: A2(
+								$author$project$Domain$Recipe$updateImage,
+								$author$project$Domain$Recipe$Path(imagePath),
+								model.draft)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'AddIngredient':
+				var _v1 = model.edit;
+				if (_v1.$ === 'Ingredient') {
+					var ing = _v1.a;
+					return A2($author$project$Page$Recipe$Create$validateIngredient, ing, model.draft.ingredients) ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$addIngredient, ing, model.draft),
+								edit: $author$project$Page$Recipe$Create$None
+							}),
+						$elm$core$Platform$Cmd$none) : noChange;
+				} else {
+					return noChange;
+				}
+			case 'EditIngredient':
+				var ing = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
+							edit: $author$project$Page$Recipe$Create$Ingredient(ing)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'RemoveIngredient':
+				var ing = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
+							removedIngredients: A2($elm$core$List$cons, ing, model.removedIngredients)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateIngredientId':
+				var newId = msg.a;
+				var _v2 = model.edit;
+				if (_v2.$ === 'Ingredient') {
+					var ing = _v2.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								draft: A2($author$project$Domain$Recipe$updateLabel, label, model.draft)
+								edit: $author$project$Page$Recipe$Create$Ingredient(
+									A2($author$project$Domain$Recipe$updateIngredientId, newId, ing))
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdateRecipeDescription':
-					var description = msg.a;
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientLabel':
+				var newLabel = msg.a;
+				var _v3 = model.edit;
+				if (_v3.$ === 'Ingredient') {
+					var ing = _v3.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								draft: A2($author$project$Domain$Recipe$updateDescription, description, model.draft)
+								edit: $author$project$Page$Recipe$Create$Ingredient(
+									A2($author$project$Domain$Recipe$updateIngredientLabel, newLabel, ing))
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdateRecipeImagePath':
-					var imagePath = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								draft: A2(
-									$author$project$Domain$Recipe$updateImage,
-									$author$project$Domain$Recipe$Path(imagePath),
-									model.draft)
-							}),
-						$elm$core$Platform$Cmd$none);
-				case 'AddIngredient':
-					var _v1 = model.edit;
-					if (_v1.$ === 'Ingredient') {
-						var ing = _v1.a;
-						return A2($author$project$Page$Recipe$Create$validateIngredient, ing, model.draft.ingredients) ? _Utils_Tuple2(
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientAmount':
+				var newStrAmount = msg.a;
+				var _v4 = model.edit;
+				if (_v4.$ === 'Ingredient') {
+					var ing = _v4.a;
+					var _v5 = $elm$core$String$toFloat(newStrAmount);
+					if (_v5.$ === 'Just') {
+						var f = _v5.a;
+						return (f > 0) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									draft: A2($author$project$Domain$Recipe$addIngredient, ing, model.draft),
-									edit: $author$project$Page$Recipe$Create$None
+									edit: $author$project$Page$Recipe$Create$Ingredient(
+										A2($author$project$Domain$Recipe$updateIngredientAmount, f, ing))
 								}),
 							$elm$core$Platform$Cmd$none) : noChange;
 					} else {
 						return noChange;
 					}
-				case 'EditIngredient':
-					var ing = msg.a;
+				} else {
+					return noChange;
+				}
+			case 'UpdateIngredientUnit':
+				var gUnit = msg.a;
+				var _v6 = model.edit;
+				if (_v6.$ === 'Ingredient') {
+					var ing = _v6.a;
+					var parsedUnit = A2(
+						$elm$core$Maybe$withDefault,
+						$author$project$Domain$Recipe$Gram,
+						$author$project$Domain$Recipe$parseUnit(gUnit));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
-								edit: $author$project$Page$Recipe$Create$Ingredient(ing)
+								edit: $author$project$Page$Recipe$Create$Ingredient(
+									A2($author$project$Domain$Recipe$updateIngredientUnit, parsedUnit, ing))
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'RemoveIngredient':
-					var ing = msg.a;
+				} else {
+					return noChange;
+				}
+			case 'AddStep':
+				var _v7 = model.edit;
+				if (_v7.$ === 'PrepStep') {
+					var step = _v7.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
-								removedIngredients: A2($elm$core$List$cons, ing, model.removedIngredients)
+								draft: A2($author$project$Domain$Recipe$addPrepStep, step, model.draft),
+								edit: $author$project$Page$Recipe$Create$None
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdateIngredientId':
-					var newId = msg.a;
-					var _v2 = model.edit;
-					if (_v2.$ === 'Ingredient') {
-						var ing = _v2.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									edit: $author$project$Page$Recipe$Create$Ingredient(
-										A2($author$project$Domain$Recipe$updateIngredientId, newId, ing))
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'UpdateIngredientLabel':
-					var newLabel = msg.a;
-					var _v3 = model.edit;
-					if (_v3.$ === 'Ingredient') {
-						var ing = _v3.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									edit: $author$project$Page$Recipe$Create$Ingredient(
-										A2($author$project$Domain$Recipe$updateIngredientLabel, newLabel, ing))
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'UpdateIngredientAmount':
-					var newStrAmount = msg.a;
-					var _v4 = model.edit;
-					if (_v4.$ === 'Ingredient') {
-						var ing = _v4.a;
-						var _v5 = $elm$core$String$toFloat(newStrAmount);
-						if (_v5.$ === 'Just') {
-							var f = _v5.a;
-							return (f > 0) ? _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{
-										edit: $author$project$Page$Recipe$Create$Ingredient(
-											A2($author$project$Domain$Recipe$updateIngredientAmount, f, ing))
-									}),
-								$elm$core$Platform$Cmd$none) : noChange;
-						} else {
-							return noChange;
-						}
-					} else {
-						return noChange;
-					}
-				case 'UpdateIngredientUnit':
-					var gUnit = msg.a;
-					var _v6 = model.edit;
-					if (_v6.$ === 'Ingredient') {
-						var ing = _v6.a;
-						var parsedUnit = A2(
-							$elm$core$Maybe$withDefault,
-							$author$project$Domain$Recipe$Gram,
-							$author$project$Domain$Recipe$parseUnit(gUnit));
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									edit: $author$project$Page$Recipe$Create$Ingredient(
-										A2($author$project$Domain$Recipe$updateIngredientUnit, parsedUnit, ing))
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'AddStep':
-					var _v7 = model.edit;
-					if (_v7.$ === 'PrepStep') {
-						var step = _v7.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									draft: A2($author$project$Domain$Recipe$addPrepStep, step, model.draft),
-									edit: $author$project$Page$Recipe$Create$None
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'UpdateStepTitle':
-					var newTitle = msg.a;
-					var _v8 = model.edit;
-					if (_v8.$ === 'PrepStep') {
-						var step = _v8.a;
-						return _Utils_Tuple2(
+				} else {
+					return noChange;
+				}
+			case 'UpdateStepTitle':
+				var newTitle = msg.a;
+				var _v8 = model.edit;
+				if (_v8.$ === 'PrepStep') {
+					var step = _v8.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								edit: $author$project$Page$Recipe$Create$PrepStep(
+									A2($author$project$Domain$Recipe$updatePrepStepTitle, newTitle, step))
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateStepDescription':
+				var newDescription = msg.a;
+				var _v9 = model.edit;
+				if (_v9.$ === 'PrepStep') {
+					var step = _v9.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								edit: $author$project$Page$Recipe$Create$PrepStep(
+									A2($author$project$Domain$Recipe$updatePrepStepDescription, newDescription, step))
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'UpdateStepTime':
+				var newTimeStr = msg.a;
+				var _v10 = model.edit;
+				if (_v10.$ === 'PrepStep') {
+					var step = _v10.a;
+					var _v11 = $elm$core$String$toInt(newTimeStr);
+					if (_v11.$ === 'Just') {
+						var newTime = _v11.a;
+						return (newTime > 0) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									edit: $author$project$Page$Recipe$Create$PrepStep(
-										A2($author$project$Domain$Recipe$updatePrepStepTitle, newTitle, step))
+										A2($author$project$Domain$Recipe$updatePrepStepTime, newTime, step))
 								}),
-							$elm$core$Platform$Cmd$none);
+							$elm$core$Platform$Cmd$none) : noChange;
 					} else {
 						return noChange;
 					}
-				case 'UpdateStepDescription':
-					var newDescription = msg.a;
-					var _v9 = model.edit;
-					if (_v9.$ === 'PrepStep') {
-						var step = _v9.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									edit: $author$project$Page$Recipe$Create$PrepStep(
-										A2($author$project$Domain$Recipe$updatePrepStepDescription, newDescription, step))
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'UpdateStepTime':
-					var newTimeStr = msg.a;
-					var _v10 = model.edit;
-					if (_v10.$ === 'PrepStep') {
-						var step = _v10.a;
-						var _v11 = $elm$core$String$toInt(newTimeStr);
-						if (_v11.$ === 'Just') {
-							var newTime = _v11.a;
-							return (newTime > 0) ? _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{
-										edit: $author$project$Page$Recipe$Create$PrepStep(
-											A2($author$project$Domain$Recipe$updatePrepStepTime, newTime, step))
-									}),
-								$elm$core$Platform$Cmd$none) : noChange;
-						} else {
-							return noChange;
-						}
-					} else {
-						return noChange;
-					}
-				case 'EditStep':
-					var step = msg.a;
-					var _v12 = model.edit;
-					if (_v12.$ === 'None') {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									edit: $author$project$Page$Recipe$Create$PrepStep(step),
-									removedSteps: A2($elm$core$List$cons, step, model.removedSteps)
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'RemoveStep':
-					var step = msg.a;
-					var _v13 = model.edit;
-					if (_v13.$ === 'None') {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									draft: A2($author$project$Domain$Recipe$removePrepStep, step, model.draft)
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'OpenConfirmModal':
-					var m = msg.a;
-					var _v14 = model.modal;
-					if (_v14.$ === 'Nothing') {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									modal: $elm$core$Maybe$Just(
-										$author$project$Page$Recipe$Create$ConfirmModal(m))
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'Confirm':
-					var _v15 = model.modal;
-					if (_v15.$ === 'Just') {
-						var m = _v15.a.a;
-						var $temp$msg = m,
-							$temp$model = model;
-						msg = $temp$msg;
-						model = $temp$model;
-						continue update;
-					} else {
-						return noChange;
-					}
-				case 'Abort':
-					var _v16 = model.modal;
-					if (_v16.$ === 'Just') {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{modal: $elm$core$Maybe$Nothing}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return noChange;
-					}
-				case 'Out':
-					var outMsg = msg.a;
+				} else {
 					return noChange;
-				default:
+				}
+			case 'EditStep':
+				var step = msg.a;
+				var _v12 = model.edit;
+				if (_v12.$ === 'None') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								edit: $author$project$Page$Recipe$Create$PrepStep(step),
+								removedSteps: A2($elm$core$List$cons, step, model.removedSteps)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
 					return noChange;
-			}
+				}
+			case 'RemoveStep':
+				var step = msg.a;
+				var _v13 = model.edit;
+				if (_v13.$ === 'None') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$removePrepStep, step, model.draft)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'OpenConfirmModal':
+				var m = msg.a;
+				var _v14 = model.modal;
+				if (_v14.$ === 'Nothing') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								modal: $elm$core$Maybe$Just(
+									$author$project$Page$Recipe$Create$ConfirmModal(m)),
+								showModal: false
+							}),
+						A2(
+							$elm$core$Task$attempt,
+							function (_v15) {
+								return $author$project$Page$Recipe$Create$ShowModal;
+							},
+							$elm$core$Process$sleep(10)));
+				} else {
+					return noChange;
+				}
+			case 'ShowModal':
+				var _v16 = model.modal;
+				if (_v16.$ === 'Just') {
+					return A2(
+						$elm$core$Debug$log,
+						'smth in modal',
+						_Utils_Tuple2(
+							_Utils_update(
+								model,
+								{showModal: true}),
+							$elm$core$Platform$Cmd$none));
+				} else {
+					return A2($elm$core$Debug$log, 'Nothing in modal', noChange);
+				}
+			case 'Confirm':
+				var _v17 = model.modal;
+				if (_v17.$ === 'Just') {
+					var m = _v17.a.a;
+					var _v18 = A2($author$project$Page$Recipe$Create$update, m, model);
+					var mdl = _v18.a;
+					var cmd = _v18.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							mdl,
+							{showModal: false}),
+						cmd);
+				} else {
+					return noChange;
+				}
+			case 'Abort':
+				var _v19 = model.modal;
+				if (_v19.$ === 'Just') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{modal: $elm$core$Maybe$Nothing, showModal: false}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return noChange;
+				}
+			case 'Out':
+				var outMsg = msg.a;
+				return noChange;
+			default:
+				return noChange;
 		}
 	});
 var $elm$core$Maybe$map2 = F3(
@@ -6619,10 +6646,12 @@ var $author$project$Main$update = F2(
 									A2($elm$core$List$cons, recipe, c.recipes))),
 							$elm$core$Platform$Cmd$none);
 					} else {
+						var _v14 = A2($author$project$Page$Recipe$Create$update, createMsg, c);
+						var m = _v14.a;
+						var cm = _v14.b;
 						return _Utils_Tuple2(
-							$author$project$Main$RecipeCreate(
-								A2($author$project$Page$Recipe$Create$update, createMsg, c).a),
-							$elm$core$Platform$Cmd$none);
+							$author$project$Main$RecipeCreate(m),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$CreateMsg, cm));
 					}
 				} else {
 					return noChange;
@@ -6630,14 +6659,14 @@ var $author$project$Main$update = F2(
 			case 'ViewMsg':
 				var viewMsg = msg.a;
 				if (model.$ === 'RecipeView') {
-					var _v15 = model.a;
-					var recipes = _v15.a;
-					var recipe = _v15.b;
-					var maybeIngredient = _v15.c;
-					var stepIndex = _v15.d;
-					var maybeAmount = _v15.e;
-					var ratio = _v15.f;
-					var tab = _v15.g;
+					var _v16 = model.a;
+					var recipes = _v16.a;
+					var recipe = _v16.b;
+					var maybeIngredient = _v16.c;
+					var stepIndex = _v16.d;
+					var maybeAmount = _v16.e;
+					var ratio = _v16.f;
+					var tab = _v16.g;
 					var m = A7($author$project$Page$Recipe$View$View, recipes, recipe, maybeIngredient, stepIndex, maybeAmount, ratio, tab);
 					switch (viewMsg.$) {
 						case 'SelectIngredient':
@@ -6684,9 +6713,6 @@ var $author$project$Main$update = F2(
 	});
 var $author$project$Main$AlbumMsg = function (a) {
 	return {$: 'AlbumMsg', a: a};
-};
-var $author$project$Main$CreateMsg = function (a) {
-	return {$: 'CreateMsg', a: a};
 };
 var $author$project$Main$RecipeAlbumPage = {$: 'RecipeAlbumPage'};
 var $author$project$Main$RecipeCreatorPage = {$: 'RecipeCreatorPage'};
@@ -7344,115 +7370,129 @@ var $author$project$Page$Recipe$Album$view = function (model) {
 };
 var $author$project$Page$Recipe$Create$Abort = {$: 'Abort'};
 var $author$project$Page$Recipe$Create$Confirm = {$: 'Confirm'};
-var $author$project$Page$Recipe$Create$confirmModalView = A2(
-	$elm$html$Html$div,
-	_List_Nil,
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('modal-backdrop fade show')
-				]),
-			_List_Nil),
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('modal fade show'),
-					A2($elm$html$Html$Attributes$style, 'display', 'block')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-dialog')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-content')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-header')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$h5,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('modal-title')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Modal Title')
-												])),
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('btn-close'),
-													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
-												]),
-											_List_Nil)
-										])),
-									A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-body')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('This is the popup content!')
-										])),
-									A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-footer')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('btn action-btn-light'),
-													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Close')
-												])),
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('btn action-btn-danger'),
-													$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Confirm)
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Save Changes')
-												]))
-										]))
-								]))
-						]))
-				]))
-		]));
+var $author$project$Page$Recipe$Create$confirmModalView = function (isShowModal) {
+	return A4(
+		$elm$core$Debug$log,
+		isShowModal ? 'showme' : 'dont show me',
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('modal-backdrop fade', true),
+								_Utils_Tuple2('show', isShowModal)
+							]))
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$classList(
+						_List_fromArray(
+							[
+								_Utils_Tuple2('modal fade', true),
+								_Utils_Tuple2('show', isShowModal)
+							])),
+						A2($elm$html$Html$Attributes$style, 'display', 'block')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-dialog')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-content')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('modal-header')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$h5,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('modal-title')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Modal Title')
+													])),
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn-close'),
+														$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('modal-body')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('This is the popup content!')
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('modal-footer')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn action-btn-light'),
+														$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Abort)
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Close')
+													])),
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn action-btn-danger'),
+														$elm$html$Html$Events$onClick($author$project$Page$Recipe$Create$Confirm)
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Save Changes')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$Page$Recipe$Create$AddIngredient = {$: 'AddIngredient'};
 var $author$project$Page$Recipe$Create$AddStep = {$: 'AddStep'};
 var $author$project$Page$Recipe$Create$UpdateRecipeDescription = function (a) {
@@ -8186,7 +8226,7 @@ var $author$project$Page$Recipe$Create$view = function (model) {
 				A2(
 					$elm$core$Maybe$map,
 					function (_v2) {
-						return $author$project$Page$Recipe$Create$confirmModalView;
+						return $author$project$Page$Recipe$Create$confirmModalView(model.showModal);
 					},
 					model.modal))
 			]));

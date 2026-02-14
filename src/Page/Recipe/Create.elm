@@ -9,6 +9,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Page.Recipe.Album exposing (OutMsg)
 import Platform.Cmd as Cmd
+import Process
+import Task
 
 
 type alias Model =
@@ -17,6 +19,7 @@ type alias Model =
     , removedIngredients : List Recipe.Ingredient
     , removedSteps : List Recipe.PrepStep
     , modal : Maybe Modal
+    , showModal : Bool
     , edit : Edit
     }
 
@@ -48,6 +51,7 @@ type Msg
     | UpdateStepDescription String
       --
     | OpenConfirmModal Msg
+    | ShowModal
     | Confirm
     | Abort
     | NoOp
@@ -70,6 +74,7 @@ init recipes =
     , removedIngredients = []
     , removedSteps = []
     , modal = Nothing
+    , showModal = False
     , edit = None
     }
 
@@ -81,6 +86,7 @@ initWithRecipe r l =
     , removedIngredients = []
     , removedSteps = []
     , modal = Nothing
+    , showModal = False
     , edit = None
     }
 
@@ -296,17 +302,36 @@ update msg model =
                 Nothing ->
                     ( { model
                         | modal = Just (ConfirmModal m)
+                        , showModal = False
                       }
-                    , Cmd.none
+                    , Task.attempt (\_ -> ShowModal) (Process.sleep 10)
                     )
 
                 _ ->
                     noChange
 
+        ShowModal ->
+            case model.modal of
+                Just _ ->
+                    Debug.log "smth in modal"
+                        ( { model
+                            | showModal = True
+                          }
+                        , Cmd.none
+                        )
+
+                _ ->
+                    Debug.log "Nothing in modal"
+                        noChange
+
         Confirm ->
             case model.modal of
                 Just (ConfirmModal m) ->
-                    update m model
+                    let
+                        ( mdl, cmd ) =
+                            update m model
+                    in
+                    ( { mdl | showModal = False }, cmd )
 
                 _ ->
                     noChange
@@ -316,6 +341,7 @@ update msg model =
                 Just (ConfirmModal _) ->
                     ( { model
                         | modal = Nothing
+                        , showModal = False
                       }
                     , Cmd.none
                     )
@@ -417,7 +443,7 @@ view model =
                     Nothing
             )
         , model.modal
-            |> Maybe.map (\_ -> confirmModalView)
+            |> Maybe.map (\_ -> confirmModalView model.showModal)
             |> Maybe.withDefault (text "")
         ]
 
@@ -775,16 +801,29 @@ editStepView maybeStep =
         ]
 
 
-confirmModalView : Html Msg
-confirmModalView =
-    div []
+confirmModalView : Bool -> Html Msg
+confirmModalView isShowModal =
+    Debug.log
+        (if isShowModal then
+            "showme"
+
+         else
+            "dont show me"
+        )
+        div
+        []
         [ div
-            [ class
-                "modal-backdrop fade show"
+            [ classList
+                [ ( "modal-backdrop fade", True )
+                , ( "show", isShowModal )
+                ]
             ]
             []
         , div
-            [ class "modal fade show"
+            [ classList
+                [ ( "modal fade", True )
+                , ( "show", isShowModal )
+                ]
             , style "display" "block"
             ]
             [ div
