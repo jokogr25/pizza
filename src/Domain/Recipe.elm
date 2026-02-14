@@ -8,9 +8,71 @@ type alias Recipe =
     { id : String
     , label : String
     , description : String
+    , image : Path
     , ingredients : List Ingredient
     , steps : List PrepStep
-    , image : Path
+    }
+
+
+updateId : String -> Recipe -> Recipe
+updateId id recipe =
+    { recipe
+        | id = id
+    }
+
+
+updateLabel : String -> Recipe -> Recipe
+updateLabel label recipe =
+    { recipe
+        | label = label
+    }
+
+
+updateDescription : String -> Recipe -> Recipe
+updateDescription description recipe =
+    { recipe
+        | description = description
+    }
+
+
+updateImage : Path -> Recipe -> Recipe
+updateImage path recipe =
+    { recipe
+        | image = path
+    }
+
+
+addIngredient : Ingredient -> Recipe -> Recipe
+addIngredient ing recipe =
+    { recipe
+        | ingredients = recipe.ingredients ++ [ ing ]
+    }
+
+
+removeIngredient : Ingredient -> Recipe -> Recipe
+removeIngredient ing recipe =
+    { recipe
+        | ingredients =
+            List.filter
+                (\i -> i.id /= ing.id)
+                recipe.ingredients
+    }
+
+
+addPrepStep : PrepStep -> Recipe -> Recipe
+addPrepStep step recipe =
+    { recipe
+        | steps = recipe.steps ++ [ step ]
+    }
+
+
+removePrepStep : PrepStep -> Recipe -> Recipe
+removePrepStep step recipe =
+    { recipe
+        | steps =
+            List.filter
+                (\i -> i /= step)
+                recipe.steps
     }
 
 
@@ -21,11 +83,60 @@ type alias PrepStep =
     }
 
 
+updatePrepStepTime : Int -> PrepStep -> PrepStep
+updatePrepStepTime time step =
+    { step
+        | time = time
+    }
+
+
+updatePrepStepTitle : String -> PrepStep -> PrepStep
+updatePrepStepTitle title step =
+    { step
+        | title = title
+    }
+
+
+updatePrepStepDescription : String -> PrepStep -> PrepStep
+updatePrepStepDescription description step =
+    { step
+        | description = description
+    }
+
+
 type alias Ingredient =
     { id : String
     , label : String
     , amount : Float
     , unit : Unit
+    }
+
+
+updateIngredientId : String -> Ingredient -> Ingredient
+updateIngredientId id ing =
+    { ing
+        | id = id
+    }
+
+
+updateIngredientLabel : String -> Ingredient -> Ingredient
+updateIngredientLabel label ing =
+    { ing
+        | label = label
+    }
+
+
+updateIngredientAmount : Float -> Ingredient -> Ingredient
+updateIngredientAmount amount ing =
+    { ing
+        | amount = amount
+    }
+
+
+updateIngredientUnit : Unit -> Ingredient -> Ingredient
+updateIngredientUnit unit ing =
+    { ing
+        | unit = unit
     }
 
 

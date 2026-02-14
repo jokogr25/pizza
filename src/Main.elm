@@ -12,7 +12,7 @@ import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import List
 import Page.Recipe.Album as RecipeAlbum exposing (Model(..), Msg(..))
-import Page.Recipe.Create as RecipeCreate exposing (Model(..))
+import Page.Recipe.Create as RecipeCreate exposing (Model)
 import Page.Recipe.View as RecipeView exposing (Model(..), Tab(..))
 import Platform.Cmd as Cmd
 import Task
@@ -157,8 +157,8 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreate (RecipeCreate.Create recipes _ _ _ _) ->
-                    ( Front recipes
+                RecipeCreate c ->
+                    ( Front c.recipes
                     , Cmd.none
                     )
 
@@ -191,12 +191,12 @@ update msg model =
                     , Cmd.none
                     )
 
-                RecipeCreate (RecipeCreate.Create recipes _ _ _ _) ->
+                RecipeCreate c ->
                     ( RecipeAlbum
                         (RecipeAlbum.update
                             RecipeAlbum.NoOp
                             (RecipeAlbum.Album
-                                recipes
+                                c.recipes
                                 Nothing
                             )
                         )
@@ -238,13 +238,13 @@ update msg model =
 
         CreateMsg createMsg ->
             case model of
-                RecipeCreate (RecipeCreate.Create recipes draft maybeIngredient maybeStep modal) ->
+                RecipeCreate c ->
                     case createMsg of
                         RecipeCreate.Out outMsg ->
                             case outMsg of
                                 RecipeCreate.SaveRecipe recipe ->
                                     ( RecipeAlbum
-                                        (RecipeAlbum.init (recipe :: recipes))
+                                        (RecipeAlbum.init (recipe :: c.recipes))
                                     , Cmd.none
                                     )
 
@@ -253,7 +253,7 @@ update msg model =
                                 (Tuple.first
                                     (RecipeCreate.update
                                         createMsg
-                                        (RecipeCreate.Create recipes draft maybeIngredient maybeStep modal)
+                                        c
                                     )
                                 )
                             , Cmd.none
@@ -280,7 +280,10 @@ update msg model =
                             case outMsg of
                                 RecipeView.EditRecipe ->
                                     ( RecipeCreate
-                                        (RecipeCreate.Create [] recipe Nothing Nothing Nothing)
+                                        (RecipeCreate.initWithRecipe
+                                            recipe
+                                            recipes
+                                        )
                                     , Cmd.none
                                     )
 

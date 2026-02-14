@@ -1,8 +1,9 @@
 module Page.Recipe.Create exposing (..)
 
+import Domain.ActionButton exposing (ActionButton(..))
 import Domain.Helper exposing (..)
 import Domain.Icon exposing (ionIcon)
-import Domain.Recipe as Recipe exposing (Ingredient, Path(..), PrepStep, Recipe, Unit(..), allUnits, getPathStr, parseUnit, unitToAbbr)
+import Domain.Recipe as Recipe
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -10,8 +11,18 @@ import Page.Recipe.Album exposing (OutMsg)
 import Platform.Cmd as Cmd
 
 
-type Model
-    = Create (List Recipe) Recipe (Maybe Ingredient) (Maybe PrepStep) (Maybe Modal)
+type alias Model =
+    { recipes : List Recipe.Recipe
+    , draft : Recipe.Recipe
+    , modal : Maybe Modal
+    , edit : Edit
+    }
+
+
+type Edit
+    = None
+    | Ingredient Recipe.Ingredient
+    | PrepStep Recipe.PrepStep
 
 
 type Msg
@@ -20,16 +31,16 @@ type Msg
     | UpdateImagePath String
       -- Ingredient
     | AddIngredient
-    | RemoveIngredient String
-    | EditIngredient Ingredient
+    | RemoveIngredient Recipe.Ingredient
+    | EditIngredient Recipe.Ingredient
     | UpdateIngredientId String
     | UpdateIngredientLabel String
     | UpdateIngredientAmount String
     | UpdateIngredientUnit String
       -- Step
     | AddStep
-    | RemoveStep PrepStep
-    | EditStep PrepStep
+    | RemoveStep Recipe.PrepStep
+    | EditStep Recipe.PrepStep
     | UpdateStepTitle String
     | UpdateStepTime String
     | UpdateStepDescription String
@@ -43,30 +54,32 @@ type Msg
 
 
 type OutMsg
-    = SaveRecipe Recipe
+    = SaveRecipe Recipe.Recipe
 
 
 type Modal
     = ConfirmModal Msg
 
 
-init : List Recipe -> Model
+init : List Recipe.Recipe -> Model
 init recipes =
-    Create
-        recipes
-        { id = ""
-        , label = ""
-        , description = ""
-        , ingredients = []
-        , steps = []
-        , image = Recipe.Path ""
-        }
-        Nothing
-        Nothing
-        Nothing
+    { recipes = recipes
+    , draft = recipeDraft
+    , modal = Nothing
+    , edit = None
+    }
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+initWithRecipe : Recipe.Recipe -> List Recipe.Recipe -> Model
+initWithRecipe r l =
+    { recipes = l
+    , draft = r
+    , modal = Nothing
+    , edit = None
+    }
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
         noChange =
@@ -74,374 +87,208 @@ update msg model =
     in
     case msg of
         UpdateLabel label ->
-            case model of
-                Create recipes draft ingredientDraft stepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | label = label
-                        }
-                        ingredientDraft
-                        stepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+            ( { model
+                | draft = Recipe.updateLabel label model.draft
+              }
+            , Cmd.none
+            )
 
         UpdateDescription description ->
-            case model of
-                Create recipes draft ingredientDraft stepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | description = description
-                        }
-                        ingredientDraft
-                        stepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+            ( { model
+                | draft = Recipe.updateDescription description model.draft
+              }
+            , Cmd.none
+            )
 
         UpdateImagePath imagePath ->
-            case model of
-                Create recipes draft ingredientDraft stepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | image = Path imagePath
-                        }
-                        ingredientDraft
-                        stepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+            ( { model
+                | draft = Recipe.updateImage (Recipe.Path imagePath) model.draft
+              }
+            , Cmd.none
+            )
 
         AddIngredient ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | ingredients =
-                                draft.ingredients
-                                    ++ (case maybeIngredientDraft of
-                                            Just ingredient ->
-                                                if validateIngredient ingredient draft.ingredients then
-                                                    [ ingredient ]
-
-                                                else
-                                                    []
-
-                                            Nothing ->
-                                                []
-                                       )
-                        }
-                        (maybeIngredientDraft
-                            |> Maybe.andThen
-                                (\i ->
-                                    if not (validateIngredient i draft.ingredients) then
-                                        Just i
-
-                                    else
-                                        Nothing
-                                )
+            case model.edit of
+                Ingredient ing ->
+                    if validateIngredient ing model.draft.ingredients then
+                        ( { model
+                            | draft =
+                                Recipe.addIngredient
+                                    ing
+                                    model.draft
+                            , edit = None
+                          }
+                        , Cmd.none
                         )
-                        maybeStepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+
+                    else
+                        noChange
+
+                _ ->
+                    noChange
 
         EditIngredient ing ->
-            case model of
-                Create recipes draft _ maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | ingredients =
-                                List.filter (\i -> i.id /= ing.id) draft.ingredients
-                        }
-                        (Just ing)
-                        maybeStepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+            ( { model
+                | edit = Ingredient ing
+                , draft = Recipe.removeIngredient ing model.draft
+              }
+            , Cmd.none
+            )
 
-        RemoveIngredient id ->
-            case model of
-                Create recipes draft ingredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | ingredients =
-                                List.filter
-                                    (\ingredient ->
-                                        ingredient.id /= id
-                                    )
-                                    draft.ingredients
-                        }
-                        ingredientDraft
-                        maybeStepDraft
-                        Nothing
-                    , Cmd.none
-                    )
+        RemoveIngredient ing ->
+            ( { model
+                | draft = Recipe.removeIngredient ing model.draft
+              }
+            , Cmd.none
+            )
 
         UpdateIngredientId newId ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just ing ->
-                                Just
-                                    { ing
-                                        | id = newId
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { id = newId
-                                    , label = ""
-                                    , amount = 0
-                                    , unit = Gram
-                                    }
-                        )
-                        maybeStepDraft
-                        Nothing
+            case model.edit of
+                Ingredient ing ->
+                    ( { model
+                        | edit = Ingredient (Recipe.updateIngredientId newId ing)
+                      }
                     , Cmd.none
                     )
+
+                _ ->
+                    noChange
 
         UpdateIngredientLabel newLabel ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just ing ->
-                                Just
-                                    { ing
-                                        | label = newLabel
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { id = ""
-                                    , label = newLabel
-                                    , amount = 0
-                                    , unit = Gram
-                                    }
-                        )
-                        maybeStepDraft
-                        Nothing
+            case model.edit of
+                Ingredient ing ->
+                    ( { model
+                        | edit = Ingredient (Recipe.updateIngredientLabel newLabel ing)
+                      }
                     , Cmd.none
                     )
 
+                _ ->
+                    noChange
+
         UpdateIngredientAmount newStrAmount ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
+            case model.edit of
+                Ingredient ing ->
                     case String.toFloat newStrAmount of
                         Just f ->
-                            ( Create
-                                recipes
-                                draft
-                                (case maybeIngredientDraft of
-                                    Just ing ->
-                                        Just
-                                            { ing
-                                                | amount = f
-                                            }
-
-                                    Nothing ->
-                                        Just
-                                            { id = ""
-                                            , label = ""
-                                            , amount = f
-                                            , unit = Gram
-                                            }
+                            if f > 0 then
+                                ( { model
+                                    | edit = Ingredient (Recipe.updateIngredientAmount f ing)
+                                  }
+                                , Cmd.none
                                 )
-                                maybeStepDraft
-                                Nothing
-                            , Cmd.none
-                            )
+
+                            else
+                                noChange
 
                         Nothing ->
                             noChange
 
-        UpdateIngredientUnit gUnit ->
-            let
-                parsedUnit : Unit
-                parsedUnit =
-                    Debug.log gUnit
-                        (Maybe.withDefault Gram (parseUnit gUnit))
-            in
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        (case maybeIngredientDraft of
-                            Just i ->
-                                Just { i | unit = parsedUnit }
+                _ ->
+                    noChange
 
-                            Nothing ->
-                                Just
-                                    { id = ""
-                                    , label = ""
-                                    , amount = 0
-                                    , unit = parsedUnit
-                                    }
-                        )
-                        maybeStepDraft
-                        Nothing
+        UpdateIngredientUnit gUnit ->
+            case model.edit of
+                Ingredient ing ->
+                    let
+                        parsedUnit : Recipe.Unit
+                        parsedUnit =
+                            Maybe.withDefault Recipe.Gram (Recipe.parseUnit gUnit)
+                    in
+                    ( { model
+                        | edit = Ingredient (Recipe.updateIngredientUnit parsedUnit ing)
+                      }
                     , Cmd.none
                     )
+
+                _ ->
+                    noChange
 
         AddStep ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | steps =
-                                draft.steps
-                                    ++ (case maybeStepDraft of
-                                            Just step ->
-                                                [ step ]
-
-                                            Nothing ->
-                                                []
-                                       )
-                        }
-                        maybeIngredientDraft
-                        Nothing
-                        Nothing
+            case model.edit of
+                PrepStep step ->
+                    ( { model
+                        | draft = Recipe.addPrepStep step model.draft
+                        , edit = None
+                      }
                     , Cmd.none
                     )
+
+                _ ->
+                    noChange
 
         UpdateStepTitle newTitle ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | title = newTitle
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { title = newTitle
-                                    , time = -1
-                                    , description = ""
-                                    }
-                        )
-                        Nothing
+            case model.edit of
+                PrepStep step ->
+                    ( { model
+                        | edit = PrepStep (Recipe.updatePrepStepTitle newTitle step)
+                      }
                     , Cmd.none
                     )
+
+                _ ->
+                    noChange
 
         UpdateStepDescription newDescription ->
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | description = newDescription
-                                    }
-
-                            Nothing ->
-                                Just
-                                    { description = newDescription
-                                    , time = -1
-                                    , title = ""
-                                    }
-                        )
-                        Nothing
+            case model.edit of
+                PrepStep step ->
+                    ( { model
+                        | edit = PrepStep (Recipe.updatePrepStepDescription newDescription step)
+                      }
                     , Cmd.none
                     )
 
-        UpdateStepTime newTime ->
-            let
-                parsedTime : Int
-                parsedTime =
-                    String.toInt newTime |> Maybe.withDefault -1
-            in
-            case model of
-                Create recipes draft maybeIngredientDraft maybeStepDraft _ ->
-                    ( Create
-                        recipes
-                        draft
-                        maybeIngredientDraft
-                        (case maybeStepDraft of
-                            Just step ->
-                                Just
-                                    { step
-                                        | time = parsedTime
-                                    }
+                _ ->
+                    noChange
 
-                            Nothing ->
-                                Just
-                                    { time = parsedTime
-                                    , description = "newDescription"
-                                    , title = ""
-                                    }
-                        )
-                        Nothing
-                    , Cmd.none
-                    )
+        UpdateStepTime newTimeStr ->
+            case model.edit of
+                PrepStep step ->
+                    case String.toInt newTimeStr of
+                        Just newTime ->
+                            if newTime > 0 then
+                                ( { model
+                                    | edit = PrepStep (Recipe.updatePrepStepTime newTime step)
+                                  }
+                                , Cmd.none
+                                )
+
+                            else
+                                noChange
+
+                        Nothing ->
+                            noChange
+
+                _ ->
+                    noChange
 
         EditStep step ->
-            case model of
-                Create recipes draft maybeIngredient _ _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | steps =
-                                List.filter
-                                    (\s -> s /= step)
-                                    draft.steps
-                        }
-                        maybeIngredient
-                        (Just step)
-                        Nothing
+            case model.edit of
+                None ->
+                    ( { model
+                        | edit = PrepStep step
+                      }
                     , Cmd.none
                     )
 
+                _ ->
+                    noChange
+
         RemoveStep step ->
-            case model of
-                Create recipes draft maybeIngredient _ _ ->
-                    ( Create
-                        recipes
-                        { draft
-                            | steps =
-                                List.filter
-                                    (\s -> s /= step)
-                                    draft.steps
-                        }
-                        maybeIngredient
-                        Nothing
-                        Nothing
-                    , Cmd.none
-                    )
+            case model.edit of
+                None ->
+                    ( { model | draft = Recipe.removePrepStep step model.draft }, Cmd.none )
+
+                _ ->
+                    noChange
 
         -- m is the message that will be sent after clicking confirm button
         OpenConfirmModal m ->
-            case model of
-                Create recipes draft maybeIngredient maybeAmount Nothing ->
-                    ( Create
-                        recipes
-                        draft
-                        maybeIngredient
-                        maybeAmount
-                        (Just (ConfirmModal m))
+            case model.modal of
+                Nothing ->
+                    ( { model
+                        | modal = Just (ConfirmModal m)
+                      }
                     , Cmd.none
                     )
 
@@ -449,24 +296,24 @@ update msg model =
                     noChange
 
         Confirm ->
-            case model of
-                Create _ _ _ _ (Just (ConfirmModal m)) ->
+            case model.modal of
+                Just (ConfirmModal m) ->
                     update m model
 
                 _ ->
                     noChange
 
         Abort ->
-            case model of
-                Create recipes draft maybeIngredient maybeAmount _ ->
-                    ( Create
-                        recipes
-                        draft
-                        maybeIngredient
-                        maybeAmount
-                        Nothing
+            case model.modal of
+                Just (ConfirmModal _) ->
+                    ( { model
+                        | modal = Nothing
+                      }
                     , Cmd.none
                     )
+
+                _ ->
+                    noChange
 
         Out outMsg ->
             case outMsg of
@@ -477,13 +324,13 @@ update msg model =
             noChange
 
 
-validateRecipe : Recipe -> Bool
+validateRecipe : Recipe.Recipe -> Bool
 validateRecipe recipe =
     validateIngredients recipe.ingredients
         && validateSteps recipe.steps
 
 
-validateStep : PrepStep -> Bool
+validateStep : Recipe.PrepStep -> Bool
 validateStep step =
     step.time
         >= -1
@@ -491,7 +338,7 @@ validateStep step =
         && not (String.isEmpty step.description)
 
 
-validateIngredient : Ingredient -> List Ingredient -> Bool
+validateIngredient : Recipe.Ingredient -> List Recipe.Ingredient -> Bool
 validateIngredient ing ings =
     let
         listOfIds =
@@ -504,7 +351,7 @@ validateIngredient ing ings =
         && not (String.isEmpty ing.label)
 
 
-validateIngredients : List Ingredient -> Bool
+validateIngredients : List Recipe.Ingredient -> Bool
 validateIngredients ingredients =
     not
         (List.isEmpty ingredients)
@@ -518,7 +365,7 @@ validateIngredients ingredients =
             ingredients
 
 
-validateSteps : List PrepStep -> Bool
+validateSteps : List Recipe.PrepStep -> Bool
 validateSteps steps =
     not
         (List.isEmpty steps)
@@ -543,21 +390,31 @@ uniqueStrings list =
 
 view : Model -> Html Msg
 view model =
-    case model of
-        Create _ recipeDraft maybeIngredientDraft maybeStepDraft modal ->
-            div
-                []
-                [ recipeCreatorView
-                    recipeDraft
-                    maybeIngredientDraft
-                    maybeStepDraft
-                , modal
-                    |> Maybe.map (\_ -> modalView)
-                    |> Maybe.withDefault (text "")
-                ]
+    div
+        []
+        [ recipeCreatorView
+            model.draft
+            (case model.edit of
+                Ingredient i ->
+                    Just i
+
+                _ ->
+                    Nothing
+            )
+            (case model.edit of
+                PrepStep i ->
+                    Just i
+
+                _ ->
+                    Nothing
+            )
+        , model.modal
+            |> Maybe.map (\_ -> modalView)
+            |> Maybe.withDefault (text "")
+        ]
 
 
-recipeCreatorView : Recipe -> Maybe Ingredient -> Maybe PrepStep -> Html Msg
+recipeCreatorView : Recipe.Recipe -> Maybe Recipe.Ingredient -> Maybe Recipe.PrepStep -> Html Msg
 recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
     let
         isIngredientValid =
@@ -642,7 +499,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
                 [ input
                     [ class "form-control"
                     , Html.Attributes.id id
-                    , Html.Attributes.value (getPathStr draft.image)
+                    , Html.Attributes.value (Recipe.getPathStr draft.image)
                     , onInput UpdateImagePath
                     ]
                     []
@@ -682,7 +539,7 @@ recipeCreatorView draft maybeIngredientToEdit maybePrepStepToEdit =
         ]
 
 
-ingredientsAddedView : List Ingredient -> Html Msg
+ingredientsAddedView : List Recipe.Ingredient -> Html Msg
 ingredientsAddedView ingredients =
     div []
         (List.map
@@ -696,7 +553,7 @@ ingredientsAddedView ingredients =
                         [ button
                             [ class "btn btn-sm btn-outline action-btn-danger"
                             , Html.Attributes.title "Remove ingredient"
-                            , onClick (OpenConfirmModal (RemoveIngredient ing.id))
+                            , onClick (OpenConfirmModal (RemoveIngredient ing))
                             ]
                             [ ionIcon "close" 20 ]
                         , button
@@ -712,7 +569,7 @@ ingredientsAddedView ingredients =
         )
 
 
-editIngredientView : Maybe Ingredient -> Html Msg
+editIngredientView : Maybe Recipe.Ingredient -> Html Msg
 editIngredientView maybeIngredient =
     let
         idValue =
@@ -756,7 +613,7 @@ editIngredientView maybeIngredient =
                         (List.map
                             (\unit ->
                                 Html.option
-                                    [ Html.Attributes.value (unitToAbbr unit)
+                                    [ Html.Attributes.value (Recipe.unitToAbbr unit)
                                     , Html.Attributes.selected
                                         (case maybeIngredient of
                                             Just i ->
@@ -766,9 +623,9 @@ editIngredientView maybeIngredient =
                                                 False
                                         )
                                     ]
-                                    [ text (unitToAbbr unit) ]
+                                    [ text (Recipe.unitToAbbr unit) ]
                             )
-                            allUnits
+                            Recipe.allUnits
                         )
                     , label
                         []
@@ -794,7 +651,7 @@ editIngredientView maybeIngredient =
         ]
 
 
-stepsAddedView : List PrepStep -> Html Msg
+stepsAddedView : List Recipe.PrepStep -> Html Msg
 stepsAddedView steps =
     div []
         (List.map
@@ -824,7 +681,7 @@ stepsAddedView steps =
         )
 
 
-editStepView : Maybe PrepStep -> Html Msg
+editStepView : Maybe Recipe.PrepStep -> Html Msg
 editStepView maybeStep =
     let
         stepTitleValue =
@@ -959,3 +816,14 @@ modalView =
                 ]
             ]
         ]
+
+
+recipeDraft : Recipe.Recipe
+recipeDraft =
+    { id = ""
+    , label = ""
+    , description = ""
+    , ingredients = []
+    , steps = []
+    , image = Recipe.Path ""
+    }

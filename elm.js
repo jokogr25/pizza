@@ -5800,10 +5800,6 @@ var $author$project$Page$Recipe$Album$Album = F2(
 		return {$: 'Album', a: a, b: b};
 	});
 var $author$project$Main$Carousel = {$: 'Carousel'};
-var $author$project$Page$Recipe$Create$Create = F5(
-	function (a, b, c, d, e) {
-		return {$: 'Create', a: a, b: b, c: c, d: d, e: e};
-	});
 var $author$project$Page$Recipe$Album$InputAlbumSearch = function (a) {
 	return {$: 'InputAlbumSearch', a: a};
 };
@@ -5860,26 +5856,26 @@ var $author$project$Main$focus = function (id) {
 var $author$project$Page$Recipe$Album$init = function (recipes) {
 	return A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing);
 };
+var $author$project$Page$Recipe$Create$None = {$: 'None'};
+var $author$project$Page$Recipe$Create$recipeDraft = {
+	description: '',
+	id: '',
+	image: $author$project$Domain$Recipe$Path(''),
+	ingredients: _List_Nil,
+	label: '',
+	steps: _List_Nil
+};
 var $author$project$Page$Recipe$Create$init = function (recipes) {
-	return A5(
-		$author$project$Page$Recipe$Create$Create,
-		recipes,
-		{
-			description: '',
-			id: '',
-			image: $author$project$Domain$Recipe$Path(''),
-			ingredients: _List_Nil,
-			label: '',
-			steps: _List_Nil
-		},
-		$elm$core$Maybe$Nothing,
-		$elm$core$Maybe$Nothing,
-		$elm$core$Maybe$Nothing);
+	return {draft: $author$project$Page$Recipe$Create$recipeDraft, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: recipes};
 };
 var $author$project$Page$Recipe$View$Ingredients = {$: 'Ingredients'};
 var $author$project$Page$Recipe$View$init = F2(
 	function (recipes, recipe) {
 		return A7($author$project$Page$Recipe$View$View, recipes, recipe, $elm$core$Maybe$Nothing, 0, $elm$core$Maybe$Nothing, 1, $author$project$Page$Recipe$View$Ingredients);
+	});
+var $author$project$Page$Recipe$Create$initWithRecipe = F2(
+	function (r, l) {
+		return {draft: r, edit: $author$project$Page$Recipe$Create$None, modal: $elm$core$Maybe$Nothing, recipes: l};
 	});
 var $author$project$Page$Recipe$Album$update = F2(
 	function (msg, model) {
@@ -5897,29 +5893,34 @@ var $author$project$Page$Recipe$Album$update = F2(
 var $author$project$Page$Recipe$Create$ConfirmModal = function (a) {
 	return {$: 'ConfirmModal', a: a};
 };
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
+var $author$project$Page$Recipe$Create$Ingredient = function (a) {
+	return {$: 'Ingredient', a: a};
+};
+var $author$project$Page$Recipe$Create$PrepStep = function (a) {
+	return {$: 'PrepStep', a: a};
+};
+var $author$project$Domain$Recipe$addIngredient = F2(
+	function (ing, recipe) {
+		return _Utils_update(
+			recipe,
+			{
+				ingredients: _Utils_ap(
+					recipe.ingredients,
+					_List_fromArray(
+						[ing]))
+			});
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
+var $author$project$Domain$Recipe$addPrepStep = F2(
+	function (step, recipe) {
+		return _Utils_update(
+			recipe,
+			{
+				steps: _Utils_ap(
+					recipe.steps,
+					_List_fromArray(
+						[step]))
+			});
 	});
-var $elm$core$Debug$log = _Debug_log;
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Domain$Recipe$parseUnit = function (s) {
 	switch (s) {
 		case 'g':
@@ -5932,7 +5933,105 @@ var $author$project$Domain$Recipe$parseUnit = function (s) {
 			return $elm$core$Maybe$Nothing;
 	}
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Domain$Recipe$removeIngredient = F2(
+	function (ing, recipe) {
+		return _Utils_update(
+			recipe,
+			{
+				ingredients: A2(
+					$elm$core$List$filter,
+					function (i) {
+						return !_Utils_eq(i.id, ing.id);
+					},
+					recipe.ingredients)
+			});
+	});
+var $author$project$Domain$Recipe$removePrepStep = F2(
+	function (step, recipe) {
+		return _Utils_update(
+			recipe,
+			{
+				steps: A2(
+					$elm$core$List$filter,
+					function (i) {
+						return !_Utils_eq(i, step);
+					},
+					recipe.steps)
+			});
+	});
 var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Domain$Recipe$updateDescription = F2(
+	function (description, recipe) {
+		return _Utils_update(
+			recipe,
+			{description: description});
+	});
+var $author$project$Domain$Recipe$updateImage = F2(
+	function (path, recipe) {
+		return _Utils_update(
+			recipe,
+			{image: path});
+	});
+var $author$project$Domain$Recipe$updateIngredientAmount = F2(
+	function (amount, ing) {
+		return _Utils_update(
+			ing,
+			{amount: amount});
+	});
+var $author$project$Domain$Recipe$updateIngredientId = F2(
+	function (id, ing) {
+		return _Utils_update(
+			ing,
+			{id: id});
+	});
+var $author$project$Domain$Recipe$updateIngredientLabel = F2(
+	function (label, ing) {
+		return _Utils_update(
+			ing,
+			{label: label});
+	});
+var $author$project$Domain$Recipe$updateIngredientUnit = F2(
+	function (unit, ing) {
+		return _Utils_update(
+			ing,
+			{unit: unit});
+	});
+var $author$project$Domain$Recipe$updateLabel = F2(
+	function (label, recipe) {
+		return _Utils_update(
+			recipe,
+			{label: label});
+	});
+var $author$project$Domain$Recipe$updatePrepStepDescription = F2(
+	function (description, step) {
+		return _Utils_update(
+			step,
+			{description: description});
+	});
+var $author$project$Domain$Recipe$updatePrepStepTime = F2(
+	function (time, step) {
+		return _Utils_update(
+			step,
+			{time: time});
+	});
+var $author$project$Domain$Recipe$updatePrepStepTitle = F2(
+	function (title, step) {
+		return _Utils_update(
+			step,
+			{title: title});
+	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5963,6 +6062,7 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Page$Recipe$Create$validateIngredient = F2(
 	function (ing, ings) {
 		var listOfIds = A2(
@@ -5990,434 +6090,258 @@ var $author$project$Page$Recipe$Create$update = F2(
 			switch (msg.$) {
 				case 'UpdateLabel':
 					var label = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var ingredientDraft = model.c;
-					var stepDraft = model.d;
 					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							_Utils_update(
-								draft,
-								{label: label}),
-							ingredientDraft,
-							stepDraft,
-							$elm$core$Maybe$Nothing),
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$updateLabel, label, model.draft)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'UpdateDescription':
 					var description = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var ingredientDraft = model.c;
-					var stepDraft = model.d;
 					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							_Utils_update(
-								draft,
-								{description: description}),
-							ingredientDraft,
-							stepDraft,
-							$elm$core$Maybe$Nothing),
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$updateDescription, description, model.draft)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'UpdateImagePath':
 					var imagePath = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var ingredientDraft = model.c;
-					var stepDraft = model.d;
 					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							_Utils_update(
-								draft,
-								{
-									image: $author$project$Domain$Recipe$Path(imagePath)
-								}),
-							ingredientDraft,
-							stepDraft,
-							$elm$core$Maybe$Nothing),
+						_Utils_update(
+							model,
+							{
+								draft: A2(
+									$author$project$Domain$Recipe$updateImage,
+									$author$project$Domain$Recipe$Path(imagePath),
+									model.draft)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'AddIngredient':
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
+					var _v1 = model.edit;
+					if (_v1.$ === 'Ingredient') {
+						var ing = _v1.a;
+						return A2($author$project$Page$Recipe$Create$validateIngredient, ing, model.draft.ingredients) ? _Utils_Tuple2(
 							_Utils_update(
-								draft,
+								model,
 								{
-									ingredients: _Utils_ap(
-										draft.ingredients,
-										function () {
-											if (maybeIngredientDraft.$ === 'Just') {
-												var ingredient = maybeIngredientDraft.a;
-												return A2($author$project$Page$Recipe$Create$validateIngredient, ingredient, draft.ingredients) ? _List_fromArray(
-													[ingredient]) : _List_Nil;
-											} else {
-												return _List_Nil;
-											}
-										}())
+									draft: A2($author$project$Domain$Recipe$addIngredient, ing, model.draft),
+									edit: $author$project$Page$Recipe$Create$None
 								}),
-							A2(
-								$elm$core$Maybe$andThen,
-								function (i) {
-									return (!A2($author$project$Page$Recipe$Create$validateIngredient, i, draft.ingredients)) ? $elm$core$Maybe$Just(i) : $elm$core$Maybe$Nothing;
-								},
-								maybeIngredientDraft),
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+							$elm$core$Platform$Cmd$none) : noChange;
+					} else {
+						return noChange;
+					}
 				case 'EditIngredient':
 					var ing = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeStepDraft = model.d;
 					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							_Utils_update(
-								draft,
-								{
-									ingredients: A2(
-										$elm$core$List$filter,
-										function (i) {
-											return !_Utils_eq(i.id, ing.id);
-										},
-										draft.ingredients)
-								}),
-							$elm$core$Maybe$Just(ing),
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft),
+								edit: $author$project$Page$Recipe$Create$Ingredient(ing)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'RemoveIngredient':
-					var id = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var ingredientDraft = model.c;
-					var maybeStepDraft = model.d;
+					var ing = msg.a;
 					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							_Utils_update(
-								draft,
-								{
-									ingredients: A2(
-										$elm$core$List$filter,
-										function (ingredient) {
-											return !_Utils_eq(ingredient.id, id);
-										},
-										draft.ingredients)
-								}),
-							ingredientDraft,
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
+						_Utils_update(
+							model,
+							{
+								draft: A2($author$project$Domain$Recipe$removeIngredient, ing, model.draft)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'UpdateIngredientId':
 					var newId = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							function () {
-								if (maybeIngredientDraft.$ === 'Just') {
-									var ing = maybeIngredientDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											ing,
-											{id: newId}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{amount: 0, id: newId, label: '', unit: $author$project$Domain$Recipe$Gram});
-								}
-							}(),
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var _v2 = model.edit;
+					if (_v2.$ === 'Ingredient') {
+						var ing = _v2.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									edit: $author$project$Page$Recipe$Create$Ingredient(
+										A2($author$project$Domain$Recipe$updateIngredientId, newId, ing))
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'UpdateIngredientLabel':
 					var newLabel = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							function () {
-								if (maybeIngredientDraft.$ === 'Just') {
-									var ing = maybeIngredientDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											ing,
-											{label: newLabel}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{amount: 0, id: '', label: newLabel, unit: $author$project$Domain$Recipe$Gram});
-								}
-							}(),
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var _v3 = model.edit;
+					if (_v3.$ === 'Ingredient') {
+						var ing = _v3.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									edit: $author$project$Page$Recipe$Create$Ingredient(
+										A2($author$project$Domain$Recipe$updateIngredientLabel, newLabel, ing))
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'UpdateIngredientAmount':
 					var newStrAmount = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					var _v13 = $elm$core$String$toFloat(newStrAmount);
-					if (_v13.$ === 'Just') {
-						var f = _v13.a;
-						return _Utils_Tuple2(
-							A5(
-								$author$project$Page$Recipe$Create$Create,
-								recipes,
-								draft,
-								function () {
-									if (maybeIngredientDraft.$ === 'Just') {
-										var ing = maybeIngredientDraft.a;
-										return $elm$core$Maybe$Just(
-											_Utils_update(
-												ing,
-												{amount: f}));
-									} else {
-										return $elm$core$Maybe$Just(
-											{amount: f, id: '', label: '', unit: $author$project$Domain$Recipe$Gram});
-									}
-								}(),
-								maybeStepDraft,
-								$elm$core$Maybe$Nothing),
-							$elm$core$Platform$Cmd$none);
+					var _v4 = model.edit;
+					if (_v4.$ === 'Ingredient') {
+						var ing = _v4.a;
+						var _v5 = $elm$core$String$toFloat(newStrAmount);
+						if (_v5.$ === 'Just') {
+							var f = _v5.a;
+							return (f > 0) ? _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										edit: $author$project$Page$Recipe$Create$Ingredient(
+											A2($author$project$Domain$Recipe$updateIngredientAmount, f, ing))
+									}),
+								$elm$core$Platform$Cmd$none) : noChange;
+						} else {
+							return noChange;
+						}
 					} else {
 						return noChange;
 					}
 				case 'UpdateIngredientUnit':
 					var gUnit = msg.a;
-					var parsedUnit = A2(
-						$elm$core$Debug$log,
-						gUnit,
-						A2(
+					var _v6 = model.edit;
+					if (_v6.$ === 'Ingredient') {
+						var ing = _v6.a;
+						var parsedUnit = A2(
 							$elm$core$Maybe$withDefault,
 							$author$project$Domain$Recipe$Gram,
-							$author$project$Domain$Recipe$parseUnit(gUnit)));
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							function () {
-								if (maybeIngredientDraft.$ === 'Just') {
-									var i = maybeIngredientDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											i,
-											{unit: parsedUnit}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{amount: 0, id: '', label: '', unit: parsedUnit});
-								}
-							}(),
-							maybeStepDraft,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
-				case 'AddStep':
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
+							$author$project$Domain$Recipe$parseUnit(gUnit));
+						return _Utils_Tuple2(
 							_Utils_update(
-								draft,
+								model,
 								{
-									steps: _Utils_ap(
-										draft.steps,
-										function () {
-											if (maybeStepDraft.$ === 'Just') {
-												var step = maybeStepDraft.a;
-												return _List_fromArray(
-													[step]);
-											} else {
-												return _List_Nil;
-											}
-										}())
+									edit: $author$project$Page$Recipe$Create$Ingredient(
+										A2($author$project$Domain$Recipe$updateIngredientUnit, parsedUnit, ing))
 								}),
-							maybeIngredientDraft,
-							$elm$core$Maybe$Nothing,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
+				case 'AddStep':
+					var _v7 = model.edit;
+					if (_v7.$ === 'PrepStep') {
+						var step = _v7.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									draft: A2($author$project$Domain$Recipe$addPrepStep, step, model.draft),
+									edit: $author$project$Page$Recipe$Create$None
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'UpdateStepTitle':
 					var newTitle = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							maybeIngredientDraft,
-							function () {
-								if (maybeStepDraft.$ === 'Just') {
-									var step = maybeStepDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											step,
-											{title: newTitle}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{description: '', time: -1, title: newTitle});
-								}
-							}(),
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var _v8 = model.edit;
+					if (_v8.$ === 'PrepStep') {
+						var step = _v8.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									edit: $author$project$Page$Recipe$Create$PrepStep(
+										A2($author$project$Domain$Recipe$updatePrepStepTitle, newTitle, step))
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'UpdateStepDescription':
 					var newDescription = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							maybeIngredientDraft,
-							function () {
-								if (maybeStepDraft.$ === 'Just') {
-									var step = maybeStepDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											step,
-											{description: newDescription}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{description: newDescription, time: -1, title: ''});
-								}
-							}(),
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var _v9 = model.edit;
+					if (_v9.$ === 'PrepStep') {
+						var step = _v9.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									edit: $author$project$Page$Recipe$Create$PrepStep(
+										A2($author$project$Domain$Recipe$updatePrepStepDescription, newDescription, step))
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'UpdateStepTime':
-					var newTime = msg.a;
-					var parsedTime = A2(
-						$elm$core$Maybe$withDefault,
-						-1,
-						$elm$core$String$toInt(newTime));
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredientDraft = model.c;
-					var maybeStepDraft = model.d;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
-							draft,
-							maybeIngredientDraft,
-							function () {
-								if (maybeStepDraft.$ === 'Just') {
-									var step = maybeStepDraft.a;
-									return $elm$core$Maybe$Just(
-										_Utils_update(
-											step,
-											{time: parsedTime}));
-								} else {
-									return $elm$core$Maybe$Just(
-										{description: 'newDescription', time: parsedTime, title: ''});
-								}
-							}(),
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var newTimeStr = msg.a;
+					var _v10 = model.edit;
+					if (_v10.$ === 'PrepStep') {
+						var step = _v10.a;
+						var _v11 = $elm$core$String$toInt(newTimeStr);
+						if (_v11.$ === 'Just') {
+							var newTime = _v11.a;
+							return (newTime > 0) ? _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										edit: $author$project$Page$Recipe$Create$PrepStep(
+											A2($author$project$Domain$Recipe$updatePrepStepTime, newTime, step))
+									}),
+								$elm$core$Platform$Cmd$none) : noChange;
+						} else {
+							return noChange;
+						}
+					} else {
+						return noChange;
+					}
 				case 'EditStep':
 					var step = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredient = model.c;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
+					var _v12 = model.edit;
+					if (_v12.$ === 'None') {
+						return _Utils_Tuple2(
 							_Utils_update(
-								draft,
+								model,
 								{
-									steps: A2(
-										$elm$core$List$filter,
-										function (s) {
-											return !_Utils_eq(s, step);
-										},
-										draft.steps)
+									edit: $author$project$Page$Recipe$Create$PrepStep(step)
 								}),
-							maybeIngredient,
-							$elm$core$Maybe$Just(step),
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'RemoveStep':
 					var step = msg.a;
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredient = model.c;
-					return _Utils_Tuple2(
-						A5(
-							$author$project$Page$Recipe$Create$Create,
-							recipes,
+					var _v13 = model.edit;
+					if (_v13.$ === 'None') {
+						return _Utils_Tuple2(
 							_Utils_update(
-								draft,
+								model,
 								{
-									steps: A2(
-										$elm$core$List$filter,
-										function (s) {
-											return !_Utils_eq(s, step);
-										},
-										draft.steps)
+									draft: A2($author$project$Domain$Recipe$removePrepStep, step, model.draft)
 								}),
-							maybeIngredient,
-							$elm$core$Maybe$Nothing,
-							$elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'OpenConfirmModal':
 					var m = msg.a;
-					if (model.e.$ === 'Nothing') {
-						var recipes = model.a;
-						var draft = model.b;
-						var maybeIngredient = model.c;
-						var maybeAmount = model.d;
-						var _v28 = model.e;
+					var _v14 = model.modal;
+					if (_v14.$ === 'Nothing') {
 						return _Utils_Tuple2(
-							A5(
-								$author$project$Page$Recipe$Create$Create,
-								recipes,
-								draft,
-								maybeIngredient,
-								maybeAmount,
-								$elm$core$Maybe$Just(
-									$author$project$Page$Recipe$Create$ConfirmModal(m))),
+							_Utils_update(
+								model,
+								{
+									modal: $elm$core$Maybe$Just(
+										$author$project$Page$Recipe$Create$ConfirmModal(m))
+								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return noChange;
 					}
 				case 'Confirm':
-					if (model.e.$ === 'Just') {
-						var m = model.e.a.a;
+					var _v15 = model.modal;
+					if (_v15.$ === 'Just') {
+						var m = _v15.a.a;
 						var $temp$msg = m,
 							$temp$model = model;
 						msg = $temp$msg;
@@ -6427,13 +6351,16 @@ var $author$project$Page$Recipe$Create$update = F2(
 						return noChange;
 					}
 				case 'Abort':
-					var recipes = model.a;
-					var draft = model.b;
-					var maybeIngredient = model.c;
-					var maybeAmount = model.d;
-					return _Utils_Tuple2(
-						A5($author$project$Page$Recipe$Create$Create, recipes, draft, maybeIngredient, maybeAmount, $elm$core$Maybe$Nothing),
-						$elm$core$Platform$Cmd$none);
+					var _v16 = model.modal;
+					if (_v16.$ === 'Just') {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{modal: $elm$core$Maybe$Nothing}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return noChange;
+					}
 				case 'Out':
 					var outMsg = msg.a;
 					return noChange;
@@ -6605,10 +6532,9 @@ var $author$project$Main$update = F2(
 							$author$project$Main$Front(recipes),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeCreate':
-						var _v4 = model.a;
-						var recipes = _v4.a;
+						var c = model.a;
 						return _Utils_Tuple2(
-							$author$project$Main$Front(recipes),
+							$author$project$Main$Front(c.recipes),
 							$elm$core$Platform$Cmd$none);
 					default:
 						return noChange;
@@ -6624,8 +6550,8 @@ var $author$project$Main$update = F2(
 								A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing)),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeView':
-						var _v6 = model.a;
-						var recipes = _v6.a;
+						var _v5 = model.a;
+						var recipes = _v5.a;
 						return _Utils_Tuple2(
 							$author$project$Main$RecipeAlbum(
 								A2(
@@ -6634,14 +6560,13 @@ var $author$project$Main$update = F2(
 									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					case 'RecipeCreate':
-						var _v7 = model.a;
-						var recipes = _v7.a;
+						var c = model.a;
 						return _Utils_Tuple2(
 							$author$project$Main$RecipeAlbum(
 								A2(
 									$author$project$Page$Recipe$Album$update,
 									$author$project$Page$Recipe$Album$NoOp,
-									A2($author$project$Page$Recipe$Album$Album, recipes, $elm$core$Maybe$Nothing))),
+									A2($author$project$Page$Recipe$Album$Album, c.recipes, $elm$core$Maybe$Nothing))),
 							$elm$core$Platform$Cmd$none);
 					default:
 						return noChange;
@@ -6649,8 +6574,8 @@ var $author$project$Main$update = F2(
 			case 'AlbumMsg':
 				var albumMsg = msg.a;
 				if (model.$ === 'RecipeAlbum') {
-					var _v9 = model.a;
-					var recipes = _v9.a;
+					var _v7 = model.a;
+					var recipes = _v7.a;
 					if (albumMsg.$ === 'Out') {
 						var outMsg = albumMsg.a;
 						if (outMsg.$ === 'GoRecipeCreator') {
@@ -6682,27 +6607,19 @@ var $author$project$Main$update = F2(
 			case 'CreateMsg':
 				var createMsg = msg.a;
 				if (model.$ === 'RecipeCreate') {
-					var _v14 = model.a;
-					var recipes = _v14.a;
-					var draft = _v14.b;
-					var maybeIngredient = _v14.c;
-					var maybeStep = _v14.d;
-					var modal = _v14.e;
+					var c = model.a;
 					if (createMsg.$ === 'Out') {
 						var outMsg = createMsg.a;
 						var recipe = outMsg.a;
 						return _Utils_Tuple2(
 							$author$project$Main$RecipeAlbum(
 								$author$project$Page$Recipe$Album$init(
-									A2($elm$core$List$cons, recipe, recipes))),
+									A2($elm$core$List$cons, recipe, c.recipes))),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
 							$author$project$Main$RecipeCreate(
-								A2(
-									$author$project$Page$Recipe$Create$update,
-									createMsg,
-									A5($author$project$Page$Recipe$Create$Create, recipes, draft, maybeIngredient, maybeStep, modal)).a),
+								A2($author$project$Page$Recipe$Create$update, createMsg, c).a),
 							$elm$core$Platform$Cmd$none);
 					}
 				} else {
@@ -6711,14 +6628,14 @@ var $author$project$Main$update = F2(
 			case 'ViewMsg':
 				var viewMsg = msg.a;
 				if (model.$ === 'RecipeView') {
-					var _v18 = model.a;
-					var recipes = _v18.a;
-					var recipe = _v18.b;
-					var maybeIngredient = _v18.c;
-					var stepIndex = _v18.d;
-					var maybeAmount = _v18.e;
-					var ratio = _v18.f;
-					var tab = _v18.g;
+					var _v15 = model.a;
+					var recipes = _v15.a;
+					var recipe = _v15.b;
+					var maybeIngredient = _v15.c;
+					var stepIndex = _v15.d;
+					var maybeAmount = _v15.e;
+					var ratio = _v15.f;
+					var tab = _v15.g;
 					var m = A7($author$project$Page$Recipe$View$View, recipes, recipe, maybeIngredient, stepIndex, maybeAmount, ratio, tab);
 					switch (viewMsg.$) {
 						case 'SelectIngredient':
@@ -6734,7 +6651,7 @@ var $author$project$Main$update = F2(
 							var outMsg = viewMsg.a;
 							return _Utils_Tuple2(
 								$author$project$Main$RecipeCreate(
-									A5($author$project$Page$Recipe$Create$Create, _List_Nil, recipe, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing)),
+									A2($author$project$Page$Recipe$Create$initWithRecipe, recipe, recipes)),
 								$elm$core$Platform$Cmd$none);
 						default:
 							return _Utils_Tuple2(
@@ -7916,7 +7833,7 @@ var $author$project$Page$Recipe$Create$ingredientsAddedView = function (ingredie
 											$elm$html$Html$Attributes$title('Remove ingredient'),
 											$elm$html$Html$Events$onClick(
 											$author$project$Page$Recipe$Create$OpenConfirmModal(
-												$author$project$Page$Recipe$Create$RemoveIngredient(ing.id)))
+												$author$project$Page$Recipe$Create$RemoveIngredient(ing)))
 										]),
 									_List_fromArray(
 										[
@@ -8222,25 +8139,41 @@ var $author$project$Page$Recipe$Create$recipeCreatorView = F3(
 				]));
 	});
 var $author$project$Page$Recipe$Create$view = function (model) {
-	var recipeDraft = model.b;
-	var maybeIngredientDraft = model.c;
-	var maybeStepDraft = model.d;
-	var modal = model.e;
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				A3($author$project$Page$Recipe$Create$recipeCreatorView, recipeDraft, maybeIngredientDraft, maybeStepDraft),
+				A3(
+				$author$project$Page$Recipe$Create$recipeCreatorView,
+				model.draft,
+				function () {
+					var _v0 = model.edit;
+					if (_v0.$ === 'Ingredient') {
+						var i = _v0.a;
+						return $elm$core$Maybe$Just(i);
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}(),
+				function () {
+					var _v1 = model.edit;
+					if (_v1.$ === 'PrepStep') {
+						var i = _v1.a;
+						return $elm$core$Maybe$Just(i);
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				}()),
 				A2(
 				$elm$core$Maybe$withDefault,
 				$elm$html$Html$text(''),
 				A2(
 					$elm$core$Maybe$map,
-					function (_v1) {
+					function (_v2) {
 						return $author$project$Page$Recipe$Create$modalView;
 					},
-					modal))
+					model.modal))
 			]));
 };
 var $author$project$Domain$ActionButton$Nex = F2(
